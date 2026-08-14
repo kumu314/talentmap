@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>天赋星图 · 我的星图数据</title>
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="icon" href="logo-mark.svg" type="image/svg+xml">
+  <meta name="description" content="天赋星图 · 集中查看、导出、管理你在本站生成的所有本地数据（测评结果、日记、反馈、统计）。">
+<meta property="og:type" content="website">
+<meta property="og:title" content="天赋星图 · 我的星图数据">
+<meta property="og:description" content="集中查看、导出、管理你在本站生成的所有本地数据。">
+<meta property="og:image" content="https://46461dec3937411d970e0881cbfa0056.app.codebuddy.work/og-cover.png">
+<style>
+  :root{
+    --bg:#060912;--ink:#eef2ff;--ink-soft:#9aa6cf;--ink-faint:#7f8bb3;
+    --gold:#f3c14b;--gold-soft:#ffe1a0;--sky:#6ea0ff;--violet:#a98bff;--mint:#54d8c4;
+    --line:rgba(255,255,255,.08);--line-2:rgba(255,255,255,.16);--radius:20px;
+    --maxw:820px;--serif:"Songti SC","STSong","Noto Serif SC",Georgia,serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{font-family:"PingFang SC","Microsoft YaHei","Hiragino Sans GB",system-ui,sans-serif;
+    color:var(--ink);background:var(--bg);line-height:1.75;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+  /* ===== 深空背景（与全站一致） ===== */
+  .sky-bg{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none;
+    background:linear-gradient(180deg,#05070f 0%, #070b1c 50%, #060912 100%)}
+  .nebula{position:absolute;inset:-12% 0;z-index:0}
+  .neb-blob{position:absolute;border-radius:50%;filter:blur(70px);will-change:opacity}
+  .neb-b1{width:62vw;height:62vw;left:-12vw;top:-12vh;background:radial-gradient(circle,rgba(110,160,255,.5),transparent 65%)}
+  .neb-b2{width:56vw;height:56vw;right:-14vw;top:34vh;background:radial-gradient(circle,rgba(169,139,255,.45),transparent 65%)}
+  .neb-b3{width:52vw;height:52vw;left:18vw;bottom:-18vh;background:radial-gradient(circle,rgba(243,193,75,.35),transparent 65%)}
+  .star-layer{position:absolute;left:0;top:0;width:100%;height:320vh;will-change:transform}
+  .star{position:absolute;width:2px;height:2px;border-radius:50%;background:#fff}
+  .star.bright{width:3px;height:3px;box-shadow:0 0 6px rgba(255,255,255,.85)}
+  .star.gold{background:#ffe1a0;box-shadow:0 0 6px rgba(243,193,75,.8)}
+  .star.blue{background:#cfe0ff;box-shadow:0 0 6px rgba(110,160,255,.8)}
+  @keyframes starTw{0%,100%{opacity:.45}50%{opacity:1}}
+  .constel-layer{position:fixed;top:0;left:0;width:100%;height:320vh;z-index:2;pointer-events:none;will-change:transform}
+  .constel{position:absolute;width:150px;height:150px;pointer-events:auto;cursor:pointer}
+  .constel svg{width:100%;height:100%;overflow:visible;display:block;transform-box:fill-box;transform-origin:center}
+  .constel .c-line{stroke:rgba(243,193,75,.32);stroke-width:1;fill:none;stroke-dasharray:2 5;transition:stroke .4s}
+  .constel .c-dot{fill:#fff;transform-box:fill-box;transform-origin:center;transition:transform .25s,fill .25s}
+  .constel .c-halo{fill:none;stroke:rgba(243,193,75,0);stroke-width:1.6;transition:stroke .4s}
+  .constel:hover .c-dot{transform:scale(1.7);fill:var(--gold-soft)}
+  .constel:hover .c-line{stroke:rgba(243,193,75,.7)}
+  .constel:hover .c-halo{stroke:rgba(243,193,75,.55)}
+  .constel.pulse{animation:cPulse 1.6s cubic-bezier(.2,.8,.2,1)}
+  .constel.pulse .c-halo{stroke:rgba(243,193,75,.9);animation:halo 1.6s ease-out}
+  @keyframes cPulse{0%{transform:scale(1) rotate(0)}30%{transform:scale(1.18) rotate(-2deg)}55%{transform:scale(.95) rotate(1.8deg)}80%{transform:scale(1.07) rotate(-1deg)}100%{transform:scale(1) rotate(0)}}
+  @keyframes halo{0%{stroke-opacity:.9;transform:scale(.6)}100%{stroke-opacity:0;transform:scale(1.9)}}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 22px;position:relative;z-index:1}
+
+  header.nav{position:fixed;top:0;left:0;right:0;z-index:50;background:rgba(6,9,18,.72);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+  .nav-inner{display:flex;align-items:center;justify-content:space-between;height:60px}
+  .brand{display:flex;align-items:center;gap:9px;font-weight:700;font-size:15px;color:inherit;text-decoration:none}
+  .brand .dot{width:12px;height:12px;border-radius:50%;background:radial-gradient(circle at 30% 30%,#fff,var(--gold) 60%,#a87f24);box-shadow:0 0 12px var(--gold)}
+  .nav-links{display:flex;gap:22px;font-size:14px}
+  .nav-links a{color:var(--ink-soft);text-decoration:none;transition:.2s}
+  .nav-links a:hover{color:var(--ink)}
+  .nav-links a.active{color:var(--gold-soft,#f3c14b)}
+  .brand-mark{width:18px;height:18px;flex:0 0 auto;border-radius:50%;object-fit:contain;filter:drop-shadow(0 0 6px rgba(243,193,75,.55))}
+  @media(max-width:720px){
+    .nav-links{display:flex !important;gap:11px;font-size:12.5px;flex:1;min-width:0;overflow-x:auto;margin:0 8px}
+    .nav-links a{white-space:nowrap}
+    .nav .btn{padding:7px 12px;font-size:13px}
+    .neb-blob{filter:blur(40px)}
+  }
+
+  .me{padding:108px 0 80px;min-height:100vh}
+  .me-hero{text-align:center;margin-bottom:30px}
+  .me-hero .m-no{font-family:var(--serif);font-style:italic;font-size:15px;color:var(--gold-soft);letter-spacing:2px;margin-bottom:12px}
+  .me-hero h1{font-size:clamp(26px,3.4vw,40px);font-weight:800;line-height:1.3}
+  .me-hero h1 .hl{font-family:var(--serif);font-style:italic;font-weight:600;
+    background:linear-gradient(120deg,var(--gold-soft),var(--gold) 55%,var(--mint));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .me-hero p{color:var(--ink-soft);margin-top:14px;font-size:15px;max-width:560px;margin-left:auto;margin-right:auto}
+
+  .me-tools{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-bottom:30px}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:11px 22px;border-radius:999px;
+    font-size:14px;font-weight:600;border:1px solid transparent;cursor:pointer;transition:.2s;font-family:inherit;text-decoration:none}
+  .btn-primary{color:#1c1404;background:linear-gradient(135deg,var(--gold-soft),var(--gold));box-shadow:0 8px 30px rgba(243,193,75,.26)}
+  .btn-primary:hover{transform:translateY(-2px);box-shadow:0 12px 38px rgba(243,193,75,.4)}
+  .btn-ghost{color:var(--ink);border-color:var(--line-2);background:rgba(255,255,255,.04)}
+  .btn-ghost:hover{border-color:var(--gold);color:var(--gold-soft)}
+  .btn-danger{color:#ffb4b4;border-color:rgba(255,138,138,.45);background:rgba(255,138,138,.08)}
+  .btn-danger:hover{border-color:#ff8a8a;background:rgba(255,138,138,.16)}
+
+  .grp{border:1px solid var(--line);border-radius:var(--radius);padding:22px 24px;margin-bottom:18px;
+    background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.015))}
+  .grp h3{font-size:17px;font-weight:800;margin-bottom:4px;display:flex;align-items:center;gap:9px}
+  .grp h3 .gnum{font-family:var(--serif);font-style:italic;color:var(--gold-soft);font-size:20px}
+  .grp .gsub{font-size:13px;color:var(--ink-faint);margin-bottom:16px}
+
+  .ditem{display:flex;align-items:center;gap:14px;padding:13px 14px;border:1px solid var(--line);border-radius:14px;
+    background:rgba(255,255,255,.025);margin-bottom:10px}
+  .ditem:last-child{margin-bottom:0}
+  .ditem .di-main{flex:1;min-width:0}
+  .ditem .di-key{font-size:13px;color:var(--gold-soft);font-weight:600;letter-spacing:.3px}
+  .ditem .di-desc{font-size:13px;color:var(--ink-soft);margin-top:3px;line-height:1.5}
+  .ditem .di-meta{font-size:12px;color:var(--ink-faint);margin-top:3px}
+  .ditem .di-acts{display:flex;gap:8px;flex:0 0 auto}
+  .mini-btn{font-size:12.5px;padding:7px 13px;border-radius:999px;border:1px solid var(--line-2);background:rgba(255,255,255,.04);
+    color:var(--ink-soft);cursor:pointer;font-family:inherit;transition:.18s;white-space:nowrap}
+  .mini-btn:hover{border-color:var(--gold);color:var(--gold-soft)}
+  .mini-btn.del:hover{border-color:#ff8a8a;color:#ffb4b4;background:rgba(255,138,138,.1)}
+
+  .empty-grp{text-align:center;font-size:14px;color:var(--ink-faint);padding:18px;font-style:italic}
+
+  .me-note{font-size:13px;color:var(--ink-faint);line-height:1.7;text-align:center;max-width:600px;margin:26px auto 0}
+  .me-note b{color:var(--gold-soft)}
+
+  footer.foot{border-top:1px solid var(--line);margin-top:46px;padding:26px 0 8px;text-align:center;font-size:13px;color:var(--ink-faint)}
+  footer.foot a{color:var(--ink-soft);text-decoration:none;margin:0 9px}
+  footer.foot a:hover{color:var(--gold-soft)}
+
+  .reveal{opacity:0;transform:translateY(18px);transition:.7s ease}
+  .reveal.in{opacity:1;transform:none}
+
+  .toast{position:fixed;left:50%;bottom:32px;transform:translateX(-50%) translateY(20px);z-index:80;
+    background:rgba(20,26,48,.96);border:1px solid var(--line-2);color:var(--ink);padding:12px 22px;border-radius:999px;
+    font-size:14px;opacity:0;transition:.35s;pointer-events:none}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}
+  .layerFar,.layerMid,.layerNear,.constel-layer{transform:none!important}
+}
+</style>
+  <script src="track.js"></script>
+  <script src="https://beacon.cdn.qq.com/sdk/4.5.9/beacon_web.min.js" async></script>
+<script>
+(function(){
+  try{
+    window.addEventListener('load',function(){
+      if(!window.BeaconAction) return;
+      var beacon=new BeaconAction({appkey:'0WEB06U85YBSLJNL',versionCode:'1.0.0',channelID:'share',
+        delay:1000,sessionDuration:30*60*1000,isOversea:false,needReportRqdEvent:false});
+      beacon.onDirectUserAction('preview_page_view',{'url':location.href,'referrer':document.referrer,'title':document.title,'sandbox_id':'46461dec3937411d970e0881cbfa0056'});
+    });
+  }catch(e){}
+})();
+</script></head>
+<body>
+  <div class="sky-bg" aria-hidden="true">
+    <div class="nebula">
+      <div class="neb-blob neb-b1"></div><div class="neb-blob neb-b2"></div><div class="neb-blob neb-b3"></div>
+    </div>
+    <div class="star-layer" id="layerFar" data-speed="0.12"></div>
+    <div class="star-layer" id="layerMid" data-speed="0.30"></div>
+  </div>
+  <div class="constel-layer" id="layerNear" data-speed="0.50" aria-hidden="true"></div>
+
+  <header class="nav">
+    <div class="wrap nav-inner">
+      <a class="brand" href="index.html"><img class="brand-mark" src="logo-mark.svg" alt="天赋星图" width="18" height="18">天赋星图</a>
+    <nav class="nav-links">
+      <a href="index.html">首页</a>
+      <a href="quiz.html">测评</a>
+      <a href="report.html">报告</a>
+      <a href="action.html">行动</a>
+      <a href="stories.html">案例</a>
+      <a href="companion.html">伙伴</a>
+      <a href="me.html" class="active">我的星图</a>
+<a href="pricing.html">价格</a>
+<a href="blog.html">博客</a>
+<a href="about.html">关于</a>
+<a href="faq.html">FAQ</a>
+<a href="contact.html">联系</a>
+    </nav>
+    <a href="quiz.html" class="btn btn-primary">绘制我的星图</a>
+    </div>
+  </header>
+
+  <div class="wrap">
+    <section class="me">
+      <div class="me-hero reveal">
+        <div class="m-no">你的数据，都在你手里</div>
+        <h1>我的<span class="hl">星图</span>数据</h1>
+        <p>这里汇总你在本站生成的所有本地数据。它只存在你这台设备，随时可导出带走、可单项删除、可一键清空。</p>
+      </div>
+
+      <div class="me-tools reveal">
+        <button class="btn btn-primary" id="exportAll">导出全部数据</button>
+        <button class="btn btn-ghost" id="refreshBtn">刷新</button>
+        <button class="btn btn-danger" id="clearAll">清空全部</button>
+      </div>
+
+      <div id="groups"></div>
+
+      <p class="me-note reveal">所有数据都保存在你浏览器的 <b>localStorage</b> 里，不经过任何服务器。换设备 / 清缓存会丢失，重要内容请先用上方「导出全部数据」存一份备份。</p>
+    </section>
+  </div>
+
+  <footer class="foot">
+    <a href="index.html">首页</a>·<a href="quiz.html">测评</a>·<a href="report.html">报告</a>·<a href="action.html">行动</a>·<a href="stories.html">案例</a>·<a href="companion.html">伙伴</a>·        <a href="me.html">我的星图</a>·<a href="pricing.html">价格</a>·<a href="blog.html">博客</a>·<a href="about.html">关于</a>·<a href="faq.html">FAQ</a>·<a href="contact.html">联系</a>
+    <div style="margin-top:10px">天赋星图 · 在共产主义尚未到来的时期，把生命力放大到它应该在的水平</div>
+  </footer>
+  <div class="toast" id="toast"></div>
+
+<script>
+const GROUPS=[
+  {id:'core',name:'天赋星图 · 核心',sub:'你的测评成果，决定报告、分享图、行动页的线索',keys:[
+    {k:'talentmap_result',name:'完整测评结果',desc:'三关自测生成的星图数据，报告页与分享图都读它',link:'report.html'},
+    {k:'talentmap_history',name:'多次测评对比记录',desc:'每次重测的快照，用于「你的星图在长」横向对比',link:'report.html'},
+    {k:'talentmap_quiz_progress',name:'测评断点续测进度',desc:'中途退出时暂存，下次接着测',link:'quiz.html'}
+  ]},
+  {id:'action',name:'行动 · 日记与实验',sub:'21 天心流日记与 7 天微实验',keys:[
+    {k:'talentmap_diary',name:'21 天心流日记',desc:'你记录的「忘记时间」瞬间',link:'action.html'},
+    {k:'talentmap_exp',name:'7 天微实验进度',desc:'基于你星图定制的行动勾选',link:'action.html'}
+  ]},
+  {id:'social',name:'社交 · 反馈与投稿',sub:'星图伙伴与案例墙里你留下的内容',keys:[
+    {k:'talentmap_feedback',name:'星图伙伴反馈',desc:'你对伙伴的反馈记录',link:'companion.html'},
+    {k:'talentmap_stories',name:'我的案例投稿',desc:'在案例墙提交的自己的故事',link:'stories.html'},
+    {k:'talentmap_mirror',name:'他人镜子（三个词）',desc:'朋友/你自己写的「你像在发光时」三个词',link:'report.html'}
+  ]},
+  {id:'stat',name:'统计 · 本地归因',sub:'视频来源 UTM 计数（单人本地视角，非全网汇总）',keys:[
+    {k:'__utm__',name:'UTM 来源计数',desc:'各视频渠道带来的访问/转化计数',dynamic:true}
+  ]}
+];
+
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1800);}
+function esc(s){return String(s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));}
+function sizeHuman(n){if(n<1024)return n+' B';if(n<1024*1024)return (n/1024).toFixed(1)+' KB';return (n/1024/1024).toFixed(2)+' MB';}
+function safeGet(k){try{const v=localStorage.getItem(k);return v==null?null:v;}catch(e){return null;}}
+
+function collectAll(){
+  const out={type:'talentmap_all',ts:Date.now(),data:{}};
+  for(let i=0;i<localStorage.length;i++){
+    const k=localStorage.key(i);
+    if(k&&k.indexOf('talentmap_')===0){ try{out.data[k]=JSON.parse(localStorage.getItem(k));}catch(e){out.data[k]=localStorage.getItem(k);} }
+  }
+  // 单独收 UTM 计数
+  const utm={};
+  for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.indexOf('talentmap_utm_')===0)utm[k]=localStorage.getItem(k);}
+  if(Object.keys(utm).length) out.data['__utm__']=utm;
+  return out;
+}
+
+function render(){
+  const root=document.getElementById('groups');
+  let html='';
+  GROUPS.forEach((g,gi)=>{
+    let items='';
+    if(g.id==='stat'){
+      const utm={};
+      for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.indexOf('talentmap_utm_')===0)utm[k.replace('talentmap_utm_','')]=localStorage.getItem(k);}
+      const ks=Object.keys(utm);
+      if(!ks.length){ items='<div class="empty-grp">还没有来源计数。从带 ?from= 的视频链接进入后会产生。</div>'; }
+      else{
+        ks.forEach(k=>{ items+=`<div class="ditem"><div class="di-main"><div class="di-key">${esc(k)}</div><div class="di-desc">访问/转化计数</div><div class="di-meta">${esc(utm[k])} 次</div></div><div class="di-acts"><button class="mini-btn del" data-del="talentmap_utm_${esc(k)}">删除</button></div></div>`; });
+      }
+    } else {
+      let any=false;
+      g.keys.forEach(meta=>{
+        const raw=safeGet(meta.k);
+        if(raw==null) return;
+        any=true;
+        let size=raw.length;
+        let desc=meta.desc;
+        // 对已知结构补一句概要
+        try{
+          const obj=JSON.parse(raw);
+          if(meta.k==='talentmap_result'&&obj.riaTop){ desc+='（兴趣 '+(obj.riaTop.map(r=>r.label).join('/')||'—')+'）'; }
+          if(meta.k==='talentmap_diary'&&Array.isArray(obj)){ desc+='（'+(obj.length)+' 条记录）'; }
+          if(meta.k==='talentmap_history'&&Array.isArray(obj)){ desc+='（'+(obj.length)+' 张星图）'; }
+        }catch(e){}
+        items+=`<div class="ditem">
+          <div class="di-main">
+            <div class="di-key">${esc(meta.name)}</div>
+            <div class="di-desc">${esc(desc)}</div>
+            <div class="di-meta">${sizeHuman(size)}</div>
+          </div>
+          <div class="di-acts">
+            ${meta.link?`<a class="mini-btn" href="${meta.link}">查看</a>`:''}
+            <button class="mini-btn" data-export="${esc(meta.k)}">导出</button>
+            <button class="mini-btn del" data-del="${esc(meta.k)}">删除</button>
+          </div>
+        </div>`;
+      });
+      if(!any) items='<div class="empty-grp">还没有数据。先去完成一次测评，这里才会亮起来。</div>';
+    }
+    html+=`<div class="grp reveal" style="transition-delay:${gi*60}ms">
+      <h3><span class="gnum">${gi+1}</span>${esc(g.name)}</h3>
+      <div class="gsub">${esc(g.sub)}</div>
+      ${items}
+    </div>`;
+  });
+  root.innerHTML=html;
+
+  root.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{
+    const k=b.dataset.del;
+    if(confirm('确定删除「'+k+'」吗？\n\n此操作不可撤销，删除后无法恢复（除非你有备份）。')){
+      try{localStorage.removeItem(k);}catch(e){}
+      toast('已删除 '+k); render();
+    }
+  });
+  root.querySelectorAll('[data-export]').forEach(b=>b.onclick=()=>{
+    const k=b.dataset.export; const raw=safeGet(k); if(raw==null)return;
+    let obj; try{obj=JSON.parse(raw);}catch(e){obj=raw;}
+    download({type:'talentmap_item',key:k,data:obj,ts:Date.now()}, '天赋星图-'+k+'.json');
+    toast('已导出 '+k);
+  });
+}
+
+function download(obj,filename){
+  const blob=new Blob([JSON.stringify(obj,null,2)],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');a.href=url;a.download=filename;
+  document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);
+}
+
+document.getElementById('exportAll').onclick=()=>{
+  const all=collectAll();
+  if(!Object.keys(all.data).length){toast('当前没有任何数据可导出');return;}
+  download(all,'天赋星图-全部数据备份.json');
+  toast('已导出全部数据 ✓');
+};
+document.getElementById('refreshBtn').onclick=()=>render();
+document.getElementById('clearAll').onclick=()=>{
+  const all=collectAll();
+  const n=Object.keys(all.data).length;
+  if(!n){toast('当前没有任何数据');return;}
+  if(confirm('确定清空全部本地数据吗？\n\n共 '+n+' 项，包括测评结果、日记、反馈、统计。此操作不可撤销。\n建议先点「导出全部数据」存一份备份。')){
+    Object.keys(all.data).forEach(k=>{ if(k!=='__utm__'){try{localStorage.removeItem(k);}catch(e){}} });
+    if(all.data.__utm__){ Object.keys(all.data.__utm__).forEach(k=>{try{localStorage.removeItem('talentmap_utm_'+k);}catch(e){}}); }
+    toast('已清空全部本地数据'); render();
+  }
+};
+
+render();
+
+// 进入视口淡入
+const io=new IntersectionObserver((es)=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}}),{threshold:.1});
+document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+</script>
+  <script>
+  /* ===== 深空背景：视差星海 + 真实星座（与首页一致） ===== */
+  (function(){
+    var layers=[].slice.call(document.querySelectorAll('[data-speed]'));
+    function onScroll(){
+      layers.forEach(function(l){var s=parseFloat(l.dataset.speed);l.style.transform='translate3d(0,'+(-window.scrollY*s).toFixed(1)+'px,0)';});
+    }
+    onScroll();window.addEventListener('scroll',onScroll,{passive:true});window.addEventListener('resize',onScroll,{passive:true});
+    var SVGNS='http://www.w3.org/2000/svg';
+    function seedStars(layer,count,extra){
+      if(!layer)return;var frag=document.createDocumentFragment();
+      for(var i=0;i<count;i++){var s=document.createElement('i');s.className='star';
+        if(extra&&Math.random()<0.22)s.classList.add(extra[Math.floor(Math.random()*extra.length)]);
+        s.style.left=(Math.random()*100).toFixed(2)+'%';s.style.top=(Math.random()*100).toFixed(2)+'%';
+        s.style.transform='scale('+(0.6+Math.random()*0.9).toFixed(2)+')';
+        if(Math.random()<0.4)s.style.animation='starTw '+(3+Math.random()*4).toFixed(1)+'s ease-in-out infinite';
+        frag.appendChild(s);}
+      layer.appendChild(frag);
+    }
+    const isMobile=window.innerWidth<720;
+    seedStars(document.getElementById('layerFar'),isMobile?70:130,['blue']);
+    seedStars(document.getElementById('layerMid'),isMobile?34:64,['gold','bright']);
+    var CONSTELS=[
+      {name:'北斗七星',left:'3%',top:'34%',stars:[[6,12],[6,34],[26,42],[26,20],[46,18],[64,13],[84,7]],edges:[[0,1],[1,2],[2,3],[3,4],[4,5],[5,6]]},
+      {name:'猎户座',left:'80%',top:'50%',stars:[[16,22],[38,18],[24,56],[31,53],[40,50],[40,80],[17,82],[27,7]],edges:[[7,0],[7,1],[0,1],[0,2],[1,4],[2,3],[3,4],[2,6],[4,5],[6,5]]},
+      {name:'仙后座',left:'6%',top:'70%',stars:[[8,72],[30,40],[50,62],[70,34],[92,56]],edges:[[0,1],[1,2],[2,3],[3,4]]},
+      {name:'天鹅座',left:'78%',top:'88%',stars:[[50,10],[50,46],[50,90],[24,46],[76,46]],edges:[[0,1],[1,2],[3,1],[1,4]]}
+    ];
+    function buildConstel(cfg){
+      var wrap=document.createElement('div');wrap.className='constel';
+      wrap.style.left=cfg.left;wrap.style.top=cfg.top;wrap.title=cfg.name+'（点一下，让它亮起来）';
+      var svg=document.createElementNS(SVGNS,'svg');svg.setAttribute('viewBox','0 0 100 100');
+      cfg.edges.forEach(function(e){var p=document.createElementNS(SVGNS,'path');p.setAttribute('class','c-line');p.setAttribute('d','M'+cfg.stars[e[0]][0]+' '+cfg.stars[e[0]][1]+' L'+cfg.stars[e[1]][0]+' '+cfg.stars[e[1]][1]);svg.appendChild(p);});
+      var halo=document.createElementNS(SVGNS,'circle');halo.setAttribute('class','c-halo');halo.setAttribute('cx','50');halo.setAttribute('cy','50');halo.setAttribute('r','44');svg.appendChild(halo);
+      cfg.stars.forEach(function(st){var c=document.createElementNS(SVGNS,'circle');c.setAttribute('class','c-dot');c.setAttribute('cx',st[0]);c.setAttribute('cy',st[1]);c.setAttribute('r','2.4');svg.appendChild(c);});
+      wrap.appendChild(svg);
+      wrap.addEventListener('click',function(){wrap.classList.remove('pulse');void wrap.offsetWidth;wrap.classList.add('pulse');});
+      return wrap;
+    }
+    var near=document.getElementById('layerNear');
+    if(near)CONSTELS.forEach(function(c){near.appendChild(buildConstel(c));});
+    onScroll();
+  })();
+  </script>
+</body>
+</html>

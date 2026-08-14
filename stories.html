@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>天赋星图 · 案例墙 — 被放大生命力的人，会成为后来者的光</title>
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="icon" href="logo-mark.svg" type="image/svg+xml">
+  <meta name="description" content="天赋星图 · 用 RIASEC/VIA/心流/IKIGAI 三层定位 + 一层现实校验，8 分钟画出你的天赋星图，把被压住的生命力放大到它应该在的水平。">
+<meta property="og:type" content="website">
+<meta property="og:title" content="天赋星图 · 你做什么会忘记时间？">
+<meta property="og:description" content="三层定位 + 一层现实校验，8 分钟画出你的天赋星图。">
+<meta property="og:image" content="https://46461dec3937411d970e0881cbfa0056.app.codebuddy.work/og-cover.png">
+<style>
+  :root{
+    --bg:#060912;--bg-1:#0a0f22;--ink:#eef2ff;--ink-soft:#9aa6cf;--ink-faint:#7f8bb3;
+    --gold:#f3c14b;--gold-soft:#ffe1a0;--sky:#6ea0ff;--violet:#a98bff;--mint:#54d8c4;
+    --line:rgba(255,255,255,.08);--line-2:rgba(255,255,255,.16);--radius:20px;
+    --maxw:860px;--serif:"Songti SC","STSong","Noto Serif SC",Georgia,serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{font-family:"PingFang SC","Microsoft YaHei","Hiragino Sans GB",system-ui,sans-serif;
+    color:var(--ink);background:var(--bg);line-height:1.75;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+  /* ===== 深空背景：多层视差星海 + 真实星座（与首页一致） ===== */
+  .sky-bg{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none;
+    background:linear-gradient(180deg,#05070f 0%, #070b1c 50%, #060912 100%)}
+  .nebula{position:absolute;inset:-12% 0;z-index:0}
+  .neb-blob{position:absolute;border-radius:50%;filter:blur(70px);will-change:opacity}
+  .neb-b1{width:62vw;height:62vw;left:-12vw;top:-12vh;background:radial-gradient(circle,rgba(110,160,255,.5),transparent 65%)}
+  .neb-b2{width:56vw;height:56vw;right:-14vw;top:34vh;background:radial-gradient(circle,rgba(169,139,255,.45),transparent 65%)}
+  .neb-b3{width:52vw;height:52vw;left:18vw;bottom:-18vh;background:radial-gradient(circle,rgba(243,193,75,.35),transparent 65%)}
+  .star-layer{position:absolute;left:0;top:0;width:100%;height:320vh;will-change:transform}
+  .star{position:absolute;width:2px;height:2px;border-radius:50%;background:#fff}
+  .star.bright{width:3px;height:3px;box-shadow:0 0 6px rgba(255,255,255,.85)}
+  .star.gold{background:#ffe1a0;box-shadow:0 0 6px rgba(243,193,75,.8)}
+  .star.blue{background:#cfe0ff;box-shadow:0 0 6px rgba(110,160,255,.8)}
+  @keyframes starTw{0%,100%{opacity:.45}50%{opacity:1}}
+  .constel-layer{position:fixed;top:0;left:0;width:100%;height:320vh;z-index:2;pointer-events:none;will-change:transform}
+  .constel{position:absolute;width:150px;height:150px;pointer-events:auto;cursor:pointer}
+  .constel svg{width:100%;height:100%;overflow:visible;display:block;transform-box:fill-box;transform-origin:center}
+  .constel .c-line{stroke:rgba(243,193,75,.32);stroke-width:1;fill:none;stroke-dasharray:2 5;transition:stroke .4s}
+  .constel .c-dot{fill:#fff;transform-box:fill-box;transform-origin:center;transition:transform .25s,fill .25s}
+  .constel .c-halo{fill:none;stroke:rgba(243,193,75,0);stroke-width:1.6;transition:stroke .4s}
+  .constel:hover .c-dot{transform:scale(1.7);fill:var(--gold-soft)}
+  .constel:hover .c-line{stroke:rgba(243,193,75,.7)}
+  .constel:hover .c-halo{stroke:rgba(243,193,75,.55)}
+  .constel.pulse{animation:cPulse 1.6s cubic-bezier(.2,.8,.2,1)}
+  .constel.pulse .c-halo{stroke:rgba(243,193,75,.9);animation:halo 1.6s ease-out}
+  @keyframes cPulse{0%{transform:scale(1) rotate(0)}30%{transform:scale(1.18) rotate(-2deg)}55%{transform:scale(.95) rotate(1.8deg)}80%{transform:scale(1.07) rotate(-1deg)}100%{transform:scale(1) rotate(0)}}
+  @keyframes halo{0%{stroke-opacity:.9;transform:scale(.6)}100%{stroke-opacity:0;transform:scale(1.9)}}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 22px;position:relative;z-index:1}
+
+  header.nav{position:fixed;top:0;left:0;right:0;z-index:50;background:rgba(6,9,18,.72);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+  .nav-inner{display:flex;align-items:center;justify-content:space-between;height:60px}
+  .brand{display:flex;align-items:center;gap:9px;font-weight:700;font-size:15px}
+  .brand .dot{width:12px;height:12px;border-radius:50%;background:radial-gradient(circle at 30% 30%,#fff,var(--gold) 60%,#a87f24);box-shadow:0 0 12px var(--gold)}
+  .nav a.back{color:var(--ink-soft);text-decoration:none;font-size:14px}
+  .nav a.back:hover{color:var(--ink)}
+  .nav-links{display:flex;gap:24px;font-size:14px}
+  .nav-links a{color:var(--ink-soft);text-decoration:none;transition:.2s}
+  .nav-links a:hover{color:var(--ink)}
+  .nav-links a.active{color:var(--gold-soft,#f3c14b)}
+  .brand{color:inherit;text-decoration:none}
+  @media(max-width:720px){
+    .nav-links{display:flex !important;gap:14px;font-size:13px;flex:1;min-width:0;overflow-x:auto;margin:0 8px}
+    .nav-links a{white-space:nowrap}
+    .nav .btn{padding:7px 12px;font-size:13px}
+    .neb-blob{filter:blur(40px)}
+  }
+
+  .st{padding:108px 0 80px;min-height:100vh}
+  .s-hero{text-align:center;margin-bottom:14px}
+  .s-hero .s-no{font-family:var(--serif);font-style:italic;font-size:15px;color:var(--gold-soft);letter-spacing:2px;margin-bottom:12px}
+  .s-hero h1{font-size:clamp(26px,3.6vw,40px);font-weight:800;line-height:1.3}
+  .s-hero h1 .hl{font-family:var(--serif);font-style:italic;font-weight:600;
+    background:linear-gradient(120deg,var(--gold-soft),var(--gold) 55%,var(--mint));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .s-hero p{color:var(--ink-soft);margin:14px auto 0;font-size:15px;max-width:560px}
+  .s-note{text-align:center;color:var(--ink-faint);font-size:13px;margin:18px auto 26px;max-width:560px;line-height:1.7}
+
+  .filters{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:26px}
+  .fchip{padding:9px 18px;border-radius:999px;cursor:pointer;font-size:14px;font-weight:600;
+    border:1px solid var(--line-2);background:rgba(255,255,255,.03);color:var(--ink-soft);transition:.18s}
+  .fchip:hover{border-color:var(--gold);color:var(--gold-soft)}
+  .fchip.on{background:linear-gradient(135deg,var(--gold-soft),var(--gold));color:#1c1404;border-color:transparent}
+
+  .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+  .story{border:1px solid var(--line);border-radius:var(--radius);padding:22px 22px;position:relative;overflow:hidden;
+    background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.015));transition:.2s}
+  .story:hover{transform:translateY(-3px);border-color:var(--line-2)}
+  .story::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--c)}
+  .story .smeta{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+  .story .badge{padding:3px 11px;border-radius:999px;font-size:12px;font-weight:600}
+  .story .badge.ria{background:color-mix(in srgb,var(--sky) 16%,transparent);color:var(--sky)}
+  .story .badge.via{background:color-mix(in srgb,var(--violet) 16%,transparent);color:var(--violet)}
+  .story .badge.flow{background:color-mix(in srgb,var(--mint) 16%,transparent);color:var(--mint)}
+  .story .who{font-size:13px;color:var(--ink-faint)}
+  .story h3{font-size:18px;font-weight:800;margin-bottom:10px;line-height:1.5}
+  .story .body{font-size:14.5px;color:var(--ink-soft);line-height:1.7}
+  .story .clue{font-size:12.5px;color:var(--ink-faint);margin-top:14px;padding-top:12px;border-top:1px solid var(--line)}
+  .story .clue b{color:var(--gold-soft)}
+  .story .mine{margin-top:10px;font-size:11.5px;color:var(--mint)}
+  .story .mine::before{content:"★ 我的种子 · "}
+
+  /* 提交卡片（D1） */
+  .card{border:1px solid var(--line-2);border-radius:var(--radius);padding:26px 26px;margin:26px 0;
+    background:linear-gradient(180deg,rgba(12,18,40,.5),rgba(9,14,32,.3))}
+  .card h3{font-size:18px;font-weight:800;margin-bottom:4px}
+  .card .csub{font-size:13px;color:var(--ink-soft);margin-bottom:18px}
+  label.fld{display:block;font-size:13.5px;color:var(--ink-soft);margin:16px 0 8px}
+  textarea,input[type=text]{width:100%;background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:12px;
+    color:var(--ink);font-family:inherit;font-size:15px;padding:12px 14px;line-height:1.6}
+  textarea:focus,input[type=text]:focus{outline:none;border-color:var(--gold)}
+  textarea{min-height:110px;resize:vertical}
+  .layers{display:flex;gap:10px;flex-wrap:wrap}
+  .lchip{flex:1;min-width:110px;text-align:center;padding:12px 10px;border-radius:14px;cursor:pointer;
+    border:1px solid var(--line);background:rgba(255,255,255,.03);transition:.18s;font-size:14px}
+  .lchip .lc{font-size:11px;letter-spacing:.5px;opacity:.8}
+  .lchip .lv{font-size:13px;margin-top:3px;color:var(--ink-soft)}
+  .lchip[data-k=ria]{--c:var(--sky)} .lchip[data-k=via]{--c:var(--violet)} .lchip[data-k=flow]{--c:var(--mint)}
+  .lchip:hover{border-color:var(--c)}
+  .lchip.on{border-color:var(--c);background:color-mix(in srgb,var(--c) 14%,transparent);color:var(--ink);font-weight:600}
+  .form-actions{display:flex;gap:12px;margin-top:22px;flex-wrap:wrap}
+
+
+  .cta{border:1px solid var(--line-2);border-radius:var(--radius);padding:30px 28px;text-align:center;margin-top:30px;
+    background:linear-gradient(180deg,rgba(12,18,40,.5),rgba(9,14,32,.3))}
+  .cta h3{font-size:19px;font-weight:800;margin-bottom:10px}
+  .cta p{color:var(--ink-soft);font-size:14px;margin-bottom:20px;max-width:520px;margin-left:auto;margin-right:auto}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 26px;border-radius:999px;
+    font-size:15px;font-weight:600;border:1px solid transparent;cursor:pointer;transition:.2s;font-family:inherit;text-decoration:none}
+  .btn-primary{color:#1c1404;background:linear-gradient(135deg,var(--gold-soft),var(--gold));box-shadow:0 8px 30px rgba(243,193,75,.26)}
+  .btn-primary:hover{transform:translateY(-2px);box-shadow:0 12px 38px rgba(243,193,75,.4)}
+  .btn-ghost{color:var(--ink);border-color:var(--line-2);background:rgba(255,255,255,.04);padding:11px 20px;font-size:14px}
+  .btn-ghost:hover{border-color:var(--gold);color:var(--gold-soft)}
+
+  footer.foot{border-top:1px solid var(--line);margin-top:40px;padding:26px 0 8px;text-align:center;font-size:13px;color:var(--ink-faint)}
+  footer.foot a{color:var(--ink-soft);text-decoration:none;margin:0 9px}
+  footer.foot a:hover{color:var(--gold-soft)}
+
+  .reveal{opacity:0;transform:translateY(18px);transition:.7s ease}
+  .reveal.in{opacity:1;transform:none}
+  @media(max-width:640px){.grid{grid-template-columns:1fr}.story{padding:20px 18px}}
+
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}
+  .layerFar,.layerMid,.layerNear,.constel-layer{transform:none!important}
+}
+
+  .brand-mark{width:18px;height:18px;flex:0 0 auto;border-radius:50%;object-fit:contain;filter:drop-shadow(0 0 6px rgba(243,193,75,.55))}
+</style>
+  <script src="track.js"></script>
+  <script src="https://beacon.cdn.qq.com/sdk/4.5.9/beacon_web.min.js" async></script>
+<script>
+(function(){
+  try{
+    window.addEventListener('load',function(){
+      if(!window.BeaconAction) return;
+      var beacon=new BeaconAction({
+        appkey:'0WEB06U85YBSLJNL',
+        versionCode:'1.0.0',
+        channelID:'share',
+        delay:1000,
+        sessionDuration:30*60*1000,
+        isOversea:false,
+        needReportRqdEvent:false
+      });
+      beacon.onDirectUserAction('preview_page_view',{
+        'url':location.href,
+        'referrer':document.referrer,
+        'title':document.title,
+        'sandbox_id':'46461dec3937411d970e0881cbfa0056'
+      });
+    });
+  }catch(e){}
+})();
+</script></head>
+<body>
+    <div class="sky-bg" id="skyBg" aria-hidden="true">
+    <div class="nebula" id="nebula">
+      <div class="neb-blob neb-b1" id="nebB1"></div>
+      <div class="neb-blob neb-b2" id="nebB2"></div>
+      <div class="neb-blob neb-b3" id="nebB3"></div>
+    </div>
+    <div class="star-layer" id="layerFar" data-speed="0.12"></div>
+    <div class="star-layer" id="layerMid" data-speed="0.30"></div>
+  </div>
+  <div class="constel-layer" id="layerNear" data-speed="0.50" aria-hidden="true"></div>
+  <header class="nav">
+    <div class="wrap nav-inner">
+      <a class="brand" href="index.html"><img class="brand-mark" src="logo-mark.svg" alt="天赋星图" width="18" height="18">天赋星图</a>
+    <nav class="nav-links">
+      <a href="index.html">首页</a>
+      <a href="quiz.html">测评</a>
+      <a href="report.html">报告</a>
+      <a href="action.html">行动</a>
+      <a href="stories.html" class="active">案例</a>
+        <a href="companion.html">伙伴</a>
+        <a href="me.html">我的星图</a>
+<a href="pricing.html">价格</a>
+<a href="blog.html">博客</a>
+<a href="about.html">关于</a>
+<a href="faq.html">FAQ</a>
+<a href="contact.html">联系</a>
+      </nav>
+    <a href="quiz.html" class="btn btn-primary">绘制我的星图</a>
+    </div>
+  </header>
+
+  <div class="wrap">
+    <section class="st">
+      <div class="s-hero reveal">
+        <div class="s-no">案例墙 · L1</div>
+        <h1>被放大生命力的人<br/>会成为<span class="hl">后来者的光</span></h1>
+        <p>这里收的不是一个個「我成功了」的勋章，而是「我怎么一点点靠近自己」的过程。</p>
+      </div>
+      <div class="s-note reveal">
+        故事均为化名与脱敏记录。我们更想听你<b style="color:var(--ink-soft)">卡住、绕路、又回来了</b>的那段，
+        而不是最终多漂亮。因为每个还在迷茫的人，需要的是同路人的脚印，不是山顶的旗。
+      </div>
+
+      <div class="filters reveal" id="filters">
+        <div class="fchip on" data-f="all">全部</div>
+        <div class="fchip" data-f="ria">兴趣</div>
+        <div class="fchip" data-f="via">优势</div>
+        <div class="fchip" data-f="flow">心流</div>
+      </div>
+
+      <div class="grid" id="grid"></div>
+
+      <div class="card reveal" id="submitCard">
+        <h3>留下你的故事种子</h3>
+        <div class="csub">不必「成功」。写一段你<b style="color:var(--ink-soft)">卡住、绕路、又靠近自己</b>的过程——它会先存在你这台设备里，等投稿通道开放时，可以一键带上。匿名也行。</div>
+        <label class="fld">它属于哪一层？</label>
+        <div class="layers" id="subLayers">
+          <div class="lchip" data-k="ria"><div class="lc">兴趣</div><div class="lv">你被什么吸走</div></div>
+          <div class="lchip" data-k="via"><div class="lc">优势</div><div class="lv">你身上什么在漏光</div></div>
+          <div class="lchip" data-k="flow"><div class="lc">心流</div><div class="lv">你什么时候消失过</div></div>
+        </div>
+        <label class="fld">怎么称呼你（可化名）</label>
+        <input type="text" id="subWho" placeholder="例如：小路 · 24 岁 · 转行中" />
+        <label class="fld">一句话标题</label>
+        <input type="text" id="subTitle" placeholder="例如：从「我什么都不会」到做了一份人和人的工作" />
+        <label class="fld">你的故事</label>
+        <textarea id="subBody" placeholder="写那段你慢慢靠近自己的过程，越具体越好。"></textarea>
+        <label class="fld">星图线索（选填，会显示在卡片底部）</label>
+        <input type="text" id="subClue" placeholder="例如：兴趣 · 社会型亮起 → 找到助人但不被聚焦的姿势" />
+        <div class="form-actions">
+          <button class="btn btn-primary" id="subBtn">保存我的故事种子</button>
+          <button class="btn btn-ghost" type="button" id="subExport">导出我的草稿</button>
+        </div>
+        <div class="s-note" style="margin-top:14px">本地保存，仅存于你当前设备；清空浏览器数据会丢失。投稿通道开放后这里会提示如何提交。</div>
+      </div>
+
+      <div class="cta reveal">
+        <h3>想成为下一个故事？</h3>
+        <p>不用先「成功」。先去记 21 天心流日记——那些让你忘记时间的瞬间，本身就是故事的种子。投稿通道正在筹备，会以「过程」为优先收录。</p>
+        <a class="btn btn-primary" href="action.html">去记我的 21 天 →</a>
+      </div>
+
+      <footer class="foot">
+        <a href="index.html">首页</a>·<a href="quiz.html">测评</a>·<a href="report.html">报告</a>·<a href="action.html">行动</a>·<a href="stories.html">案例</a>·<a href="companion.html">伙伴</a>·<a href="me.html">我的星图</a>·<a href="pricing.html">价格</a>·<a href="blog.html">博客</a>·<a href="about.html">关于</a>·<a href="faq.html">FAQ</a>·<a href="contact.html">联系</a>
+        <div style="margin-top:10px">天赋星图 · 在共产主义尚未到来的时期，把生命力放大到它应该在的水平</div>
+      </footer>
+    </section>
+  </div>
+
+<script>
+/* ===== 种子故事（L1 静态墙，手工收录；后续可接投稿表单） =====
+   想新增：在 STORIES 数组里加一项即可。layer: ria/via/flow；clue 为星图线索摘要。 */
+const STORIES = [
+  {layer:'ria', who:'阿野 · 22 岁 · 大三', title:'从「我是不是该考研」到重拾手里的螺丝刀',
+   body:'大三被家里推着考研，自己却每天都在 B 站看人家修老相机。测完星图，兴趣层亮的是「现实型」——我不是不爱学，是手得动起来才踏实。后来接了学校的设备维修值班，半年修了三十多台机器，手一忙脑子就安静了。考研没去，但没慌。',
+   clue:'兴趣 · <b>现实型</b>亮起 → 把「动手」从爱好升级成被需要的角色'},
+  {layer:'via', who:'小满 · 27 岁 · 职场两年', title:'原来「太较真」是我最值钱的东西',
+   body:'一直被人说太较真、想太多。星图里优势层最亮的是「洞察力」和「诚实」。有次项目出了烂账，只有我追着把根因写清楚，反而被组长记住。现在我开始把「看穿问题」当成正经能力练，不再当成性格缺点藏着。',
+   clue:'优势 · <b>洞察力 / 诚实</b> → 把被嫌弃的特质，重新认领为武器'},
+  {layer:'flow', who:'陈默 · 25 岁 · 待业中', title:'我发现自己「消失」的地方，是深夜写东西',
+   body:'待业那阵很丧。星图心流层亮的是「自我消失」和「自成目标」。我试着每天半夜写 20 分钟，不为发、不为谁看。三个月后回看，竟攒了四万字。不是写出了名，是终于有件「做完不累、反而满电」的事垫着，人没塌。',
+   clue:'心流 · <b>自我消失 / 自成目标</b> → 在最低谷，靠一件「隐形」的事续命'},
+  {layer:'ria', who:'阿桥 · 24 岁 · 转行中', title:'从「我什么都不会」到做了一份「人和人」的工作',
+   body:'毕业觉得自己啥也不是。星图社会型很亮，但我一直怕社交。后来去做社区活动助理，发现我怕的是「被看着」，不烦「帮人把事办成」。现在每周组织一次小活动，不露脸、只兜底，意外地稳。',
+   clue:'兴趣 · <b>社会型</b> → 找到「助人但不被聚焦」的姿势，焦虑就降了'},
+  {layer:'flow', who:'林洲 · 29 岁 · 设计师', title:'把「忘记时间」的那块，搬进了工作日',
+   body:'我做图会忘时间，但上班画图就累。星图心流层是「挑战匹配」和「即时反馈」。我给自己定：每天留一小时做一件「刚好够得着」的小实验，做完立刻发出来看反馈。半年后，那块成了我作品集里最亮的部分。',
+   clue:'心流 · <b>挑战匹配 / 即时反馈</b> → 主动给工作日造「小难度 + 快反馈」的缝隙'},
+  {layer:'via', who:'之之 · 23 岁 · 大一', title:'我不再逼自己「外向」了',
+   body:'宿舍里大家都很能聊，我以为自己有病。星图优势层是「爱」和「谦逊」，不是「领导力」。放下「要活跃」的剧本后，我成了那个「你难过时来找我」的人，反而交到真朋友。温柔不是次一等的性格。',
+   clue:'优势 · <b>爱 / 谦逊</b> → 停止模仿别人，把安静变成一种在场'}
+];
+
+const META={ria:{name:'兴趣',c:'var(--sky)'},via:{name:'优势',c:'var(--violet)'},flow:{name:'心流',c:'var(--mint)'}};
+const SUB_KEY='talentmap_stories';
+let cur='all';
+
+function getUserStories(){try{return JSON.parse(localStorage.getItem(SUB_KEY))||[];}catch(e){return [];}}
+function esc2(s){return String(s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));}
+
+function render(){
+  const grid=document.getElementById('grid');
+  const mine=getUserStories().map(s=>({...s,mine:true}));
+  const all=[...mine, ...STORIES];
+  const list=all.filter(s=>cur==='all'||s.layer===cur);
+  grid.innerHTML=list.map(s=>{
+    const m=META[s.layer];
+    return `<div class="story reveal in" style="--c:${m.c}">
+      <div class="smeta"><span class="badge ${s.layer}">${m.name}</span><span class="who">${esc2(s.who)}</span></div>
+      <h3>${esc2(s.title)}</h3>
+      <div class="body">${esc2(s.body)}</div>
+      <div class="clue">${s.clue?esc2(s.clue):''}</div>
+      ${s.mine?'<div class="mine">本地保存的种子，投稿通道开放后可一键提交</div>':''}
+    </div>`;
+  }).join('') || '<div style="grid-column:1/-1;text-align:center;color:var(--ink-faint);padding:30px">这类故事还在收集中，先去看看别的 →</div>';
+}
+
+/* —— D1 提交表单 —— */
+let subLayer='flow';
+(function initSubmit(){
+  const layers=document.getElementById('subLayers');
+  layers.querySelectorAll('.lchip').forEach(c=>c.onclick=()=>{
+    subLayer=c.dataset.k;
+    layers.querySelectorAll('.lchip').forEach(x=>x.classList.toggle('on',x===c));
+  });
+  layers.querySelector('.lchip').classList.add('on');
+  const btn=document.getElementById('subBtn');
+  btn.onclick=()=>{
+    const who=document.getElementById('subWho').value.trim();
+    const title=document.getElementById('subTitle').value.trim();
+    const body=document.getElementById('subBody').value.trim();
+    if(!body){alert('先写写你的那段过程吧～');return;}
+    const arr=getUserStories();
+    arr.unshift({layer:subLayer,who:who||'匿名 · 一只路过的星',title:title||'我的天赋种子',body,clue:document.getElementById('subClue').value.trim()});
+    localStorage.setItem(SUB_KEY,JSON.stringify(arr));
+    document.getElementById('subWho').value='';document.getElementById('subTitle').value='';
+    document.getElementById('subBody').value='';document.getElementById('subClue').value='';
+    cur='all';document.querySelectorAll('.fchip').forEach(x=>x.classList.toggle('on',x.dataset.f==='all'));
+    render();
+    const card=document.getElementById('submitCard');card.scrollIntoView({behavior:'smooth',block:'center'});
+    alert('已存为你的故事种子 ★ 它会显示在案例墙最前面。');
+  };
+  const expBtn=document.getElementById('subExport');
+  if(expBtn) expBtn.onclick=()=>{
+    const arr=getUserStories();
+    if(!arr.length){ alert('还没有保存的故事种子。先写下你的那段过程吧～'); return; }
+    const body=arr.map((s,i)=>`【${i+1}】${s.who||'匿名'} · ${s.title||'我的天赋种子'}\n层：${s.layer}\n星图线索：${s.clue||'（无）'}\n\n${s.body}`).join('\n'+'-'.repeat(24)+'\n\n');
+    const header='天赋星图 · 我的故事种子（本地导出，可发给运营者人工精选）\n导出时间：'+new Date().toLocaleString()+'\n\n';
+    try{
+      const blob=new Blob([header+body],{type:'text/plain;charset=utf-8'});
+      const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='我的天赋星图故事种子.txt'; document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(()=>URL.revokeObjectURL(a.href),2000);
+      alert('已导出 '+arr.length+' 条故事种子为 .txt 文件。可发给运营者人工精选，等投稿通道开放后一键提交。');
+    }catch(e){ alert('导出失败：'+e.message); }
+  };
+})();
+
+document.getElementById('filters').querySelectorAll('.fchip').forEach(c=>{
+  c.onclick=()=>{cur=c.dataset.f;document.querySelectorAll('.fchip').forEach(x=>x.classList.toggle('on',x===c));render();};
+});
+render();
+</script>
+  <script>
+  /* ===== 深空背景：视差星海 + 真实星座（与首页一致） ===== */
+  (function(){
+    var layers=[].slice.call(document.querySelectorAll('[data-speed]'));
+    var nebB1=document.getElementById('nebB1'),nebB2=document.getElementById('nebB2'),nebB3=document.getElementById('nebB3');
+    function onScroll(){
+      layers.forEach(function(l){var s=parseFloat(l.dataset.speed);l.style.transform='translate3d(0,'+(-window.scrollY*s).toFixed(1)+'px,0)';});
+      var max=document.documentElement.scrollHeight-window.innerHeight;
+      var p=max>0?Math.min(1,Math.max(0,window.scrollY/max)):0;
+      if(nebB1)nebB1.style.opacity=(0.55-0.38*p).toFixed(3);
+      if(nebB2)nebB2.style.opacity=(0.30+0.28*p).toFixed(3);
+      if(nebB3)nebB3.style.opacity=(0.16+0.55*p).toFixed(3);
+    }
+    onScroll();window.addEventListener('scroll',onScroll,{passive:true});window.addEventListener('resize',onScroll,{passive:true});
+    var SVGNS='http://www.w3.org/2000/svg';
+    function seedStars(layer,count,extra){
+      if(!layer)return;var frag=document.createDocumentFragment();
+      for(var i=0;i<count;i++){var s=document.createElement('i');s.className='star';
+        if(extra&&Math.random()<0.22)s.classList.add(extra[Math.floor(Math.random()*extra.length)]);
+        s.style.left=(Math.random()*100).toFixed(2)+'%';s.style.top=(Math.random()*100).toFixed(2)+'%';
+        s.style.transform='scale('+(0.6+Math.random()*0.9).toFixed(2)+')';
+        if(Math.random()<0.4)s.style.animation='starTw '+(3+Math.random()*4).toFixed(1)+'s ease-in-out infinite';
+        frag.appendChild(s);}
+      layer.appendChild(frag);
+    }
+    const isMobile=window.innerWidth<720;
+    seedStars(document.getElementById('layerFar'),isMobile?70:130,['blue']);
+    seedStars(document.getElementById('layerMid'),isMobile?34:64,['gold','bright']);
+    var CONSTELS=[
+      {name:'北斗七星',left:'3%',top:'34%',stars:[[6,12],[6,34],[26,42],[26,20],[46,18],[64,13],[84,7]],edges:[[0,1],[1,2],[2,3],[3,4],[4,5],[5,6]]},
+      {name:'猎户座',left:'80%',top:'50%',stars:[[16,22],[38,18],[24,56],[31,53],[40,50],[40,80],[17,82],[27,7]],edges:[[7,0],[7,1],[0,1],[0,2],[1,4],[2,3],[3,4],[2,6],[4,5],[6,5]]},
+      {name:'仙后座',left:'6%',top:'70%',stars:[[8,72],[30,40],[50,62],[70,34],[92,56]],edges:[[0,1],[1,2],[2,3],[3,4]]},
+      {name:'天鹅座',left:'78%',top:'88%',stars:[[50,10],[50,46],[50,90],[24,46],[76,46]],edges:[[0,1],[1,2],[3,1],[1,4]]}
+    ];
+    function buildConstel(cfg){
+      var wrap=document.createElement('div');wrap.className='constel';
+      wrap.style.left=cfg.left;wrap.style.top=cfg.top;wrap.title=cfg.name+'（点一下，让它亮起来）';
+      var svg=document.createElementNS(SVGNS,'svg');svg.setAttribute('viewBox','0 0 100 100');
+      cfg.edges.forEach(function(e){var p=document.createElementNS(SVGNS,'path');p.setAttribute('class','c-line');p.setAttribute('d','M'+cfg.stars[e[0]][0]+' '+cfg.stars[e[0]][1]+' L'+cfg.stars[e[1]][0]+' '+cfg.stars[e[1]][1]);svg.appendChild(p);});
+      var halo=document.createElementNS(SVGNS,'circle');halo.setAttribute('class','c-halo');halo.setAttribute('cx','50');halo.setAttribute('cy','50');halo.setAttribute('r','44');svg.appendChild(halo);
+      cfg.stars.forEach(function(st){var c=document.createElementNS(SVGNS,'circle');c.setAttribute('class','c-dot');c.setAttribute('cx',st[0]);c.setAttribute('cy',st[1]);c.setAttribute('r','2.4');svg.appendChild(c);});
+      wrap.appendChild(svg);
+      wrap.addEventListener('click',function(){wrap.classList.remove('pulse');void wrap.offsetWidth;wrap.classList.add('pulse');});
+      return wrap;
+    }
+    var near=document.getElementById('layerNear');
+    if(near)CONSTELS.forEach(function(c){near.appendChild(buildConstel(c));});
+    onScroll();
+  })();
+  </script>
+</body>
+</html>

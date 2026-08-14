@@ -1,0 +1,1057 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>天赋星图 · 测评 — 绘制你的星图</title>
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="icon" href="logo-mark.svg" type="image/svg+xml">
+  <meta name="description" content="天赋星图 · 用 RIASEC/VIA/心流/IKIGAI 三层定位 + 一层现实校验，8 分钟画出你的天赋星图，把被压住的生命力放大到它应该在的水平。">
+<meta property="og:type" content="website">
+<meta property="og:title" content="天赋星图 · 你做什么会忘记时间？">
+<meta property="og:description" content="三层定位 + 一层现实校验，8 分钟画出你的天赋星图。">
+<meta property="og:image" content="https://46461dec3937411d970e0881cbfa0056.app.codebuddy.work/og-cover.png">
+<style>
+  :root{
+    --bg:#060912;--bg-1:#0a0f22;--ink:#eef2ff;--ink-soft:#9aa6cf;--ink-faint:#7f8bb3;
+    --gold:#f3c14b;--gold-soft:#ffe1a0;--sky:#6ea0ff;--violet:#a98bff;--mint:#54d8c4;
+    --line:rgba(255,255,255,.08);--line-2:rgba(255,255,255,.16);--radius:20px;
+    --maxw:760px;--serif:"Songti SC","STSong","Noto Serif SC",Georgia,serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{font-family:"PingFang SC","Microsoft YaHei","Hiragino Sans GB",system-ui,sans-serif;
+    color:var(--ink);background:var(--bg);line-height:1.75;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+    /* ===== 深空背景：多层视差星海 + 真实星座（与首页一致） ===== */
+  .sky-bg{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none;
+    background:linear-gradient(180deg,#05070f 0%, #070b1c 50%, #060912 100%)}
+  .nebula{position:absolute;inset:-12% 0;z-index:0}
+  .neb-blob{position:absolute;border-radius:50%;filter:blur(70px);will-change:opacity}
+  .neb-b1{width:62vw;height:62vw;left:-12vw;top:-12vh;background:radial-gradient(circle,rgba(110,160,255,.5),transparent 65%)}
+  .neb-b2{width:56vw;height:56vw;right:-14vw;top:34vh;background:radial-gradient(circle,rgba(169,139,255,.45),transparent 65%)}
+  .neb-b3{width:52vw;height:52vw;left:18vw;bottom:-18vh;background:radial-gradient(circle,rgba(243,193,75,.35),transparent 65%)}
+  .star-layer{position:absolute;left:0;top:0;width:100%;height:320vh;will-change:transform}
+  .star{position:absolute;width:2px;height:2px;border-radius:50%;background:#fff}
+  .star.bright{width:3px;height:3px;box-shadow:0 0 6px rgba(255,255,255,.85)}
+  .star.gold{background:#ffe1a0;box-shadow:0 0 6px rgba(243,193,75,.8)}
+  .star.blue{background:#cfe0ff;box-shadow:0 0 6px rgba(110,160,255,.8)}
+  @keyframes starTw{0%,100%{opacity:.45}50%{opacity:1}}
+  .constel-layer{position:fixed;top:0;left:0;width:100%;height:320vh;z-index:2;pointer-events:none;will-change:transform}
+  .constel{position:absolute;width:150px;height:150px;pointer-events:auto;cursor:pointer}
+  .constel svg{width:100%;height:100%;overflow:visible;display:block;transform-box:fill-box;transform-origin:center}
+  .constel .c-line{stroke:rgba(243,193,75,.32);stroke-width:1;fill:none;stroke-dasharray:2 5;transition:stroke .4s}
+  .constel .c-dot{fill:#fff;transform-box:fill-box;transform-origin:center;transition:transform .25s,fill .25s}
+  .constel .c-halo{fill:none;stroke:rgba(243,193,75,0);stroke-width:1.6;transition:stroke .4s}
+  .constel:hover .c-dot{transform:scale(1.7);fill:var(--gold-soft)}
+  .constel:hover .c-line{stroke:rgba(243,193,75,.7)}
+  .constel:hover .c-halo{stroke:rgba(243,193,75,.55)}
+  .constel.pulse{animation:cPulse 1.6s cubic-bezier(.2,.8,.2,1)}
+  .constel.pulse .c-halo{stroke:rgba(243,193,75,.9);animation:halo 1.6s ease-out}
+  @keyframes cPulse{0%{transform:scale(1) rotate(0)}30%{transform:scale(1.18) rotate(-2deg)}55%{transform:scale(.95) rotate(1.8deg)}80%{transform:scale(1.07) rotate(-1deg)}100%{transform:scale(1) rotate(0)}}
+  @keyframes halo{0%{stroke-opacity:.9;transform:scale(.6)}100%{stroke-opacity:0;transform:scale(1.9)}}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 22px;position:relative;z-index:1}
+
+  header.nav{position:fixed;top:0;left:0;right:0;z-index:50;background:rgba(6,9,18,.72);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+  .nav-inner{display:flex;align-items:center;justify-content:space-between;height:60px}
+  .brand{display:flex;align-items:center;gap:9px;font-weight:700;font-size:15px}
+  .brand .dot{width:12px;height:12px;border-radius:50%;background:radial-gradient(circle at 30% 30%,#fff,var(--gold) 60%,#a87f24);box-shadow:0 0 12px var(--gold)}
+  .nav a.back{color:var(--ink-soft);text-decoration:none;font-size:14px}
+  .nav a.back:hover{color:var(--ink)}
+  .nav-links{display:flex;gap:24px;font-size:14px}
+  .nav-links a{color:var(--ink-soft);text-decoration:none;transition:.2s}
+  .nav-links a:hover{color:var(--ink)}
+  .nav-links a.active{color:var(--gold-soft,#f3c14b)}
+  .brand{color:inherit;text-decoration:none}
+@media(max-width:720px){
+    .nav-links{display:flex !important;gap:14px;font-size:13px;flex:1;min-width:0;overflow-x:auto;margin:0 8px}
+    .nav-links a{white-space:nowrap}
+    .nav .btn{padding:7px 12px;font-size:13px}
+  }
+
+  @media(max-width:720px){
+    .neb-blob{filter:blur(40px)}
+  }
+
+  .quiz{padding:108px 0 70px;min-height:100vh}
+  /* 进度 */
+  .progress{height:4px;border-radius:999px;background:rgba(255,255,255,.08);overflow:hidden;margin-bottom:10px}
+  .progress > i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--sky),var(--violet),var(--mint));transition:width .5s ease}
+  .progress-label{font-size:12.5px;color:var(--ink-faint);letter-spacing:1px;margin-bottom:30px}
+
+  /* 关卡门 / 反馈 */
+  .gate{text-align:center;padding:40px 10px;animation:fade .5s ease}
+  .gate .gno{font-family:var(--serif);font-style:italic;font-size:15px;color:var(--gold-soft);letter-spacing:2px}
+  .gate h2{font-size:clamp(26px,3.4vw,38px);margin:14px 0 12px;font-weight:800}
+  .gate .gsub{color:var(--ink-soft);font-size:15px;max-width:480px;margin:0 auto 14px}
+  .gate .gnote{color:var(--ink-faint);font-size:13px;margin-bottom:28px}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 28px;border-radius:999px;
+    font-size:15px;font-weight:600;border:1px solid transparent;cursor:pointer;transition:.2s;font-family:inherit}
+  .btn-primary{color:#1c1404;background:linear-gradient(135deg,var(--gold-soft),var(--gold));box-shadow:0 8px 30px rgba(243,193,75,.26)}
+  .btn-primary:hover{transform:translateY(-2px);box-shadow:0 12px 38px rgba(243,193,75,.4)}
+  .btn-ghost{color:var(--ink);border-color:var(--line-2);background:rgba(255,255,255,.04);padding:11px 22px;font-size:14px}
+  .btn-ghost:hover{border-color:var(--gold);color:var(--gold-soft)}
+
+  /* 中间反馈 */
+  .feedback .gsub{max-width:560px}
+  .feedback .mini-tags{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:22px 0 28px}
+  .feedback .mini-tags span{font-size:13.5px;padding:6px 14px;border-radius:999px;background:rgba(255,255,255,.06);border:1px solid var(--line);color:var(--ink)}
+  .feedback .mini-tags span.top{background:rgba(243,193,75,.12);border-color:rgba(243,193,75,.3);color:var(--gold-soft)}
+  .feedback .fb-note{font-size:13.5px;color:var(--ink-faint);max-width:480px;margin:18px auto 0;line-height:1.7}
+
+  /* 回看过去（A2） */
+  .recall{max-width:560px;margin:0 auto;animation:fade .5s ease}
+  .recall .rno{font-family:var(--serif);font-style:italic;font-size:15px;color:var(--gold-soft);letter-spacing:2px;text-align:center}
+  .recall h2{font-size:clamp(24px,3.2vw,34px);text-align:center;margin:12px 0 10px;font-weight:800}
+  .recall .rsub{color:var(--ink-soft);font-size:15px;text-align:center;max-width:480px;margin:0 auto 10px}
+  .recall .rnote{color:var(--ink-faint);font-size:13px;text-align:center;margin-bottom:24px}
+  .recall label{display:block;font-size:13.5px;color:var(--ink-soft);margin:18px 0 8px}
+  .recall textarea{width:100%;background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:12px;
+    color:var(--ink);font-family:inherit;font-size:15px;padding:12px 14px;resize:vertical;line-height:1.6;min-height:70px}
+  .recall textarea:focus{outline:none;border-color:var(--gold)}
+
+  /* 题目 */
+  .q{animation:slide .45s ease}
+  @keyframes slide{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+  @keyframes fade{from{opacity:0}to{opacity:1}}
+  .q .qmeta{font-size:12.5px;color:var(--gold-soft);letter-spacing:1px;margin-bottom:10px}
+  .q h3{font-size:clamp(19px,2.4vw,23px);font-weight:700;line-height:1.5;margin-bottom:24px}
+  .opts{display:flex;flex-direction:column;gap:12px}
+  .g4hint{font-size:13px;color:var(--ink-faint);background:rgba(243,193,75,.07);border:1px solid rgba(243,193,75,.18);border-radius:10px;padding:9px 13px;margin-bottom:4px;line-height:1.6}
+  .why-btn{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;margin-left:10px;vertical-align:middle;border-radius:50%;border:1px solid var(--line-2);background:rgba(255,255,255,.04);color:var(--gold-soft);font-size:12px;cursor:pointer;font-family:inherit;transition:.18s}
+  .why-btn:hover{border-color:var(--gold);color:var(--gold)}
+  .why-pop{margin-bottom:18px;padding:12px 14px;border-left:3px solid var(--gold);background:rgba(243,193,75,.07);border-radius:0 10px 10px 0;font-size:13.5px;line-height:1.65;color:var(--ink-soft)}
+  .opt{text-align:left;padding:16px 18px;border:1px solid var(--line);border-radius:14px;background:rgba(255,255,255,.03);
+    color:var(--ink);font-size:15.5px;cursor:pointer;transition:.18s;font-family:inherit;line-height:1.5}
+  .opt:hover{border-color:var(--c,var(--gold));background:rgba(255,255,255,.06);transform:translateX(3px)}
+  .opt .tag{display:block;font-size:12px;color:var(--ink-faint);margin-top:4px}
+  .opt.sel{border-color:var(--gold);background:rgba(243,193,75,.12);color:var(--gold-soft)}
+  .opt.sel::after{content:"✓";float:right;color:var(--gold-soft);font-weight:700}
+  .recall .hl{color:var(--gold-soft)}
+  .recall .rstep{font-size:13px;color:var(--gold-soft);letter-spacing:1px;margin:8px 0 4px}
+  .recall .ropt-tip{font-size:13px;color:var(--ink-faint);text-align:center;margin-bottom:18px}
+
+  .prev-row{display:flex;justify-content:center;margin-top:22px}
+  .prev-row .btn-ghost{padding:10px 20px;font-size:14px}
+  .opt-hint{font-size:12.5px;color:var(--ink-faint);margin:-8px 0 14px;text-align:center}
+
+  /* 结果 */
+  .result{text-align:center;animation:fade .6s ease}
+  .result h2{font-size:clamp(26px,3.4vw,38px);font-weight:800;margin-bottom:6px}
+  .result .rsub{color:var(--ink-soft);margin-bottom:28px;font-size:15px}
+  .map{width:100%;max-width:360px;margin:0 auto 30px;aspect-ratio:1/1}
+  .map svg{width:100%;height:100%;overflow:visible}
+  .grp{transition:opacity .5s}
+  .groups{display:flex;flex-direction:column;gap:18px;max-width:560px;margin:0 auto 28px;text-align:left}
+  .gcard{border:1px solid var(--line);border-radius:16px;padding:18px 20px;background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.015))}
+  .gcard .gh{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+  .gcard .gh .dotc{width:10px;height:10px;border-radius:50%}
+  .gcard .gh h4{font-size:16px;font-weight:700}
+  .gcard .gh .en{font-size:12px;color:var(--ink-faint);letter-spacing:1px;margin-left:auto}
+  .tags{display:flex;flex-wrap:wrap;gap:8px}
+  .tags span{font-size:13.5px;padding:5px 12px;border-radius:999px;background:rgba(255,255,255,.06);border:1px solid var(--line);color:var(--ink)}
+  .tags span.top{background:rgba(243,193,75,.12);border-color:rgba(243,193,75,.3);color:var(--gold-soft)}
+  .verdict{font-size:16px;line-height:1.7;color:var(--ink-soft);max-width:600px;margin:0 auto 30px;
+    background:rgba(243,193,75,.06);border:1px solid rgba(243,193,75,.2);border-radius:16px;padding:22px;text-align:left}
+  .verdict b{color:var(--gold-soft)}
+  .result .actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+  .disclaim{font-size:12px;color:var(--ink-faint);margin-top:26px;max-width:520px;margin-left:auto;margin-right:auto;line-height:1.6}
+  .conf{display:inline-block;font-size:12.5px;color:var(--ink-faint);margin-top:6px;padding:6px 14px;border-radius:999px;
+    border:1px solid var(--line);background:rgba(255,255,255,.03)}
+  .conf b{color:var(--gold-soft)}
+
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}
+  .layerFar,.layerMid,.layerNear,.constel-layer{transform:none!important}
+}
+
+  .brand-mark{width:18px;height:18px;flex:0 0 auto;border-radius:50%;object-fit:contain;filter:drop-shadow(0 0 6px rgba(243,193,75,.55))}
+</style>
+  <script src="track.js"></script>
+  <script src="https://beacon.cdn.qq.com/sdk/4.5.9/beacon_web.min.js" async></script>
+<script>
+(function(){
+  try{
+    window.addEventListener('load',function(){
+      if(!window.BeaconAction) return;
+      var beacon=new BeaconAction({
+        appkey:'0WEB06U85YBSLJNL',
+        versionCode:'1.0.0',
+        channelID:'share',
+        delay:1000,
+        sessionDuration:30*60*1000,
+        isOversea:false,
+        needReportRqdEvent:false
+      });
+      beacon.onDirectUserAction('preview_page_view',{
+        'url':location.href,
+        'referrer':document.referrer,
+        'title':document.title,
+        'sandbox_id':'46461dec3937411d970e0881cbfa0056'
+      });
+    });
+  }catch(e){}
+})();
+</script></head>
+<body>
+    <div class="sky-bg" id="skyBg" aria-hidden="true">
+    <div class="nebula" id="nebula">
+      <div class="neb-blob neb-b1" id="nebB1"></div>
+      <div class="neb-blob neb-b2" id="nebB2"></div>
+      <div class="neb-blob neb-b3" id="nebB3"></div>
+    </div>
+    <div class="star-layer" id="layerFar" data-speed="0.12"></div>
+    <div class="star-layer" id="layerMid" data-speed="0.30"></div>
+  </div>
+  <div class="constel-layer" id="layerNear" data-speed="0.50" aria-hidden="true"></div>
+  <header class="nav">
+    <div class="wrap nav-inner">
+      <a class="brand" href="index.html"><img class="brand-mark" src="logo-mark.svg" alt="天赋星图" width="18" height="18">天赋星图</a>
+      <nav class="nav-links">
+        <a href="index.html">首页</a>
+        <a href="quiz.html" class="active">测评</a>
+        <a href="report.html">报告</a>
+        <a href="action.html">行动</a>
+        <a href="stories.html">案例</a>
+        <a href="companion.html">伙伴</a>
+        <a href="me.html">我的星图</a>
+<a href="pricing.html">价格</a>
+<a href="blog.html">博客</a>
+<a href="about.html">关于</a>
+<a href="faq.html">FAQ</a>
+<a href="contact.html">联系</a>
+      </nav>
+      <a href="quiz.html" class="btn btn-primary">绘制我的星图</a>
+    </div>
+  </header>
+
+  <div class="wrap">
+    <section class="quiz">
+      <div class="progress"><i id="bar"></i></div>
+      <div class="progress-label" id="plabel">准备开始</div>
+      <div id="stage"></div>
+    </section>
+  </div>
+
+<script>
+/* ===================== 题库 ===================== */
+/* 维度累加：RIASEC(R/I/A/S/E/C)、VIA(优势名)、心流信号、能量(充电/耗尽)、五信号(sig_*) */
+
+/* —— A2：回看过去（引导式回忆 · 用「点选」帮用户想起，而非逼ta硬想）—— */
+/* 三件小事，每件事分 步：时间 → 场景 → 认领感觉（多选）→ 补充一句（可选） */
+const RECALL_ITEMS = [
+  {tag:'全心投入', lead:'回想一个你曾<span class="hl">全心全意投入</span>的时刻——哪怕很小。',
+   hint:'是那种你做着做着，抬头发现时间过了好久的事。'},
+  {tag:'做完充电', lead:'再想一个：你做完不是累，而是<span class="hl">踏实 / 满足 / 还想再来</span>的事。',
+   hint:'是那种「消耗」完反而像充了电的事。'},
+  {tag:'小高光', lead:'还有一个：你被夸、或自己暗暗得意<span class="hl">「这事儿我居然行」</span>的瞬间。',
+   hint:'不是大成就，是那个让你有点意外「我还能这样」的小高光。'}
+];
+const RECALL_STEPS = {
+  time:{q:'大概是什么时候的事？', multi:false, opts:[
+    '很小的时候（中小学以前）','学生时代（中小学 / 大学）','刚工作 / 不久前','就是最近这半年','记不清哪年，但记得那件事']},
+  scene:{q:'当时，你大概在什么状态里？', multi:false, opts:[
+    '一个人，安静地做','和一两个人在一起','一群人当中','动手做某件具体的事','学东西 / 钻研什么','帮谁、照顾谁']},
+  cue:{q:'下面哪几句，最像你那会儿的感觉？', multi:true, opts:[
+    '忘了时间，抬头发现天都黑了','不在乎有没有人看，自己就想做',
+    '做完不累，反而心里很踏实','有点上头，还想再来一次',
+    '被夸了，或者自己偷偷得意','哪怕重来，我还会选做它']}
+};
+
+/* —— 第一关：兴趣 RIASEC（每型充分覆盖，A5 增强） —— */
+const GATE1 = [
+  {gate:1, q:"周六一整天没人找你，你最可能会——", why:"空闲时自发去做的事，比「应该做」更诚实——这是兴趣最可靠的自发动机信号。", opts:[
+    {t:"把某个坏掉的小东西拆开修好，或者做个手工", s:{R:1}, tag:"动手 · 具体"},
+    {t:"钻进一个你最近着迷的问题或一本书里", s:{I:1}, tag:"探究 · 分析"},
+    {t:"写点东西、画画，或者折腾排版和配色", s:{A:1}, tag:"表达 · 创造"},
+    {t:"主动约朋友聊聊，或者帮谁排忧解难", s:{S:1}, tag:"人群 · 助人"}]},
+  {gate:1, q:"别人夸你时，你最常被夸的是——", why:"别人常夸你的词，往往是你稳定能力的标签，像一面社会反馈的镜子。", opts:[
+    {t:"手巧，什么东西到你手里就能弄好", s:{R:1}, tag:""},
+    {t:"脑子清楚，想得深", s:{I:1}, tag:""},
+    {t:"有想法、有审美，不按套路出牌", s:{A:1}, tag:""},
+    {t:"会带人、能成事", s:{E:1}, tag:""},
+    {t:"靠谱、细致，交给你放心", s:{C:1}, tag:""}]},
+  {gate:1, q:"选一门选修课，你眼睛亮的是——", why:"对哪类知识天然好奇，直接对应霍兰德兴趣的 R/I/A/S/E/C 代码。", opts:[
+    {t:"机械/编程/实验操作", s:{R:1}, tag:""},
+    {t:"哲学/天文/心理学", s:{I:1}, tag:""},
+    {t:"文学/设计/影视", s:{A:1}, tag:""},
+    {t:"社工/教育/组织", s:{S:1}, tag:""},
+    {t:"统计/会计/行政管理", s:{C:1}, tag:""}]},
+  {gate:1, q:"一群人里，你更容易扮演的角色是——", why:"群体里你习惯扮演的功能位，折射出主导兴趣类型。", opts:[
+    {t:"那个默默把东西做出来的人", s:{R:1,C:1}, tag:""},
+    {t:"抛出新问题、追着问为什么的人", s:{I:1}, tag:""},
+    {t:"出点子、搞气氛、想标题的人", s:{A:1,E:1}, tag:""},
+    {t:"照顾大家情绪、调和矛盾的人", s:{S:1}, tag:""},
+    {t:"把混乱理成清单的人", s:{C:1}, tag:""}]},
+  {gate:1, q:"你敬佩的人，通常是——", why:"你敬佩的特质，常是你想成为的自己，藏着未被认领的向往。", opts:[
+    {t:"匠人、工程师、把事做扎实的人", s:{R:1}, tag:""},
+    {t:"科学家、思考者、看透规律的人", s:{I:1}, tag:""},
+    {t:"艺术家、创作者、活得很自我的人", s:{A:1}, tag:""},
+    {t:"领袖、创业者、能拉动资源的人", s:{E:1}, tag:""},
+    {t:"管理者、调度者、让系统转起来的人", s:{C:1}, tag:""}]},
+  {gate:1, q:"一份工作最让你怕的是——", why:"工作最怕的，反向标记你最需要保护的自主空间。", opts:[
+    {t:"天天坐着动不了手，脑子也用不上", s:{R:1,I:1}, tag:""},
+    {t:"一切按流程走，没有发挥空间", s:{A:1}, tag:""},
+    {t:"孤军奋战，没人可交流", s:{S:1}, tag:""},
+    {t:"没有目标感，不知道在为什么忙", s:{E:1}, tag:""},
+    {t:"太乱、没规则、随时变", s:{C:1}, tag:""}]},
+  {gate:1, q:"你刷手机时，最容易陷进去的是——", why:"无目的刷手机陷进去的内容，暴露真实好奇心的落点。", opts:[
+    {t:"教程、拆解、怎么做东西的视频", s:{R:1}, tag:""},
+    {t:"科普、深度长文、原理讲解", s:{I:1}, tag:""},
+    {t:"审美向的内容、别人的创作", s:{A:1}, tag:""},
+    {t:"人物故事、关系话题", s:{S:1}, tag:""},
+    {t:"效率方法、整理收纳、清单", s:{C:1}, tag:""}]},
+  {gate:1, q:"如果白得一天，你更想——", why:"白得一天怎么花，最贴近你不被外界塑造时的真实兴趣。", opts:[
+    {t:"把攒了很久的角落彻底收拾/改造", s:{R:1,C:1}, tag:""},
+    {t:"搞明白一个一直没想通的问题", s:{I:1}, tag:""},
+    {t:"随手写写画画，不设目的", s:{A:1}, tag:""},
+    {t:"见一个你想见的人", s:{S:1}, tag:""},
+    {t:"推进一个你负责的小目标", s:{E:1}, tag:""}]},
+  {gate:1, q:"别人说你“太较真”的时候，通常指你——", why:"别人说你「太较真」的吐槽，常是你优势的侧面投影。", opts:[
+    {t:"非要把东西做对、做标准", s:{R:1,C:1}, tag:""},
+    {t:"非要追问到底、不肯糊弄", s:{I:1}, tag:""},
+    {t:"非要按自己的审美和想法来", s:{A:1}, tag:""},
+    {t:"非要把事情管到底", s:{E:1}, tag:""}]},
+  {gate:1, q:"你书桌/手机里最常囤的东西是——", why:"收藏囤积的东西，是内心兴趣的实体投影。", opts:[
+    {t:"工具、零件、待修的小物件", s:{R:1}, tag:""},
+    {t:"收藏的文章、课程、知识卡片", s:{I:1}, tag:""},
+    {t:"灵感草稿、歌单、图片素材", s:{A:1}, tag:""},
+    {t:"朋友的消息、群聊、待办", s:{S:1}, tag:""},
+    {t:"日程表、表格、清单模板", s:{C:1}, tag:""}]},
+  {gate:1, q:"假期结束前，你最舍不得的是——", why:"假期结束前最舍不得的，是你真正投入过的事。", opts:[
+    {t:"还没动手做的那个小项目", s:{R:1}, tag:""},
+    {t:"还没读够的那堆书/资料", s:{I:1}, tag:""},
+    {t:"没画完/没写尽的那个念头", s:{A:1}, tag:""},
+    {t:"没聚够的那帮人", s:{S:1}, tag:""},
+    {t:"没整理完的那摊计划", s:{C:1}, tag:""}]},
+];
+
+/* —— 第二关：优势 VIA（A5 增强 + 用户反馈扩选项） —— */
+const GATE2 = [
+  {gate:2, q:"下面哪句话，更像“每次说中你”——", why:"每次「说中你」的话，指向自我认知里最稳定的优势标签。", opts:[
+    {t:"我总想弄明白它为什么是这样", s:{"好奇心":1,"热爱学习":1}, tag:""},
+    {t:"答应了的事，熬通宵也要交", s:{"毅力":1}, tag:""},
+    {t:"看别人难过，我比他还难受", s:{"善良":1,"社交智慧":1}, tag:""},
+    {t:"不公平的事，我忍不住要出头", s:{"公正":1,"领导力":1}, tag:""}]},
+  {gate:2, q:"你更常被夸“想得开”还是“靠得住”？", why:"你更被认领「想得开」还是「靠得住」，区分灵活型与可靠型优势。", opts:[
+    {t:"靠得住——我说到做到", s:{"诚实":1,"审慎":1}, tag:""},
+    {t:"想得开——很少钻牛角尖", s:{"宽容":1,"谦逊":1}, tag:""},
+    {t:"点子多——总能换个角度", s:{"创造力":1,"洞察力":1}, tag:""},
+    {t:"有温度——让人愿意靠近", s:{"爱":1,"善良":1}, tag:""}]},
+  {gate:2, q:"做一件事最有动力，是因为——", why:"不同优势由不同内在奖赏驱动——认知升级、挑战、连接或体验。", opts:[
+    {t:"它让我觉得自己又懂了点什么", s:{"热爱学习":1,"好奇心":1}, tag:"认知升级"},
+    {t:"它难，但我想证明我能行", s:{"毅力":1,"勇敢":1}, tag:"挑战"},
+    {t:"它能帮到具体的人", s:{"善良":1,"爱":1}, tag:"连接"},
+    {t:"它漂亮/有意思，本身就好玩", s:{"美感":1,"幽默":1}, tag:"体验"},
+    {t:"单纯自己感兴趣，别人说不理解也没关系", s:{"好奇心":1,"热爱学习":1}, tag:"内在驱动"},
+    {t:"做完会有一种「成了」的成就感", s:{"毅力":1,"希望":1}, tag:"成就"},
+    {t:"能探索未知领域，像打开一张新地图", s:{"好奇心":1,"创造力":1}, tag:"探索"}]},
+  {gate:2, q:"朋友遇事先找你，多半因为你——", why:"朋友遇事先找你，危难中被需要的，往往是你最突出的优势。", opts:[
+    {t:"冷静，能帮他们想清楚", s:{"判断力":1,"洞察力":1}, tag:""},
+    {t:"仗义，会替他们撑腰", s:{"公正":1,"勇敢":1}, tag:""},
+    {t:"细心，注意到他们没说的", s:{"社交智慧":1,"善良":1}, tag:""},
+    {t:"稳，不会到处乱传", s:{"审慎":1,"自我控制":1}, tag:""}]},
+  {gate:2, q:"你更骄傲自己哪种“少有人有”——", why:"你引以为傲的罕见特质，是区别于他人的差异化优势。", opts:[
+    {t:"能在没人看的时候也把事做好", s:{"诚实":1,"自我控制":1}, tag:""},
+    {t:"能从烂事里看出点道理", s:{"洞察力":1,"希望":1}, tag:""},
+    {t:"愿意为不熟的人花心思", s:{"善良":1,"爱":1}, tag:""},
+    {t:"敢在没人带路时自己上", s:{"领导力":1,"勇敢":1}, tag:""}]},
+  {gate:2, q:"你写东西/说话，别人说你——", why:"说话写字的质感，暴露创造力、判断力、诚实或谦逊。", opts:[
+    {t:"有新意，不落俗套", s:{"创造力":1}, tag:""},
+    {t:"有条理，一下就懂", s:{"判断力":1}, tag:""},
+    {t:"真诚，能戳到人", s:{"诚实":1,"爱":1}, tag:""},
+    {t:"克制，不吵闹", s:{"谦逊":1,"审慎":1}, tag:""}]},
+  {gate:2, q:"让你“感觉自己有用”的瞬间是——", why:"「被需要感」来自哪类优势在起作用，是价值感的坐标。", opts:[
+    {t:"想通了一个卡很久的结", s:{"热爱学习":1,"洞察力":1}, tag:""},
+    {t:"把一件难事咬牙扛下来了", s:{"毅力":1}, tag:""},
+    {t:"有人因为我又好了起来", s:{"善良":1,"爱":1}, tag:""},
+    {t:"把一个局面稳住了", s:{"公正":1,"自我控制":1}, tag:""}]},
+  {gate:2, q:"你更相信改变靠——", why:"你相信改变靠什么路径，对应审慎、创造、爱或领导力。", opts:[
+    {t:"把眼前每件小事做对", s:{"审慎":1,"自我控制":1}, tag:""},
+    {t:"敢想敢试，哪怕错", s:{"创造力":1,"勇敢":1}, tag:""},
+    {t:"人和人之间互相托住", s:{"爱":1,"善良":1}, tag:""},
+    {t:"有人愿意站出来带头", s:{"领导力":1,"公正":1}, tag:""}]},
+  {gate:2, q:"看到别人受委屈，你的第一反应是——", why:"看到别人受委屈的第一反应，暴露善良、公正、创造或爱。", opts:[
+    {t:"先去确认他是不是需要帮忙", s:{"善良":1,"社交智慧":1}, tag:""},
+    {t:"想清楚这事儿到底哪儿不公", s:{"公正":1,"判断力":1}, tag:""},
+    {t:"琢磨怎么帮他补上这个洞", s:{"创造力":1,"希望":1}, tag:""},
+    {t:"陪着他，哪怕不说话", s:{"爱":1,"谦逊":1}, tag:""}]},
+  {gate:2, q:"你做决定时，更相信——", why:"决策依据（事实/直觉/善意/责任）映射你最核心的优势。", opts:[
+    {t:"手上的事实和逻辑", s:{"判断力":1,"审慎":1}, tag:""},
+    {t:"心里那点说不清的直觉", s:{"洞察力":1,"希望":1}, tag:""},
+    {t:"这件事有没有让谁更好", s:{"善良":1,"爱":1}, tag:""},
+    {t:"我能不能对它负责到底", s:{"诚实":1,"自我控制":1}, tag:""}]},
+];
+
+/* —— 第三关：心流 → 能量双轴 + 五信号（A1） —— */
+const GATE3 = [
+  {gate:3, q:"回想你最投入的一次，更像是——", why:"最投入的一次，帮你识别心流的典型样貌（时间扭曲/专注/挑战匹配）。", opts:[
+    {t:"抬头发现，怎么两小时没了", s:{"时间扭曲":1}, tag:""},
+    {t:"手机响了好几声都没听见", s:{"专注":1,"自我消失":1}, tag:""},
+    {t:"明明很难，但刚好够得着，越做越上头", s:{"挑战匹配":1}, tag:""},
+    {t:"不用想下一步，手比脑子快", s:{"行动融合":1}, tag:""}]},
+  {gate:3, q:"你“忘记时间”的事，通常是——", why:"你「忘记时间」的活动类型，是心流最常发生的场所。", opts:[
+    {t:"一个人琢磨、写、画", s:{"自我消失":1}, tag:""},
+    {t:"和人深度聊一个话题", s:{"专注":1}, tag:""},
+    {t:"攻克一个具体难题", s:{"挑战匹配":1}, tag:""},
+    {t:"把混乱理成形状", s:{"清晰目标":1,"控制感":1}, tag:""}]},
+  {gate:3, q:"心流过后你的感觉更常是——", why:"心流后的能量是充电还是耗尽，区分「真热爱」与消耗型投入。", opts:[
+    {t:"累但特别踏实、满足", s:{"自成目标":1,"充电":1}, tag:""},
+    {t:"意犹未尽，想再来", s:{"即时反馈":1,"充电":1}, tag:""},
+    {t:"觉得这才像“我本来的样子”", s:{"自我消失":1,"充电":1}, tag:""},
+    {t:"想把它做得更大/更好", s:{"挑战匹配":1,"充电":1}, tag:""}]},
+  {gate:3, q:"什么会瞬间把你从心流里拽出来？", why:"什么瞬间把你拽出心流，帮你标记环境的能量雷区。", opts:[
+    {t:"被打断、被叫去开会", s:{"专注":1}, tag:""},
+    {t:"突然不知道该干嘛了", s:{"清晰目标":1}, tag:""},
+    {t:"做着做着觉得没反馈、没意思了", s:{"即时反馈":1,"耗尽":1}, tag:""},
+    {t:"发现这事其实没意义", s:{"自成目标":1,"耗尽":1}, tag:""}]},
+  {gate:3, q:"你做喜欢的事时，做完通常——", why:"做完通常的能量走向，判断这件事是否可持续。", opts:[
+    {t:"像充了电，还能再干点别的", s:{"充电":1}, tag:""},
+    {t:"有点耗，但心里是满的", s:{"充电":1}, tag:""},
+    {t:"空了，得歇好一阵", s:{"耗尽":1}, tag:""},
+    {t:"看情况，有的充电有的耗", s:{"充电":1,"耗尽":1}, tag:""}]},
+  {gate:3, q:"下面五种“被点亮”的感觉，哪个最戳你？", why:"VIA 五信号（向往/学得快/满足/忘时间/被夸）是优势最准的路标。", opts:[
+    {t:"我向往做这件事本身", s:{"sig_向往":1}, tag:""},
+    {t:"我做起来学得快，一点就通", s:{"sig_学得快":1}, tag:""},
+    {t:"做完那种满足感，别的给不了", s:{"sig_满足":1}, tag:""},
+    {t:"一做就忘了时间", s:{"sig_忘时间":1}, tag:""}]},
+  {gate:3, q:"还有哪一种，让你觉得“这事儿就是我的”？", why:"哪种「就是我的」的信号，帮你认领内在归属。", opts:[
+    {t:"别人夸我这件事做得好，我真心认", s:{"sig_被夸":1}, tag:""},
+    {t:"我总想弄明白它为什么是这样", s:{"sig_向往":1}, tag:""},
+    {t:"边做边觉得自己开窍了", s:{"sig_学得快":1}, tag:""},
+    {t:"沉浸进去，世界都安静了", s:{"sig_忘时间":1}, tag:""}]},
+  {gate:3, q:"如果有人问“你什么时候最像你”，你会说——", why:"心流状态里的自我感，是天赋区的情绪坐标。", opts:[
+    {t:"做那件我一做就停不下来的事时", s:{"行动融合":1}, tag:"停不下来"},
+    {t:"把乱糟糟变清楚的时候", s:{"控制感":1,"清晰目标":1}, tag:"理清"},
+    {t:"帮人把事办成的时候", s:{"自成目标":1,"充电":1}, tag:"成全"},
+    {t:"那个状态下，我会觉得「这大概才是我」", s:{"自我消失":1}, tag:"identity"}]},
+];
+
+/* —— 第四关：IKIGAI 现实校验层（A4） —— */
+/* 这关不累加分数，而是记录你当下的真实处境，用于报告的"能吃饭的天赋区"校验 */
+const GATE4 = [
+  {gate:4, qkey:"love", q:"先别想「热爱」这词，看下面哪个更像你最近的状态——", why:"你最近自发花时间的事，是热爱的雏形——或靠排除法逼近它。", opts:[
+    {t:"下班/下课后，总忍不住花时间鼓捣某样东西", note:"已有热爱雏形"},
+    {t:"没特别想做的，但有一堆「绝对不干」的事", note:"靠排除法"},
+    {t:"好几样都想试，贪心地列了一串清单", note:"兴趣广谱"},
+    {t:"说实话，现在还不知道自己热爱什么", note:"还在找"}]},
+  {gate:4, qkey:"good", q:"别人常夸你哪类事做得好？挑最近能想起的——", why:"别人总找你帮忙的，是已经显形的擅长。", opts:[
+    {t:"有件别人总找我帮忙、我也乐意的事", note:"优势已显形"},
+    {t:"会挺多，但没一样是「最拿得出手」的", note:"通才型"},
+    {t:"只有在做喜欢的事时才觉得自己行", note:"热爱驱动擅长"},
+    {t:"被夸了也觉得「哪有」，不太敢认", note:"低估中"}]},
+  {gate:4, qkey:"need", q:"如果世界现在缺一种人，你觉得缺的是你哪种样子？", why:"世界缺的「你那种样子」，决定天赋能否被需要。", opts:[
+    {t:"能帮具体的人解决具体麻烦的人", note:"服务型"},
+    {t:"能把复杂的东西讲清楚、做简单的人", note:"翻译型"},
+    {t:"能造点新东西出来的人", note:"创造型"},
+    {t:"还没头绪，但想做点不白费的事", note:"意义待定"}]},
+  {gate:4, qkey:"paid", q:"说到「能不能靠它吃饭」，你最诚实的念头是——", why:"能否靠它吃饭，决定天赋区能否闭环成生计。", opts:[
+    {t:"我的热爱/擅长，已经能换成钱或机会", note:"已闭环"},
+    {t:"能，但得先把它练得更像样", note:"打磨中"},
+    {t:"暂时还远，得先有份饭辙再说", note:"务实派"},
+    {t:"不想让热爱被钱绑架，宁愿分开", note:"分离派"}]},
+];
+
+const QUIZ = [...GATE1, ...GATE2, ...GATE3, ...GATE4];
+
+/* ===================== 维度元信息 ===================== */
+const RIA = {R:"现实型",I:"研究型",A:"艺术型",S:"社会型",E:"企业型",C:"常规型"};
+const FLOW_KEYS = ['时间扭曲','专注','挑战匹配','行动融合','清晰目标','即时反馈','自成目标','控制感','自我消失'];
+const SIG_KEYS = ['sig_向往','sig_学得快','sig_满足','sig_忘时间','sig_被夸'];
+const SIG_NAME = {'sig_向往':'向往','sig_学得快':'学得快','sig_满足':'满足','sig_忘时间':'忘时间','sig_被夸':'被夸'};
+const GATE_META = {
+  1:{no:"第一关",title:"你被什么吸走",en:"RIASEC · 霍兰德兴趣代码",sub:"给你几个再普通不过的情境，看你手会先伸向哪边。",note:"11 道题 · 约 3 分钟"},
+  2:{no:"第二关",title:"你身上什么在漏光",en:"VIA · 24 项性格优势",sub:"不是'你擅长什么'的客套，是哪几个特质真实地、持续地在你身上发亮。",note:"10 道题 · 约 3 分钟"},
+  3:{no:"第三关",title:"你什么时候被点亮",en:"心流 · 能量双轴 + 五信号",sub:"不是'你喜欢什么'，是哪几次你做起来忘了时间、做完还充了电。",note:"8 道题 · 约 3 分钟"},
+  4:{no:"第四关",title:"它能不能当饭吃",en:"IKIGAI · 现实校验",sub:"不考你定义，看哪个像你最近状态就好。热爱、擅长、世界需要、能谋生——四圈交叠的那块，才是你走得下去的天赋区。",note:"4 道认领题 · 约 1 分钟"}
+};
+
+/* ===================== 状态 ===================== */
+const stage=document.getElementById('stage');
+const bar=document.getElementById('bar');
+const plabel=document.getElementById('plabel');
+const total=QUIZ.length;
+const scores={};
+const ikigai={};
+let past=[];
+let idx=0;            // 当前题序号（仅统计带 gate 的题目）
+let currentGate=0;
+let recallDone=false;
+let history=[];       // 答题历史，用于回退 [{gate,qkey?,deltas:{k:delta},prevNote?}]
+let recallHistory=[]; // A2引导式回忆步骤历史，用于回退
+
+function topN(obj,n){return Object.entries(obj).sort((a,b)=>b[1]-a[1]).slice(0,n);}
+function countGate(g){return QUIZ.filter(q=>q.gate===g).length;}
+function countInGateBefore(g){let n=0;for(let i=0;i<idx;i++)if(QUIZ[i].gate===g)n++;return n;}
+
+/* —— 断点续测：进度快照（仅存本机，关掉不丢） —— */
+const PROGRESS_KEY='talentmap_quiz_progress';
+function saveProgress(phase){
+  try{
+    localStorage.setItem(PROGRESS_KEY, JSON.stringify({
+      phase, idx, currentGate,
+      scores:JSON.parse(JSON.stringify(scores)), ikigai:JSON.parse(JSON.stringify(ikigai)),
+      past:JSON.parse(JSON.stringify(past)), recallDone,
+      history:JSON.parse(JSON.stringify(history)),
+      recallStepIdx, recallStepKey, recallSel:JSON.parse(JSON.stringify(recallSel)),
+      recallNotes:JSON.parse(JSON.stringify(recallNotes)), recallHistory:JSON.parse(JSON.stringify(recallHistory))
+    }));
+  }catch(e){}
+}
+function clearProgress(){ try{ localStorage.removeItem(PROGRESS_KEY); }catch(e){} }
+function loadProgress(){ try{ return JSON.parse(localStorage.getItem(PROGRESS_KEY)); }catch(e){ return null; } }
+function restoreProgress(s){
+  for(const k in scores) delete scores[k];
+  Object.assign(scores, s.scores||{});
+  for(const k in ikigai) delete ikigai[k];
+  Object.assign(ikigai, s.ikigai||{});
+  idx=s.idx||0; currentGate=s.currentGate||0;
+  past=Array.isArray(s.past)?s.past.slice():[];
+  recallDone=!!s.recallDone;
+  history=Array.isArray(s.history)?s.history.slice():[];
+  recallStepIdx=s.recallStepIdx||0; recallStepKey=s.recallStepKey||'time';
+  recallSel=Object.assign({time:null,scene:null,cues:[],note:''}, s.recallSel||{});
+  recallNotes=Array.isArray(s.recallNotes)?s.recallNotes.slice():[];
+  recallHistory=Array.isArray(s.recallHistory)?s.recallHistory.slice():[];
+}
+
+/* —— A2：引导式回忆状态机（用「点选」帮用户想起，而非逼ta硬想） —— */
+let recallStepIdx=0, recallStepKey='time';
+let recallSel={time:null,scene:null,cues:[],note:''};
+let recallNotes=[];
+function buildPastNote(item, sel){
+  const time = sel.time? (sel.time+'，') : '';
+  const scene = sel.scene? ('在'+sel.scene+'，') : '';
+  const cues = sel.cues.length? ('「'+sel.cues.join('、')+'」') : '';
+  const note = sel.note? ('—— '+sel.note) : '';
+  const s = (time+scene+cues+note).replace(/^\s*——\s*|\s+$/g,'');
+  return s.trim()? (item.tag+'：'+s) : null;
+}
+function renderRecall(){
+  recallStepIdx=0; recallStepKey='time';
+  recallSel={time:null,scene:null,cues:[],note:''}; recallNotes=[]; recallHistory=[];
+  plabel.textContent='第 0 关 · 先让记忆开口';
+  bar.style.width='0%';
+  stage.innerHTML=`
+    <div class="recall">
+      <div class="rno">第 0 关 · 回望</div>
+      <h2>在测之前，先听你自己的</h2>
+      <div class="rsub">天赋不是被「测」出来的，是曾被你活过的。我们换个轻松的方式——不用硬想，<span class="hl">点着点着，它就自己浮出来了</span>。</div>
+      <div class="rnote">3 件小事，每件事 3 步选择题，几十秒就好。留白也行，但留下来它们会在你的报告里重新亮起。<br/>不管你擅长的事看起来多冷门、多「暂时没用」，这里识别的都是你做事时的<span class="hl">模式</span>（兴趣 / 优势 / 心流）。模式有限，技能无限。</div>
+      <div style="text-align:center;margin-top:26px">
+        <button class="btn btn-primary" id="startRecall">开始回想 →</button>
+      </div>
+    </div>`;
+  document.getElementById('startRecall').onclick=renderRecallStep;
+}
+function renderRecallStep(){
+  saveProgress('recall-step');
+  const item=RECALL_ITEMS[recallStepIdx];
+  const step=RECALL_STEPS[recallStepKey];
+  const order=['time','scene','cue','note'];
+  const si=order.indexOf(recallStepKey);
+  bar.style.width=((recallStepIdx*4+si)/(RECALL_ITEMS.length*4)*100)+'%';
+  plabel.textContent=`回想 ${recallStepIdx+1} / ${RECALL_ITEMS.length} · 第 ${si+1} / 4 步`;
+  if(recallStepKey==='note'){
+    stage.innerHTML=`
+      <div class="recall">
+        <div class="rno">第 ${recallStepIdx+1} 件 · ${item.tag}</div>
+        <h2>${item.hint}</h2>
+        <div class="rsub">想补一句当时做了什么吗？<span class="hl">可跳过</span>。</div>
+        <textarea id="rnote" placeholder="可选，例如：高三晚自习后偷偷写小说，写到熄灯还舍不得停">${recallSel.note||''}</textarea>
+        <div class="ropt-tip">不写也完全 OK，前面点过的已经够用了。</div>
+        <div class="prev-row"><button class="btn btn-ghost" id="prevBtnRecall">← 上一步</button></div>
+        <div style="text-align:center;margin-top:12px;display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+          <button class="btn btn-ghost" id="skipNote">跳过</button>
+          <button class="btn btn-primary" id="nextNote">下一步 →</button>
+        </div>
+      </div>`;
+    const pushRecallHistory=()=>recallHistory.push({idx:recallStepIdx,key:'note',sel:JSON.parse(JSON.stringify(recallSel))});
+    document.getElementById('skipNote').onclick=()=>{ pushRecallHistory(); finishRecallStep(); };
+    document.getElementById('nextNote').onclick=()=>{ recallSel.note=document.getElementById('rnote').value.trim(); pushRecallHistory(); finishRecallStep(); };
+    document.getElementById('prevBtnRecall').onclick=goBackRecall;
+    return;
+  }
+  const isMulti=step.multi;
+  const optsHtml=step.opts.map((o,i)=>{
+    const sel = isMulti ? recallSel.cues.includes(o) : recallSel[recallStepKey]===o;
+    return `<button class="opt ${sel?'sel':''}" data-o="${i}">${o}</button>`;
+  }).join('');
+  const prevBtnHtml = `<div class="prev-row"><button class="btn btn-ghost" id="prevBtnRecall">← 上一步</button></div>`;
+  const nextBtn = recallStepKey==='cue'
+    ? `${prevBtnHtml}<div style="text-align:center;margin-top:12px;display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+         <button class="btn btn-ghost" id="skipCue">都不太像，跳过</button>
+         <button class="btn btn-primary" id="nextStep">下一步 →</button>
+       </div>`
+    : `${prevBtnHtml}<div style="text-align:center;margin-top:12px">
+         <button class="btn btn-primary" id="nextStep" disabled style="opacity:.45;cursor:not-allowed">选一个，下一步 →</button>
+       </div>`;
+  stage.innerHTML=`
+    <div class="recall">
+      <div class="rno">第 ${recallStepIdx+1} 件 · ${item.tag}</div>
+      <h2>${step.q}</h2>
+      <div class="ropt-tip">${isMulti?'（可多选，没有就点「跳过」）':''}</div>
+      <div class="opts">${optsHtml}</div>
+      ${nextBtn}
+    </div>`;
+  stage.querySelectorAll('.opt').forEach(b=>{
+    b.onclick=()=>{
+      const o=step.opts[+b.dataset.o];
+      if(isMulti){
+        if(recallSel.cues.includes(o)){ recallSel.cues=recallSel.cues.filter(x=>x!==o); b.classList.remove('sel'); }
+        else { recallSel.cues.push(o); b.classList.add('sel'); }
+      } else {
+        recallSel[recallStepKey]=o;
+        stage.querySelectorAll('.opt').forEach(x=>x.classList.remove('sel'));
+        b.classList.add('sel');
+        const nb=document.getElementById('nextStep'); nb.disabled=false; nb.style.opacity='1'; nb.style.cursor='pointer';
+      }
+    };
+  });
+  const ns=document.getElementById('nextStep');
+  if(ns) ns.onclick=()=>{
+    recallHistory.push({idx:recallStepIdx,key:recallStepKey,sel:JSON.parse(JSON.stringify(recallSel))});
+    if(recallStepKey==='time') recallStepKey='scene';
+    else if(recallStepKey==='scene') recallStepKey='cue';
+    else if(recallStepKey==='cue') recallStepKey='note';
+    renderRecallStep();
+  };
+  const pbr=document.getElementById('prevBtnRecall');
+  if(pbr) pbr.onclick=goBackRecall;
+  const sc=document.getElementById('skipCue');
+  if(sc) sc.onclick=()=>{
+    recallHistory.push({idx:recallStepIdx,key:recallStepKey,sel:JSON.parse(JSON.stringify(recallSel))});
+    recallStepKey='note'; renderRecallStep();
+  };
+}
+function finishRecallStep(){
+  const item=RECALL_ITEMS[recallStepIdx];
+  recallNotes[recallStepIdx]=buildPastNote(item, recallSel);
+  recallStepIdx++;
+  if(recallStepIdx>=RECALL_ITEMS.length){
+    past = recallNotes.filter(Boolean);
+    recallDone=true;
+    renderGate(1);
+  } else {
+    recallStepKey='time';
+    recallSel={time:null,scene:null,cues:[],note:''};
+    renderRecallStep();
+  }
+}
+
+function goBackRecall(){
+  if(recallHistory.length===0){
+    renderRecall();
+    return;
+  }
+  const prev=recallHistory.pop();
+  recallStepIdx=prev.idx;
+  recallStepKey=prev.key;
+  recallSel=JSON.parse(JSON.stringify(prev.sel));
+  renderRecallStep();
+}
+
+function renderGate(g){
+  currentGate=g;
+  const m=GATE_META[g];
+  stage.innerHTML=`
+    <div class="gate">
+      <div class="gno">${m.no}</div>
+      <h2>${m.title}</h2>
+      <div class="gsub">${m.sub}</div>
+      <div class="gnote">${m.en} · ${m.note}</div>
+      <button class="btn btn-primary" id="startGate">开始这一关 →</button>
+    </div>`;
+  plabel.textContent=`第 ${g} / 4 关`;
+  document.getElementById('startGate').onclick=()=>renderQuestion();
+  saveProgress('gate');
+}
+
+function updateProgress(){
+  const done=idx;
+  bar.style.width=(done/total*100)+'%';
+  if(idx<total){
+    const g=QUIZ[idx].gate;
+    plabel.textContent=`第 ${g} / 4 关 · 第 ${countInGateBefore(g)+1} / ${countGate(g)} 题`;
+  }
+}
+
+function renderQuestion(){
+  const item=QUIZ[idx];
+  currentGate=item.gate;
+  const c = item.gate===1?'var(--sky)':item.gate===2?'var(--violet)':item.gate===3?'var(--mint)':'var(--gold)';
+  const optsHtml=item.opts.map((o,i)=>`
+    <button class="opt" style="--c:${c}" data-i="${i}">
+      ${o.t}${o.tag?`<span class="tag">${o.tag}</span>`:''}
+    </button>`).join('');
+  const prevBtnHtml = idx>0 ? `<div class="prev-row"><button class="btn btn-ghost" id="prevBtn">← 上一条</button></div>` : '';
+  stage.innerHTML=`
+    <div class="q">
+      <div class="qmeta">${GATE_META[item.gate].no} · ${GATE_META[item.gate].en}</div>
+      <h3>${item.q}${item.why?` <button type="button" class="why-btn" aria-expanded="false" aria-label="为什么问这道">ⓘ</button>`:''}</h3>
+      ${item.why?`<div class="why-pop" hidden>${item.why}</div>`:''}
+      ${item.gate===4?`<div class="g4hint">认不出也别急——挑一个「最像你最近状态」的就好。这关只是确认你当下的坐标，没有标准答案。</div>`:''}
+      <div class="opts">${optsHtml}</div>
+      ${prevBtnHtml}
+    </div>`;
+  updateProgress();
+  stage.querySelectorAll('.opt').forEach(b=>{
+    b.onclick=()=>{
+      const o=item.opts[+b.dataset.i];
+      const record={gate:item.gate, q:item.q, opt:o.t, deltas:{}};
+      if(item.gate===4){
+        record.qkey=item.qkey;
+        record.prevNote=ikigai[item.qkey];
+        record.note=o.note;
+        ikigai[item.qkey]=o.note;
+      } else {
+        for(const k in o.s){ scores[k]=(scores[k]||0)+o.s[k]; record.deltas[k]=o.s[k]; }
+      }
+      history.push(record);
+      idx++;
+      if(idx>=total){ renderResult(); return; }
+      if(QUIZ[idx].gate!==currentGate){ renderFeedback(currentGate); }
+      else { renderQuestion(); }
+    };
+  });
+  const pb=document.getElementById('prevBtn');
+  if(pb) pb.onclick=goBack;
+  const wb=stage.querySelector('.why-btn');
+  if(wb){ wb.onclick=()=>{ const pop=stage.querySelector('.why-pop'); if(!pop) return; const open=!pop.hasAttribute('hidden'); pop.toggleAttribute('hidden'); wb.setAttribute('aria-expanded',String(open)); }; }
+  saveProgress('question');
+}
+
+function goBack(){
+  if(idx<=0 || history.length===0) return;
+  const last=history.pop();
+  idx--;
+  for(const k in last.deltas){
+    scores[k]-=last.deltas[k];
+    if(scores[k]<=0) delete scores[k];
+  }
+  if(last.qkey){
+    if(last.prevNote!==undefined) ikigai[last.qkey]=last.prevNote;
+    else delete ikigai[last.qkey];
+  }
+  currentGate=QUIZ[idx].gate;
+  renderQuestion();
+}
+
+function renderFeedback(g){
+  const m=GATE_META[g];
+  let body='', note='';
+  if(g===1){
+    const riaScores=Object.fromEntries(Object.entries(scores).filter(([k])=>RIA[k]));
+    const top=topN(riaScores,3).filter(([k,v])=>v>0);
+    const tags=top.map(([k,v])=>`<span class="top">${RIA[k]} · ${v}次</span>`).join('') || '<span>还不太明显</span>';
+    body=`目前你手伸得最勤的方向是——`;
+    note=`兴趣代码是「模式」，不是具体职业。不管你那件事看起来多小众，RIASEC 都能接住它。`;
+    stage.innerHTML=`
+      <div class="feedback gate">
+        <div class="gno">${m.no} · 火候反馈</div>
+        <h2>${m.title}</h2>
+        <div class="gsub">${body}</div>
+        <div class="mini-tags">${tags}</div>
+        <button class="btn btn-primary" id="nextFromFeedback">继续下一关 →</button>
+        <div class="fb-note">${note}</div>
+      </div>`;
+  } else if(g===2){
+    const viaBlack=Object.keys(RIA).concat(FLOW_KEYS,SIG_KEYS,['充电','耗尽']);
+    const viaEntries=Object.entries(scores).filter(([k])=>!viaBlack.includes(k));
+    const top=topN(Object.fromEntries(viaEntries),5).filter(([k,v])=>v>0);
+    const tags=top.map(([k,v])=>`<span class="top">${k}</span>`).join('') || '<span>还在观察中</span>';
+    body=`你身上最亮的几道光——`;
+    note=`如果刚才很多题你都感觉「两个都想选」，说明你的优势比较广谱，这不矛盾，只是你发光的维度不止一个。`;
+    stage.innerHTML=`
+      <div class="feedback gate">
+        <div class="gno">${m.no} · 火候反馈</div>
+        <h2>${m.title}</h2>
+        <div class="gsub">${body}</div>
+        <div class="mini-tags">${tags}</div>
+        <button class="btn btn-primary" id="nextFromFeedback">继续下一关 →</button>
+        <div class="fb-note">${note}</div>
+      </div>`;
+  } else if(g===3){
+    const flowTop=topN(Object.fromEntries(FLOW_KEYS.map(k=>[k,scores[k]||0])),3).filter(([k,v])=>v>0);
+    const sigTop=topN(Object.fromEntries(SIG_KEYS.map(k=>[k,scores[k]||0])),3).filter(([k,v])=>v>0).map(([k])=>SIG_NAME[k]);
+    const charge=scores['充电']||0, drain=scores['耗尽']||0;
+    const energyType = charge>drain+1 ? '充电型' : drain>charge+1 ? '耗尽型' : '看情况';
+    const flowTags=flowTop.map(([k])=>`<span class="top">${k}</span>`).join('') || '<span>还在浮现</span>';
+    const sigTags=sigTop.length? `<div class="mini-tags" style="margin-top:10px">${sigTop.map(s=>`<span>${s}</span>`).join('')}</div>` : '';
+    body=`你最容易「消失」的状态——`;
+    note=`能量上偏<b>${energyType}</b>。最后一关会看看它能不能当饭吃。`;
+    stage.innerHTML=`
+      <div class="feedback gate">
+        <div class="gno">${m.no} · 火候反馈</div>
+        <h2>${m.title}</h2>
+        <div class="gsub">${body}</div>
+        <div class="mini-tags">${flowTags}</div>
+        ${sigTags}
+        <button class="btn btn-primary" id="nextFromFeedback">继续下一关 →</button>
+        <div class="fb-note">${note}</div>
+      </div>`;
+  }
+  plabel.textContent=`第 ${g} 关 · 已完成`;
+  bar.style.width=(QUIZ.filter(q=>q.gate<=g).length/total*100)+'%';
+  document.getElementById('nextFromFeedback').onclick=()=>renderQuestion();
+  saveProgress('feedback');
+}
+
+/* 按测评分数生成星图：三层簇的大小/数量/亮度随 Top 维度权重变化 */
+function starMapSVG(ria, via, flow){
+  const anchors=[[86,112],[234,112],[160,240]];
+  const colors=['var(--sky)','var(--violet)','var(--mint)'];
+  const lists=[ria||[],via||[],flow||[]];
+  const weights=lists.map(list=>{
+    if(!list.length) return 0.2;
+    const max=Math.max(1,...list.map(x=>x.v!=null?x.v:(x[1]!=null?x[1]:1)));
+    return ((list[0].v!=null?list[0].v:(list[0][1]!=null?list[0][1]:1))/max)||0.2;
+  });
+  let groups='';
+  lists.forEach((list,gi)=>{
+    const [cx,cy]=anchors[gi];
+    const w=weights[gi];
+    const max=Math.max(1,...list.map(x=>x.v!=null?x.v:(x[1]!=null?x[1]:1)));
+    const n=Math.max(3,Math.min(7,list.length?list.length+2:3));
+    const pts=[];
+    for(let i=0;i<n;i++){
+      const a=gi*2.1+i*2*Math.PI/n;
+      const item=list[i]||null;
+      const val=item?(item.v!=null?item.v:(item[1]!=null?item[1]:1)):0.4;
+      const rr=26+(i%3)*6+(val/max)*20;
+      pts.push({
+        x:cx+Math.cos(a)*rr,
+        y:cy+Math.sin(a)*rr*0.86,
+        r:3.2+(val/max)*2.8,
+        o:0.55+(val/max)*0.45
+      });
+    }
+    const d=pts.map((p,i)=>(i?'L':'M')+p.x.toFixed(1)+' '+p.y.toFixed(1)).join(' ');
+    groups+=`<g class="grp" style="opacity:${(0.45+0.55*w).toFixed(2)}">
+      <path d="${d}" fill="none" stroke="${colors[gi]}" stroke-width="1.4" stroke-dasharray="3 5"/>
+      ${pts.map(p=>`<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="${p.r.toFixed(1)}" fill="${colors[gi]}" style="opacity:${p.o.toFixed(2)}"/>`).join('')}
+    </g>`;
+  });
+  const avg=(weights[0]+weights[1]+weights[2])/3;
+  return `<svg viewBox="0 0 320 320" role="img" aria-label="你的三层天赋星图">
+    <circle cx="160" cy="160" r="130" fill="none" stroke="rgba(255,255,255,.07)"/>
+    <circle cx="160" cy="160" r="85" fill="none" stroke="rgba(255,255,255,.07)"/>
+    <circle cx="160" cy="160" r="45" fill="none" stroke="rgba(255,255,255,.07)"/>
+    ${groups}
+    <circle cx="160" cy="160" r="34" fill="rgba(243,193,75,${(0.10+avg*0.12).toFixed(2)})"/>
+    <circle cx="160" cy="160" r="${(5.5+avg*2.5).toFixed(1)}" fill="#ffe1a0"/>
+    <circle cx="160" cy="160" r="14" fill="none" stroke="rgba(243,193,75,${(0.35+avg*0.35).toFixed(2)})" stroke-width="1.2"/>
+    <circle cx="160" cy="160" r="70" fill="none" stroke="var(--gold)" stroke-width="1.4" stroke-dasharray="4 8" style="opacity:${(0.35+avg*0.6).toFixed(2)}"/>
+  </svg>`;
+}
+
+function renderResult(){
+  bar.style.width='100%';
+  plabel.textContent='星图已绘制';
+
+  // 兴趣 Top3
+  const riaScores=Object.fromEntries(Object.entries(scores).filter(([k])=>RIA[k]));
+  const riaTop=topN(riaScores,3).map(([k,v])=>({k,label:RIA[k],v}));
+  // 优势 Top5
+  const viaBlack=Object.keys(RIA).concat(FLOW_KEYS,SIG_KEYS,['充电','耗尽']);
+  const viaEntries=Object.entries(scores).filter(([k])=>!viaBlack.includes(k));
+  const viaTop=topN(Object.fromEntries(viaEntries),5);
+  // 心流最强信号
+  const flowTop=topN(Object.fromEntries(FLOW_KEYS.map(k=>[k,scores[k]||0])),3).filter(([k,v])=>v>0);
+  // 能量读数
+  const charge=scores['充电']||0, drain=scores['耗尽']||0;
+  const energyType = charge>drain+1 ? '充电型' : drain>charge+1 ? '耗尽型' : '看情况';
+  // 五信号
+  const signals=topN(Object.fromEntries(SIG_KEYS.map(k=>[k,scores[k]||0])),3).filter(([k,v])=>v>0).map(([k])=>SIG_NAME[k]);
+
+  // —— A6：置信度（分数集中度）——
+  const riaVals=Object.values(riaScores);
+  const riaMax=Math.max(0,...riaVals), riaSum=riaVals.reduce((a,b)=>a+b,0);
+  const riaConc = riaSum? riaMax/riaSum : 0;
+  const viaVals=Object.values(Object.fromEntries(viaEntries));
+  const viaMax=Math.max(0,...viaVals), viaSum=viaVals.reduce((a,b)=>a+b,0);
+  const viaConc = viaSum? viaMax/viaSum : 0;
+  const conc=(riaConc+viaConc)/2;
+  let confLevel, confText;
+  if(conc>0.42){ confLevel='稳'; confText='你的选择相当集中，这张星图比较能代表你当下的样子。'; }
+  else if(conc>0.28){ confLevel='中等'; confText='轮廓有了，但还有几个方向在抢。隔阵子再来一次，会越画越清。'; }
+  else { confLevel='初探'; confText='你似乎哪边都想试——这本身也是种天赋（广谱兴趣）。多测几次会更聚焦。'; }
+
+  // —— B1：叙事化结论 ——
+  const r1=riaTop[0]?riaTop[0].label:'还没聚焦';
+  const v1=viaTop[0]?viaTop[0][0]:'某个还没命名的特质';
+  const f1=flowTop[0]?flowTop[0][0]:'某件让你停不下来的事';
+  const narrative=`如果只用一段话描摹你——你大概是个被 <b>${r1}</b> 吸着走的人：
+    手会先伸向那一类的东西，哪怕说不清为什么。托着你的，是 <b>${v1}</b> 这样的特质，它让你在某些时刻比平时更"是你"。
+    而真正让你消失的，常常是 <b>${f1}</b>——那种做完不是累、是满了的瞬间，就是天赋最老实的证据。
+    你偏 <b>${energyType}</b>：同样的事，你更容易被它充电而不是耗尽。${signals.length?`别人常说你"${signals.join('、')}"，那不是客套，是信号。`:''}
+    ${past.length?`你还记得：${past[0].slice(0,24)}……这些片段不是过去，是你天赋早就露过的光。`:''}
+    三层叠在一起的那一小块，不一定壮观，但它是真的——而且不管你擅长的那件事看起来多冷门、多「没用」，这三层模式都能把它接住。`;
+
+  const verdict=`你的天赋区，落在 <b>${r1}</b> 的方向上，被 <b>${v1}</b> 这样的特质托着，
+    而让你真正"消失"的，常常是 <b>${f1}</b>。三层叠在一起的那一小块，不一定壮观，但它是真的——
+    值得你拿去做点什么。`;
+
+  // 存结果，供 report.html 读取
+  const SRC_FROM=(new URLSearchParams(location.search).get('from'))||'';
+  if(SRC_FROM){
+    const L={bili:'B站',bili01:'B站',xhs:'小红书',xhs01:'小红书',dy:'抖音',dy01:'抖音',douyin:'抖音',wb:'微博',wb01:'微博',zh:'公众号',zh01:'公众号',video:'视频'};
+    document.querySelectorAll('a[href="quiz.html"]').forEach(a=>a.href='quiz.html?from='+encodeURIComponent(SRC_FROM));
+    try{const k='talentmap_utm_'+SRC_FROM;localStorage.setItem(k,String((parseInt(localStorage.getItem(k)||'0',10)||0)+1));}catch(e){}
+  }
+
+  const payload={
+    riaTop, viaTop, flowTop,
+    energy:{type:energyType,charge,drain},
+    signals,
+    ikigai, past,
+    confidence:{level:confLevel,text:confText},
+    narrative, verdict, ts:Date.now(), from:SRC_FROM,
+    trail:JSON.parse(JSON.stringify(history))
+  };
+  try{ localStorage.setItem('talentmap_result', JSON.stringify(payload)); }catch(e){}
+  if(window.tmTrack) tmTrack('quiz_complete'); // Umami 漏斗：完成测评
+  // ② 多次测评对比：把本次结果追加进历史（最多留 6 张）
+  try{
+    let h=[]; try{ h=JSON.parse(localStorage.getItem('talentmap_history'))||[]; }catch(e){}
+    if(!h.length || h[h.length-1].ts!==payload.ts){
+      h.push(JSON.parse(JSON.stringify(payload)));
+      if(h.length>6) h=h.slice(-6);
+      localStorage.setItem('talentmap_history', JSON.stringify(h));
+    }
+  }catch(e){}
+  clearProgress();
+
+  const riaTags=riaTop.map(r=>`<span class="top">${r.label}</span>`).join('')||'<span>暂不明显</span>';
+  const viaTags=viaTop.map(([k])=>`<span class="top">${k}</span>`).join('')||'<span>暂不明显</span>';
+  const flowTags=flowTop.map(([k])=>`<span class="top">${k}</span>`).join('')||'<span>暂不明显</span>';
+
+  stage.innerHTML=`
+    <div class="result">
+      <h2>你的天赋星图</h2>
+      <div class="rsub">三层已经叠好，重合的那块，就是你的天赋区</div>
+      <div class="map">
+        ${starMapSVG(riaTop, viaTop, flowTop)}
+      </div>
+      <div class="groups">
+        <div class="gcard">
+          <div class="gh"><span class="dotc" style="background:var(--sky)"></span><h4>兴趣 · 你被什么吸走</h4><span class="en">RIASEC</span></div>
+          <div class="tags">${riaTags}</div>
+        </div>
+        <div class="gcard">
+          <div class="gh"><span class="dotc" style="background:var(--violet)"></span><h4>优势 · 你身上什么在漏光</h4><span class="en">VIA</span></div>
+          <div class="tags">${viaTags}</div>
+        </div>
+        <div class="gcard">
+          <div class="gh"><span class="dotc" style="background:var(--mint)"></span><h4>心流 · 你什么时候消失过</h4><span class="en">FLOW</span></div>
+          <div class="tags">${flowTags}</div>
+        </div>
+      </div>
+      <div class="verdict">${verdict}</div>
+      <div><span class="conf">结果置信度：<b>${confLevel}</b> · ${confText}</span></div>
+      <div class="actions">
+        <button class="btn btn-primary" id="toReport">查看完整报告 →</button>
+        <a class="btn btn-ghost" href="stories.html">看看别人怎么走出来</a>
+        <button class="btn btn-ghost" onclick="location.reload()">再测一次</button>
+        <a class="btn btn-ghost" href="index.html">回到首页</a>
+        <a class="btn btn-ghost" href="companion.html">和星图伙伴聊聊</a>
+      </div>
+      <div class="disclaim">说明：本测评用于自我探索与方向参考，基于 RIASEC、VIA、心流、IKIGAI 等心理学框架简化而来，不构成职业或心理诊断。它不判断具体技能（有人擅长整理、有人擅长猜人心、有人擅长把复杂变简单），只帮你识别那些技能背后的模式。结果越贴近你的真实体验，参考价值越高。</div>
+    </div>`;
+  document.getElementById('toReport').onclick=()=>{location.href='report.html'+(SRC_FROM?('?from='+encodeURIComponent(SRC_FROM)):'');};
+}
+
+/* 启动：有未完成的进度 → 弹「继续 / 重测」；否则从头开始 */
+function showResumeBanner(s){
+  let leftTxt='';
+  if(s.phase==='recall-step'){
+    const done=s.recallStepIdx||0; leftTxt=`回想 ${Math.min(done+1,3)} / 3 步 · 继续回忆`;
+  } else if(s.phase==='recall-intro'){
+    leftTxt='刚开始 · 继续回想';
+  } else {
+    const left=Math.max(0,total-(s.idx||0));
+    leftTxt=`还剩 ${left} 题`;
+  }
+  stage.innerHTML=`
+    <div class="gate resume">
+      <div class="gno">上次没画完</div>
+      <h2>继续你的星图？</h2>
+      <div class="gsub">${leftTxt}。进度只存在你这台设备，关掉也不会丢。</div>
+      <div style="text-align:center;margin-top:24px;display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+        <button class="btn btn-primary" id="resumeBtn">继续画 →</button>
+        <button class="btn btn-ghost" id="restartBtn">重新测一次</button>
+      </div>
+      <div class="gnote" style="margin-top:18px">选「重新测一次」会清空这次进度，从第一关开始。</div>
+    </div>`;
+  document.getElementById('resumeBtn').onclick=()=>{
+    restoreProgress(s);
+    if(s.phase==='recall-step') renderRecallStep();
+    else if(s.phase==='gate') renderGate(currentGate);
+    else if(s.phase==='question') renderQuestion();
+    else if(s.phase==='feedback') renderFeedback(currentGate);
+    else renderRecall();
+    window.scrollTo(0,0);
+  };
+  document.getElementById('restartBtn').onclick=()=>{ clearProgress(); renderRecall(); window.scrollTo(0,0); };
+}
+(function boot(){
+  const saved=loadProgress();
+  if(saved && saved.phase && saved.phase!=='result'){ showResumeBanner(saved); }
+  else { renderRecall(); }
+})();
+</script>
+  <script>
+  /* ===== 深空背景：视差星海 + 真实星座（与首页一致） ===== */
+  (function(){
+    var layers=[].slice.call(document.querySelectorAll('[data-speed]'));
+    var nebB1=document.getElementById('nebB1'),nebB2=document.getElementById('nebB2'),nebB3=document.getElementById('nebB3');
+    function onScroll(){
+      layers.forEach(function(l){var s=parseFloat(l.dataset.speed);l.style.transform='translate3d(0,'+(-window.scrollY*s).toFixed(1)+'px,0)';});
+      var max=document.documentElement.scrollHeight-window.innerHeight;
+      var p=max>0?Math.min(1,Math.max(0,window.scrollY/max)):0;
+      if(nebB1)nebB1.style.opacity=(0.55-0.38*p).toFixed(3);
+      if(nebB2)nebB2.style.opacity=(0.30+0.28*p).toFixed(3);
+      if(nebB3)nebB3.style.opacity=(0.16+0.55*p).toFixed(3);
+    }
+    onScroll();window.addEventListener('scroll',onScroll,{passive:true});window.addEventListener('resize',onScroll,{passive:true});
+    var SVGNS='http://www.w3.org/2000/svg';
+    function seedStars(layer,count,extra){
+      if(!layer)return;var frag=document.createDocumentFragment();
+      for(var i=0;i<count;i++){var s=document.createElement('i');s.className='star';
+        if(extra&&Math.random()<0.22)s.classList.add(extra[Math.floor(Math.random()*extra.length)]);
+        s.style.left=(Math.random()*100).toFixed(2)+'%';s.style.top=(Math.random()*100).toFixed(2)+'%';
+        s.style.transform='scale('+(0.6+Math.random()*0.9).toFixed(2)+')';
+        if(Math.random()<0.4)s.style.animation='starTw '+(3+Math.random()*4).toFixed(1)+'s ease-in-out infinite';
+        frag.appendChild(s);}
+      layer.appendChild(frag);
+    }
+    const isMobile=window.innerWidth<720;
+    seedStars(document.getElementById('layerFar'),isMobile?70:130,['blue']);
+    seedStars(document.getElementById('layerMid'),isMobile?34:64,['gold','bright']);
+    var CONSTELS=[
+      {name:'北斗七星',left:'3%',top:'34%',stars:[[6,12],[6,34],[26,42],[26,20],[46,18],[64,13],[84,7]],edges:[[0,1],[1,2],[2,3],[3,4],[4,5],[5,6]]},
+      {name:'猎户座',left:'80%',top:'50%',stars:[[16,22],[38,18],[24,56],[31,53],[40,50],[40,80],[17,82],[27,7]],edges:[[7,0],[7,1],[0,1],[0,2],[1,4],[2,3],[3,4],[2,6],[4,5],[6,5]]},
+      {name:'仙后座',left:'6%',top:'70%',stars:[[8,72],[30,40],[50,62],[70,34],[92,56]],edges:[[0,1],[1,2],[2,3],[3,4]]},
+      {name:'天鹅座',left:'78%',top:'88%',stars:[[50,10],[50,46],[50,90],[24,46],[76,46]],edges:[[0,1],[1,2],[3,1],[1,4]]}
+    ];
+    function buildConstel(cfg){
+      var wrap=document.createElement('div');wrap.className='constel';
+      wrap.style.left=cfg.left;wrap.style.top=cfg.top;wrap.title=cfg.name+'（点一下，让它亮起来）';
+      var svg=document.createElementNS(SVGNS,'svg');svg.setAttribute('viewBox','0 0 100 100');
+      cfg.edges.forEach(function(e){var p=document.createElementNS(SVGNS,'path');p.setAttribute('class','c-line');p.setAttribute('d','M'+cfg.stars[e[0]][0]+' '+cfg.stars[e[0]][1]+' L'+cfg.stars[e[1]][0]+' '+cfg.stars[e[1]][1]);svg.appendChild(p);});
+      var halo=document.createElementNS(SVGNS,'circle');halo.setAttribute('class','c-halo');halo.setAttribute('cx','50');halo.setAttribute('cy','50');halo.setAttribute('r','44');svg.appendChild(halo);
+      cfg.stars.forEach(function(st){var c=document.createElementNS(SVGNS,'circle');c.setAttribute('class','c-dot');c.setAttribute('cx',st[0]);c.setAttribute('cy',st[1]);c.setAttribute('r','2.4');svg.appendChild(c);});
+      wrap.appendChild(svg);
+      wrap.addEventListener('click',function(){wrap.classList.remove('pulse');void wrap.offsetWidth;wrap.classList.add('pulse');});
+      return wrap;
+    }
+    var near=document.getElementById('layerNear');
+    if(near)CONSTELS.forEach(function(c){near.appendChild(buildConstel(c));});
+    onScroll();
+  })();
+  </script>
+  <footer style="border-top:1px solid rgba(255,255,255,.08);margin-top:54px;padding:26px 0 14px;text-align:center;font-size:13px;color:#7f8bb3">
+    <a href="index.html" style="color:#9aa6cf;text-decoration:none;margin:0 6px">首页</a>·<a href="quiz.html" style="color:#9aa6cf;text-decoration:none;margin:0 6px">测评</a>·<a href="report.html" style="color:#9aa6cf;text-decoration:none;margin:0 6px">报告</a>·<a href="action.html" style="color:#9aa6cf;text-decoration:none;margin:0 6px">行动</a>·<a href="stories.html" style="color:#9aa6cf;text-decoration:none;margin:0 6px">案例</a>·<a href="companion.html" style="color:#9aa6cf;text-decoration:none;margin:0 6px">伙伴</a>·<a href="me.html" style="color:#9aa6cf;text-decoration:none;margin:0 6px">我的星图</a>·<a href="pricing.html" style="color:#9aa6cf;text-decoration:none;margin:0 6px">价格</a>·<a href="blog.html" style="color:#9aa6cf;text-decoration:none;margin:0 6px">博客</a>·<a href="about.html" style="color:#9aa6cf;text-decoration:none;margin:0 6px">关于</a>·<a href="faq.html" style="color:#9aa6cf;text-decoration:none;margin:0 6px">FAQ</a>·<a href="contact.html" style="color:#9aa6cf;text-decoration:none;margin:0 6px">联系</a>
+    <div style="margin-top:10px">天赋星图 · 在共产主义尚未到来的时期，把生命力放大到它应该在的水平</div>
+  </footer>
+</body>
+</html>

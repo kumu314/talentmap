@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>天赋星图 · 你做什么会忘记时间？</title>
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="icon" href="logo-mark.svg" type="image/svg+xml">
+  <meta name="description" content="天赋星图 · 用 RIASEC/VIA/心流/IKIGAI 三层定位 + 一层现实校验，8 分钟画出你的天赋星图，把被压住的生命力放大到它应该在的水平。">
+<meta property="og:type" content="website">
+<meta property="og:title" content="天赋星图 · 你做什么会忘记时间？">
+<meta property="og:description" content="三层定位 + 一层现实校验，8 分钟画出你的天赋星图。">
+<meta property="og:image" content="https://46461dec3937411d970e0881cbfa0056.app.codebuddy.work/og-cover.png">
+<style>
+  :root{
+    --bg:#060912;
+    --bg-1:#0a0f22;
+    --ink:#eef2ff;
+    --ink-soft:#9aa6cf;
+    --ink-faint:#7f8bb3;
+    --gold:#f3c14b;
+    --gold-soft:#ffe1a0;
+    --sky:#6ea0ff;
+    --violet:#a98bff;
+    --mint:#54d8c4;
+    --line:rgba(255,255,255,.08);
+    --line-2:rgba(255,255,255,.16);
+    --radius:20px;
+    --maxw:1080px;
+    --serif:"Songti SC","STSong","Noto Serif SC",Georgia,serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:"PingFang SC","Microsoft YaHei","Hiragino Sans GB",system-ui,sans-serif;
+    color:var(--ink);background:var(--bg);line-height:1.75;
+    -webkit-font-smoothing:antialiased;overflow-x:hidden;
+  }
+  /* ===== 深空背景：多层视差星海 + 真实星座 ===== */
+  .sky-bg{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none;
+    background:linear-gradient(180deg,#05070f 0%, #070b1c 50%, #060912 100%)}
+  .nebula{position:absolute;inset:-12% 0;z-index:0}
+  .neb-blob{position:absolute;border-radius:50%;filter:blur(70px);will-change:opacity}
+  .neb-b1{width:62vw;height:62vw;left:-12vw;top:-12vh;background:radial-gradient(circle,rgba(110,160,255,.5),transparent 65%)}
+  .neb-b2{width:56vw;height:56vw;right:-14vw;top:34vh;background:radial-gradient(circle,rgba(169,139,255,.45),transparent 65%)}
+  .neb-b3{width:52vw;height:52vw;left:18vw;bottom:-18vh;background:radial-gradient(circle,rgba(243,193,75,.35),transparent 65%)}
+  /* 星海层：随滚动以不同速度漂移（视差） */
+  .star-layer{position:absolute;left:0;top:0;width:100%;height:320vh;will-change:transform}
+  .star{position:absolute;width:2px;height:2px;border-radius:50%;background:#fff}
+  .star.bright{width:3px;height:3px;box-shadow:0 0 6px rgba(255,255,255,.85)}
+  .star.gold{background:#ffe1a0;box-shadow:0 0 6px rgba(243,193,75,.8)}
+  .star.blue{background:#cfe0ff;box-shadow:0 0 6px rgba(110,160,255,.8)}
+  @keyframes starTw{0%,100%{opacity:.45}50%{opacity:1}}
+  /* 星座层：真实星座形状，可点击（位于内容之上，但仅星座本身捕获点击） */
+  .constel-layer{position:fixed;top:0;left:0;width:100%;height:320vh;z-index:2;pointer-events:none;will-change:transform}
+  .constel{position:absolute;width:150px;height:150px;pointer-events:auto;cursor:pointer}
+  .constel svg{width:100%;height:100%;overflow:visible;display:block;transform-box:fill-box;transform-origin:center}
+  .constel .c-line{stroke:rgba(243,193,75,.32);stroke-width:1;fill:none;stroke-dasharray:2 5;transition:stroke .4s}
+  .constel .c-dot{fill:#fff;transform-box:fill-box;transform-origin:center;transition:transform .25s,fill .25s}
+  .constel .c-halo{fill:none;stroke:rgba(243,193,75,0);stroke-width:1.6;transition:stroke .4s}
+  .constel:hover .c-dot{transform:scale(1.7);fill:var(--gold-soft)}
+  .constel:hover .c-line{stroke:rgba(243,193,75,.7)}
+  .constel:hover .c-halo{stroke:rgba(243,193,75,.55)}
+  .constel.pulse{animation:cPulse 1.6s cubic-bezier(.2,.8,.2,1)}
+  .constel.pulse .c-halo{stroke:rgba(243,193,75,.9);animation:halo 1.6s ease-out}
+  @keyframes cPulse{0%{transform:scale(1) rotate(0)}30%{transform:scale(1.18) rotate(-2deg)}55%{transform:scale(.95) rotate(1.8deg)}80%{transform:scale(1.07) rotate(-1deg)}100%{transform:scale(1) rotate(0)}}
+  @keyframes halo{0%{stroke-opacity:.9;transform:scale(.6)}100%{stroke-opacity:0;transform:scale(1.9)}}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px;position:relative;z-index:1}
+
+  /* 导航 */
+  header.nav{position:fixed;top:0;left:0;right:0;z-index:50;transition:.3s;border-bottom:1px solid transparent}
+  header.nav.scrolled{background:rgba(6,9,18,.72);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+  .nav-inner{display:flex;align-items:center;justify-content:space-between;height:64px}
+  .brand{display:flex;align-items:center;gap:10px;font-weight:700;letter-spacing:.5px;font-size:15px}
+  .brand .dot{width:13px;height:13px;border-radius:50%;
+    background:radial-gradient(circle at 30% 30%,#fff,var(--gold) 60%,#a87f24);
+    box-shadow:0 0 14px var(--gold)}
+  .nav-links{display:flex;gap:26px;font-size:14px}
+  .nav-links a{color:var(--ink-soft);text-decoration:none;transition:.2s}
+  .nav-links a:hover{color:var(--ink)}
+  .nav-links a.active{color:var(--gold-soft,#f3c14b)}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;
+    padding:11px 22px;border-radius:999px;font-size:14px;font-weight:600;
+    border:1px solid transparent;cursor:pointer;text-decoration:none;transition:.2s}
+  .btn-primary{color:#1c1404;background:linear-gradient(135deg,var(--gold-soft),var(--gold));
+    box-shadow:0 8px 30px rgba(243,193,75,.26)}
+  .btn-primary:hover{transform:translateY(-2px);box-shadow:0 12px 38px rgba(243,193,75,.4)}
+  .btn-ghost{color:var(--ink);border-color:var(--line-2);background:rgba(255,255,255,.04)}
+  .btn-ghost:hover{border-color:var(--gold);color:var(--gold-soft)}
+  .nav .btn{padding:8px 17px}
+
+  /* Hero */
+  .hero{padding:140px 0 80px;display:grid;grid-template-columns:1.02fr .98fr;gap:40px;align-items:center}
+  .eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:12.5px;color:var(--gold-soft);
+    background:rgba(243,193,75,.09);border:1px solid rgba(243,193,75,.26);
+    padding:6px 14px;border-radius:999px;letter-spacing:1px}
+  .eyebrow .p{width:7px;height:7px;border-radius:50%;background:var(--gold);
+    box-shadow:0 0 0 0 rgba(243,193,75,.6);animation:pl 2s infinite}
+  @keyframes pl{0%{box-shadow:0 0 0 0 rgba(243,193,75,.5)}70%{box-shadow:0 0 0 10px rgba(243,193,75,0)}100%{box-shadow:0 0 0 0 rgba(243,193,75,0)}}
+  .hero h1{font-size:clamp(33px,4.4vw,54px);line-height:1.22;margin:22px 0 20px;font-weight:800;letter-spacing:.3px}
+  .hero h1 .hl{font-family:var(--serif);font-style:italic;font-weight:600;
+    background:linear-gradient(120deg,var(--gold-soft),var(--gold) 55%,var(--violet));
+    -webkit-background-clip:text;background-clip:text;color:transparent}
+  .hero p.lead{color:var(--ink-soft);font-size:17px;max-width:520px;margin-bottom:30px}
+  .cta-row{display:flex;gap:13px;flex-wrap:wrap;align-items:center}
+  .hero .mini{font-size:12.5px;color:var(--ink-faint);margin-top:18px;letter-spacing:.3px}
+
+  /* 星图 */
+  .constellation{position:relative;width:100%;aspect-ratio:1/1;max-width:460px;margin-left:auto}
+  .constellation svg{width:100%;height:100%;overflow:visible}
+  .ring{fill:none;stroke:rgba(255,255,255,.07);stroke-width:1}
+  .link{stroke-width:1.4;fill:none;stroke-dasharray:3 6;animation:dash 22s linear infinite;transition:stroke .4s,opacity .4s}
+  @keyframes dash{to{stroke-dashoffset:-220}}
+  .star{transition:opacity .4s, r .4s}
+  .g-core{transition:opacity .4s}
+  .grp{transition:opacity .45s ease, filter .45s ease}
+  /* 默认全亮；选中时其他组淡出 */
+  svg[data-active="interest"] .g-strength,
+  svg[data-active="interest"] .g-flow{opacity:.14;filter:grayscale(1)}
+  svg[data-active="strength"] .g-interest,
+  svg[data-active="strength"] .g-flow{opacity:.14;filter:grayscale(1)}
+  svg[data-active="flow"] .g-interest,
+  svg[data-active="flow"] .g-strength{opacity:.14;filter:grayscale(1)}
+  svg[data-active="interest"] .g-interest .star,
+  svg[data-active="strength"] .g-strength .star,
+  svg[data-active="flow"] .g-flow .star{r:5}
+  /* IKIGAI：三群淡出，中心四圈重合区高亮 */
+  svg[data-active="ikigai"] .g-interest,
+  svg[data-active="ikigai"] .g-strength,
+  svg[data-active="ikigai"] .g-flow{opacity:.12;filter:grayscale(1)}
+  .ik-halo{opacity:0;transform-box:fill-box;transform-origin:center;transition:opacity .4s}
+  svg[data-active="ikigai"] .ik-halo{opacity:.85;animation:spin 20s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .breath{animation:br 4.5s ease-in-out infinite}
+  @keyframes br{0%,100%{opacity:.6}50%{opacity:1}}
+  .hint{position:absolute;left:0;right:0;bottom:-6px;text-align:center;font-size:12px;color:var(--ink-faint);letter-spacing:.5px}
+
+  /* 区块标题 */
+  section{padding:80px 0;position:relative;z-index:1}
+  .sec-head{max-width:660px;margin:0 auto 50px}
+  .sec-tag{font-size:12px;letter-spacing:3px;text-transform:uppercase;color:var(--gold-soft);opacity:.8}
+  .sec-head h2{font-size:clamp(25px,3vw,36px);margin:12px 0 14px;font-weight:800;line-height:1.3}
+  .sec-head p{color:var(--ink-soft);font-size:16px}
+
+  /* 使命 manifesto */
+  .manifesto{padding:74px 0;text-align:center;position:relative;z-index:1}
+  .manifesto .m-tag{font-size:12px;letter-spacing:3px;text-transform:uppercase;color:var(--gold-soft);opacity:.8;margin-bottom:26px}
+  .manifesto .m-line{font-size:clamp(18px,2.3vw,25px);line-height:1.72;color:var(--ink-soft);
+    max-width:720px;margin:0 auto 15px;font-weight:500}
+  .manifesto .m-strong{color:var(--ink);font-weight:700;margin-top:22px}
+  .manifesto em{font-style:normal;color:var(--gold-soft);font-weight:700}
+
+  /* 三层章节（可点击联动星图+查看理论） */
+  .chapters{display:flex;flex-direction:column;gap:14px;max-width:840px;margin:0 auto}
+  .chapter{display:grid;grid-template-columns:auto 1fr;gap:22px;align-items:start;
+    padding:24px 26px;border:1px solid var(--line);border-radius:var(--radius);
+    background:linear-gradient(180deg,rgba(255,255,255,.045),rgba(255,255,255,.015));
+    cursor:pointer;transition:.25s;position:relative}
+  .chapter:hover{transform:translateX(4px);border-color:var(--line-2)}
+  .chapter.active{border-color:var(--c)}
+  .chapter .no{font-family:var(--serif);font-size:40px;font-weight:700;line-height:1;
+    color:var(--c);opacity:.9;font-style:italic}
+  .chapter .body h3{font-size:20px;margin-bottom:4px;font-weight:700}
+  .chapter .k{font-size:12.5px;letter-spacing:1px;color:var(--c);margin-bottom:8px;text-transform:uppercase}
+  .chapter .body p{font-size:14.5px;color:var(--ink-soft)}
+  .chapter .more{display:flex;align-items:center;gap:6px;margin-top:12px;font-size:13px;color:var(--c);font-weight:600;opacity:.85;transition:.2s}
+  .chapter:hover .more{gap:10px;opacity:1}
+  .c1{--c:var(--sky)} .c2{--c:var(--violet)} .c3{--c:var(--mint)} .c4{--c:var(--gold)}
+
+  .core-line{text-align:center;max-width:680px;margin:34px auto 0;font-size:16px;color:var(--ink-soft)}
+  .core-line b{color:var(--gold-soft);font-weight:600}
+
+  /* 微型自测 modal */
+  .overlay{position:fixed;inset:0;z-index:80;background:rgba(4,6,14,.72);backdrop-filter:blur(6px);
+    display:none;align-items:center;justify-content:center;padding:24px}
+  .overlay.open{display:flex;animation:fade .25s ease}
+  @keyframes fade{from{opacity:0}to{opacity:1}}
+  .taste{width:100%;max-width:460px;background:linear-gradient(180deg,#0c1228,#0a0f22);
+    border:1px solid var(--line-2);border-radius:24px;padding:32px 28px;position:relative}
+  .taste h3{font-size:20px;margin-bottom:6px}
+  .taste .sub{font-size:13px;color:var(--ink-faint);margin-bottom:20px}
+  .opt{display:block;width:100%;text-align:left;padding:14px 16px;margin-bottom:10px;
+    border:1px solid var(--line);border-radius:14px;background:rgba(255,255,255,.03);
+    color:var(--ink);font-size:15px;cursor:pointer;transition:.2s;font-family:inherit}
+  .opt:hover{border-color:var(--sky);background:rgba(110,160,255,.08)}
+  .taste .back{position:absolute;top:18px;right:20px;color:var(--ink-faint);cursor:pointer;font-size:20px;line-height:1;
+    background:none;border:none;padding:4px;font-family:inherit}
+  .taste .feedback{display:none;margin-top:6px;padding:16px;border-radius:14px;
+    background:rgba(243,193,75,.08);border:1px solid rgba(243,193,75,.25);font-size:14.5px;color:var(--gold-soft)}
+  .taste .feedback.show{display:block;animation:fade .3s ease}
+
+  /* 理论介绍 modal */
+  .theory-overlay{z-index:90}
+  .theory-modal{width:100%;max-width:640px;max-height:86vh;overflow:auto;background:linear-gradient(180deg,#0c1228,#0a0f22);
+    border:1px solid var(--line-2);border-radius:26px;padding:34px 30px;position:relative}
+  .theory-modal::-webkit-scrollbar{width:8px}
+  .theory-modal::-webkit-scrollbar-thumb{background:rgba(255,255,255,.15);border-radius:4px}
+  .theory-close{position:absolute;top:18px;right:22px;color:var(--ink-faint);cursor:pointer;font-size:24px;line-height:1;transition:.2s;
+    background:none;border:none;padding:4px;font-family:inherit}
+  .theory-close:hover{color:var(--ink)}
+  button:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+  .theory-tag{font-size:12px;letter-spacing:1.5px;text-transform:uppercase;color:var(--tc);margin-bottom:8px;font-weight:600}
+  .theory-title{font-size:clamp(22px,3vw,30px);margin-bottom:14px;font-weight:800}
+  .theory-intro{font-size:15.5px;color:var(--ink-soft);line-height:1.8;margin-bottom:26px;padding-bottom:22px;border-bottom:1px solid var(--line)}
+  .theory-section{margin-bottom:22px;padding-left:18px;border-left:3px solid var(--tc)}
+  .theory-section h4{font-size:15px;color:var(--ink);margin-bottom:8px;font-weight:700}
+  .theory-section p{font-size:14px;color:var(--ink-soft);line-height:1.75}
+  .theory-note{margin-top:22px;padding:16px 18px;border-radius:14px;background:rgba(255,255,255,.04);border:1px solid var(--line);font-size:13.5px;color:var(--ink-faint);line-height:1.7}
+  .theory-cta{margin-top:28px;display:flex;gap:12px;flex-wrap:wrap}
+  .theory-cta .btn{padding:10px 20px;font-size:14px}
+
+  /* 信条 */
+  .creed{background:linear-gradient(180deg,transparent,rgba(12,18,40,.4),transparent)}
+  .creed-grid{display:grid;grid-template-columns:1fr 1fr;gap:38px;max-width:880px;margin:0 auto}
+  .creed-col h4{font-size:14px;letter-spacing:1px;margin-bottom:18px}
+  .creed-col.believe h4{color:var(--mint)}
+  .creed-col.reject h4{color:#ff9a9a}
+  .creed-col ul{list-style:none;display:flex;flex-direction:column;gap:16px}
+  .creed-col li{font-size:15px;color:var(--ink-soft);padding-left:24px;position:relative;line-height:1.65}
+  .creed-col.believe li::before{content:"✦";position:absolute;left:0;color:var(--mint)}
+  .creed-col.reject li::before{content:"✕";position:absolute;left:0;color:#ff9a9a;font-weight:700}
+
+  /* finale */
+  .finale{text-align:center;padding:90px 0}
+  .finale .card{background:
+      radial-gradient(560px 280px at 50% 0%, rgba(243,193,75,.12), transparent 70%),
+      linear-gradient(180deg,rgba(12,18,40,.7),rgba(9,14,32,.7));
+    border:1px solid var(--line-2);border-radius:28px;padding:58px 30px;max-width:780px;margin:0 auto}
+  .finale h2{font-size:clamp(24px,3vw,36px);font-weight:800;margin-bottom:14px;line-height:1.3}
+  .finale p{color:var(--ink-soft);max-width:500px;margin:0 auto 26px;font-size:16px}
+
+  footer{border-top:1px solid var(--line);padding:34px 0;color:var(--ink-faint);font-size:13px}
+  .foot-inner{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}
+  .foot-inner a{color:var(--ink-faint);text-decoration:none;margin-left:16px}
+  .foot-inner a:hover{color:var(--ink-soft)}
+
+  /* 新手引导 + FAQ */
+  .howto{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;max-width:880px;margin:0 auto 8px}
+  .howto .step{border:1px solid var(--line);border-radius:var(--radius);padding:22px 20px;background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.015));text-align:center}
+  .howto .step .n{width:38px;height:38px;border-radius:50%;margin:0 auto 14px;display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-style:italic;font-weight:700;color:var(--bg);background:linear-gradient(135deg,var(--gold-soft),var(--gold))}
+  .howto .step h4{font-size:16px;margin-bottom:8px}
+  .howto .step p{font-size:13.5px;color:var(--ink-soft);line-height:1.6}
+  .faq{max-width:720px;margin:34px auto 0;display:flex;flex-direction:column;gap:10px}
+  .faq details{border:1px solid var(--line);border-radius:14px;background:rgba(255,255,255,.025);overflow:hidden}
+  .faq summary{list-style:none;cursor:pointer;padding:16px 18px;font-size:15px;font-weight:600;display:flex;align-items:center;justify-content:space-between;gap:12px}
+  .faq summary::-webkit-details-marker{display:none}
+  .faq summary .ar{color:var(--gold-soft);font-size:22px;transition:.25s;flex:0 0 auto;line-height:1}
+  .faq details[open] summary .ar{transform:rotate(45deg)}
+  .faq .ans{padding:0 18px 18px;font-size:14px;color:var(--ink-soft);line-height:1.75}
+  @media(max-width:720px){.howto{grid-template-columns:1fr}}
+
+  .reveal{opacity:0;transform:translateY(22px);transition:.7s ease}
+  .reveal.in{opacity:1;transform:none}
+
+  @media(max-width:880px){
+    .hero{grid-template-columns:1fr;padding-top:118px;gap:34px}
+    .constellation{margin:0 auto;max-width:340px;order:-1}
+    .creed-grid{grid-template-columns:1fr;gap:30px}
+    .theory-modal{padding:26px 22px}
+    .neb-blob{filter:blur(40px)}
+  }
+
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}
+  .layerFar,.layerMid,.layerNear,.constel-layer{transform:none!important}
+}
+
+  .brand-mark{width:18px;height:18px;flex:0 0 auto;border-radius:50%;object-fit:contain;filter:drop-shadow(0 0 6px rgba(243,193,75,.55))}
+
+  /* 个性化恢复条 */
+  .recover-bar{display:none;grid-column:1/-1;justify-content:center;align-items:center;margin-bottom:8px}
+  .recover-bar.show{display:flex;animation:fade .4s ease}
+  .recover-card{display:flex;align-items:center;gap:12px;padding:10px 22px;
+    border:1px solid rgba(243,193,75,.3);border-radius:999px;text-decoration:none;
+    background:linear-gradient(135deg,rgba(243,193,75,.1),rgba(255,255,255,.04));transition:.25s}
+  .recover-card:hover{transform:translateY(-2px);border-color:var(--gold);box-shadow:0 8px 30px rgba(243,193,75,.18)}
+  .recover-card .rc-icon{font-size:20px;flex:0 0 auto}
+  .recover-card .rc-text{font-size:13.5px;color:var(--ink-soft);line-height:1.5}
+  .recover-card .rc-text b{color:var(--gold-soft);font-weight:600}
+  @media(max-width:880px){.recover-card{padding:9px 18px}.recover-card .rc-text{font-size:13px}}
+</style>
+  <script src="track.js"></script>
+  <script src="https://beacon.cdn.qq.com/sdk/4.5.9/beacon_web.min.js" async></script>
+<script>
+(function(){
+  try{
+    window.addEventListener('load',function(){
+      if(!window.BeaconAction) return;
+      var beacon=new BeaconAction({
+        appkey:'0WEB06U85YBSLJNL',
+        versionCode:'1.0.0',
+        channelID:'share',
+        delay:1000,
+        sessionDuration:30*60*1000,
+        isOversea:false,
+        needReportRqdEvent:false
+      });
+      beacon.onDirectUserAction('preview_page_view',{
+        'url':location.href,
+        'referrer':document.referrer,
+        'title':document.title,
+        'sandbox_id':'46461dec3937411d970e0881cbfa0056'
+      });
+    });
+  }catch(e){}
+})();
+</script></head>
+<body>
+  <div class="sky-bg" id="skyBg" aria-hidden="true">
+    <div class="nebula" id="nebula">
+      <div class="neb-blob neb-b1" id="nebB1"></div>
+      <div class="neb-blob neb-b2" id="nebB2"></div>
+      <div class="neb-blob neb-b3" id="nebB3"></div>
+    </div>
+    <div class="star-layer" id="layerFar" data-speed="0.12"></div>
+    <div class="star-layer" id="layerMid" data-speed="0.30"></div>
+  </div>
+  <div class="constel-layer" id="layerNear" data-speed="0.50" aria-hidden="true"></div>
+
+  <header class="nav" id="nav">
+    <div class="wrap nav-inner">
+      <a class="brand" href="index.html"><img class="brand-mark" src="logo-mark.svg" alt="天赋星图" width="18" height="18">天赋星图</a>
+    <nav class="nav-links">
+      <a href="index.html" class="active">首页</a>
+      <a href="quiz.html">测评</a>
+      <a href="report.html">报告</a>
+      <a href="action.html">行动</a>
+      <a href="stories.html">案例</a>
+      <a href="companion.html">伙伴</a>
+      <a href="me.html">我的星图</a>
+<a href="pricing.html">价格</a>
+<a href="blog.html">博客</a>
+<a href="about.html">关于</a>
+<a href="faq.html">FAQ</a>
+<a href="contact.html">联系</a>
+    </nav>
+    <a href="quiz.html" class="btn btn-primary">绘制我的星图</a>
+    </div>
+  </header>
+
+  <div class="wrap">
+    <section class="hero">
+      <div class="recover-bar" id="recoverBar"></div>
+      <div class="hero-copy reveal">
+        <span class="eyebrow"><span class="p"></span>不是性格测试，也不是星座</span>
+        <h1>你不是没天赋，<br/>只是从没人问过——<br/>你做什么会<span class="hl">忘记时间</span>？</h1>
+        <p class="lead">天赋不是少数人的神力。它是你天然被吸走的事、你身上自己会发光的特质、和你做起事来连手机响了都没听见的那几次。三张图叠在一起，重合的那一小块，就是你。</p>
+        <div class="cta-row">
+          <button class="btn btn-primary" id="tasteBtn">先尝一口 · 1 分钟</button>
+          <a href="#how" class="btn btn-ghost">看完整方法</a>
+        </div>
+        <p class="mini">完整测评约 8 分钟 · 三关轻量自测 · 当场生成你的天赋星图</p>
+      </div>
+
+      <div class="constellation reveal">
+        <svg viewBox="0 0 420 420" id="sky" data-active="all" aria-hidden="true">
+          <circle class="ring" cx="210" cy="215" r="170"/>
+          <circle class="ring" cx="210" cy="215" r="115"/>
+          <circle class="ring" cx="210" cy="215" r="62"/>
+          <!-- 兴趣群（左上） -->
+          <g class="grp g-interest">
+            <path class="link" style="stroke:var(--sky)" d="M95 135 L140 105 L120 185 L75 205 L100 150 Z"/>
+            <circle class="star breath" style="fill:var(--sky)" cx="95" cy="135" r="4"/>
+            <circle class="star breath" style="fill:var(--sky)" cx="140" cy="105" r="5"/>
+            <circle class="star breath" style="fill:var(--sky)" cx="120" cy="185" r="4"/>
+            <circle class="star breath" style="fill:var(--sky)" cx="75" cy="205" r="4"/>
+            <circle class="star breath" style="fill:var(--sky)" cx="100" cy="150" r="3.5"/>
+          </g>
+          <!-- 优势群（右上） -->
+          <g class="grp g-strength">
+            <path class="link" style="stroke:var(--violet)" d="M300 120 L345 165 L315 205 L270 155 L295 110 Z"/>
+            <circle class="star breath" style="fill:var(--violet)" cx="300" cy="120" r="5"/>
+            <circle class="star breath" style="fill:var(--violet)" cx="345" cy="165" r="4"/>
+            <circle class="star breath" style="fill:var(--violet)" cx="315" cy="205" r="4"/>
+            <circle class="star breath" style="fill:var(--violet)" cx="270" cy="155" r="4"/>
+            <circle class="star breath" style="fill:var(--violet)" cx="295" cy="110" r="3.5"/>
+          </g>
+          <!-- 心流群（下方） -->
+          <g class="grp g-flow">
+            <path class="link" style="stroke:var(--mint)" d="M180 320 L235 300 L205 355 L155 335 L195 312 Z"/>
+            <circle class="star breath" style="fill:var(--mint)" cx="180" cy="320" r="4"/>
+            <circle class="star breath" style="fill:var(--mint)" cx="235" cy="300" r="5"/>
+            <circle class="star breath" style="fill:var(--mint)" cx="205" cy="355" r="4"/>
+            <circle class="star breath" style="fill:var(--mint)" cx="155" cy="335" r="4"/>
+            <circle class="star breath" style="fill:var(--mint)" cx="195" cy="312" r="3.5"/>
+          </g>
+          <!-- 中心交叠 -->
+          <g class="g-core">
+            <circle cx="210" cy="215" r="46" fill="rgba(110,160,255,.10)"/>
+            <circle cx="210" cy="215" r="46" fill="rgba(169,139,255,.10)" style="mix-blend-mode:screen"/>
+            <circle cx="210" cy="215" r="46" fill="rgba(84,216,196,.10)" style="mix-blend-mode:screen"/>
+            <circle class="star breath" cx="210" cy="215" r="6.5" fill="#ffe1a0"/>
+            <circle cx="210" cy="215" r="14" fill="none" stroke="rgba(243,193,75,.5)" stroke-width="1.2"/>
+            <circle class="ik-halo" cx="210" cy="215" r="70" fill="none" stroke="var(--gold)" stroke-width="1.4" stroke-dasharray="4 8"/>
+          </g>
+        </svg>
+        <div class="hint">悬停任意一层，看它在星图里亮起</div>
+      </div>
+    </section>
+  </div>
+
+  <!-- 使命 manifesto -->
+  <section class="manifesto">
+    <div class="wrap">
+      <div class="m-tag">Why we build this</div>
+      <p class="m-line">每个人都有自己的天赋。</p>
+      <p class="m-line">只是内外的拉扯，让很多人终其一生都没看清——哪些事是一生所爱，哪些事让自己<em>孜孜不倦</em>。</p>
+      <p class="m-line m-strong">本网站想做的，是在<em>共产主义尚未到来的时期</em>，依然帮你尽力发掘自己的爱好，把被压住的生命力，放大到它<em>应该在的水平</em>。</p>
+    </div>
+  </section>
+
+  <!-- 三层 -->
+  <section id="how">
+    <div class="wrap">
+        <div class="sec-head reveal">
+        <div class="sec-tag">We don't guess. We triangulate.</div>
+        <h2>找天赋，三层定位，一层现实校验</h2>
+        <p>不靠一道题下结论。我们先把你的兴趣、优势、心流叠成一张星图，再用 IKIGAI 把重合处拿到真实世界里验一遍。</p>
+      </div>
+
+      <div class="chapters">
+        <div class="chapter c1 active" data-group="interest" tabindex="0" role="button" aria-haspopup="dialog" aria-label="了解兴趣 · RIASEC 霍兰德">
+          <div class="no">01</div>
+          <div class="body">
+            <div class="k">兴趣 · RIASEC 霍兰德</div>
+            <h3>你被什么吸走</h3>
+            <p>有些事你还没做，手就先伸过去了。我们想知道，是哪一类在拉你——是研究、创造、助人，还是把混乱理顺。</p>
+            <div class="more">了解这套方法如何帮你 →</div>
+          </div>
+        </div>
+        <div class="chapter c2" data-group="strength" tabindex="0" role="button" aria-haspopup="dialog" aria-label="了解优势 · VIA 24 项性格优势">
+          <div class="no">02</div>
+          <div class="body">
+            <div class="k">优势 · VIA 24 项性格优势</div>
+            <h3>你身上什么在漏光</h3>
+            <p>不是"你擅长什么"那种客套。是 24 种特质里，哪几个真实地、持续地在你身上发亮——哪怕你自己早就习惯了。</p>
+            <div class="more">了解这套方法如何帮你 →</div>
+          </div>
+        </div>
+        <div class="chapter c3" data-group="flow" tabindex="0" role="button" aria-haspopup="dialog" aria-label="了解心流 · 契克森米哈赖">
+          <div class="no">03</div>
+          <div class="body">
+            <div class="k">心流 · 契克森米哈赖</div>
+            <h3>你什么时候"消失"过</h3>
+            <p>不是"你喜欢什么"，是那几次你做起来，抬头发现两小时没了、肚子饿了。那才是天赋最诚实的证据。</p>
+            <div class="more">了解这套方法如何帮你 →</div>
+          </div>
+        </div>
+        <div class="chapter c4" data-group="ikigai" tabindex="0" role="button" aria-haspopup="dialog" aria-label="了解现实校验 · IKIGAI 四圈">
+          <div class="no">04</div>
+          <div class="body">
+            <div class="k">现实校验 · IKIGAI 四圈</div>
+            <h3>这块天赋，能不能落地</h3>
+            <p>热爱、擅长、世界需要、能谋生——四圈重合的那块，才是最稳的天赋区。前面三层定位出的星图，要在这里过一遍真实世界。</p>
+            <div class="more">了解这套方法如何帮你 →</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="core-line reveal">三层叠一起，重合的那一小块，是你的天赋区；再用 IKIGAI 验一遍——<b>你爱的、你擅长的、世界需要的、能谋生的，四圈重合处，才是最稳、能落地的天赋区</b>。</div>
+    </div>
+  </section>
+
+  <!-- 信条 -->
+  <section id="creed" class="creed">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <div class="sec-tag">What we believe / don't</div>
+        <h2>我们相信的几件事</h2>
+      </div>
+      <div class="creed-grid reveal">
+        <div class="creed-col believe">
+          <h4>✦ 我们信</h4>
+          <ul>
+            <li>天赋是长出来的，不是被发现的——靠做、靠验证，不靠一道题。</li>
+            <li>矛盾比标签更真实。你同时是 A 和 B，这很正常，别急着装进格子。</li>
+            <li>你比任何测试都懂自己。工具只是帮你看见，不是替你决定。</li>
+          </ul>
+        </div>
+        <div class="creed-col reject">
+          <h4>✕ 我们不信</h4>
+          <ul>
+            <li>星座、血型、塔罗——好看，但测不准。</li>
+            <li>把"多元智能"当真理——概念很美，实证偏弱。</li>
+            <li>一道题能定义一个人——所以我们用三层交叉。</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 新手引导 + FAQ -->
+  <section id="guide">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <div class="sec-tag">How to play / FAQ</div>
+        <h2>三步，画出你的星图</h2>
+        <p>不用准备什么。打开就能玩，8 分钟拿到属于你的那张图。</p>
+      </div>
+      <div class="howto reveal">
+        <div class="step"><div class="n">1</div><h4>测</h4><p>三关轻量自测：兴趣、优势、心流，各几分钟，越诚实越准。</p></div>
+        <div class="step"><div class="n">2</div><h4>看</h4><p>三层叠成一张星图，再用 IKIGAI 验一遍——哪块能当饭吃。</p></div>
+        <div class="step"><div class="n">3</div><h4>养</h4><p>去 21 天心流日记，把「发现」变成「养成」。天赋是长出来的。</p></div>
+      </div>
+      <div class="faq reveal">
+        <details><summary>测一次要多久？<span class="ar">+</span></summary><div class="ans">完整测评约 8 分钟，三关共 20+ 道轻量题。没空一次测完？进度会自动暂存，下次接着来。</div></details>
+        <details><summary>真的科学吗？<span class="ar">+</span></summary><div class="ans">框架来自心理学同行评审的工具：RIASEC（霍兰德）、VIA 24 项性格优势、契克森米哈赖的心流、IKIGAI 现实校验。我们刻意排除了星座、血型、多元智能这类实测效度弱的说法。它帮你看清模式，不替代专业诊断。</div></details>
+        <details><summary>我的数据去哪了？<span class="ar">+</span></summary><div class="ans">全部存在你这台设备的浏览器里（localStorage），不经过任何服务器。可在「我的星图」页一键导出备份或清空。换设备 / 清缓存会丢失，重要内容记得先备份。</div></details>
+        <details><summary>没测出来怎么办？<span class="ar">+</span></summary><div class="ans">很正常。天赋不是一次测出来的，是做出来的。先去记 21 天日记、做几个微实验，过阵子再测第二张，你会看见星图在动。</div></details>
+        <details><summary>测完能做什么？<span class="ar">+</span></summary><div class="ans">① 生成可保存 / 分享的星图卡片；② 复制朋友圈文案邀朋友一起测；③ 去 21 天日记把天赋养成习惯；④ 在案例墙看看别人怎么走出来。还能在「我的星图」集中管理所有数据。</div></details>
+      </div>
+    </div>
+  </section>
+
+  <!-- finale -->
+  <section id="start" class="finale">
+    <div class="wrap">
+      <div class="card reveal">
+        <h2>点一下，先看看你的星图长什么样</h2>
+        <p>完整测评约 8 分钟。做完你会拿到一张自己的天赋星图，和下一步能立刻去验证的小行动。</p>
+        <div class="cta-row" style="justify-content:center">
+          <a href="quiz.html" class="btn btn-primary">开始绘制 →</a>
+          <button class="btn btn-ghost" id="tasteBtn2">或者先尝一口</button>
+          <a href="companion.html" class="btn btn-ghost">先和星图伙伴聊聊</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="wrap foot-inner">
+      <div>© 2026 天赋星图 · 用科学，靠近真实的自己</div>
+      <div>
+        <a href="index.html">首页</a>
+        <a href="quiz.html">测评</a>
+        <a href="report.html">报告</a>
+        <a href="action.html">行动</a>
+        <a href="stories.html">案例</a>
+        <a href="companion.html">伙伴</a>
+        <a href="me.html">我的星图</a>
+        <a href="pricing.html">价格</a>
+        <a href="blog.html">博客</a>
+        <a href="about.html">关于</a>
+        <a href="faq.html">FAQ</a>
+        <a href="contact.html">联系</a>
+        <a href="#how">三层</a>
+        <a href="#creed">我们相信</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- 微型自测 -->
+  <div class="overlay" id="overlay" role="dialog" aria-modal="true" aria-label="先尝一口微型自测">
+    <div class="taste">
+      <button type="button" class="back" id="closeTaste" aria-label="关闭">×</button>
+      <h3>先尝一口</h3>
+      <div class="sub">此刻，你更想——</div>
+      <button class="opt" data-g="interest" data-label="弄明白一个想不通的道理">A · 弄明白一个想不通的道理</button>
+      <button class="opt" data-g="interest" data-label="做出个看得见的东西">B · 做出个看得见的东西</button>
+      <button class="opt" data-g="interest" data-label="帮到某个具体的人">C · 帮到某个具体的人</button>
+      <button class="opt" data-g="interest" data-label="把一团乱理顺">D · 把一团乱理顺</button>
+      <div class="feedback" id="tasteFeedback"></div>
+    </div>
+  </div>
+
+  <!-- 理论介绍 -->
+  <div class="overlay theory-overlay" id="theoryOverlay" role="dialog" aria-modal="true" aria-label="方法论介绍">
+    <div class="theory-modal" id="theoryModal">
+      <button type="button" class="theory-close" id="theoryClose" aria-label="关闭">×</button>
+      <div class="theory-tag" id="theoryTag"></div>
+      <h3 class="theory-title" id="theoryTitle"></h3>
+      <div class="theory-intro" id="theoryIntro"></div>
+      <div class="theory-content" id="theoryContent"></div>
+      <div class="theory-note" id="theoryNote"></div>
+      <div class="theory-cta">
+        <a href="quiz.html" class="btn btn-primary">去测评里看看我的结果 →</a>
+      </div>
+    </div>
+  </div>
+
+<script>
+  const nav=document.getElementById('nav');
+  const layers=[...document.querySelectorAll('[data-speed]')];
+  const nebB1=document.getElementById('nebB1'),nebB2=document.getElementById('nebB2'),nebB3=document.getElementById('nebB3');
+  function onScroll(){
+    nav.classList.toggle('scrolled',window.scrollY>20);
+    // 视差：各层按不同速度随滚动漂移，营造"穿越星海"的纵深
+    layers.forEach(l=>{const s=parseFloat(l.dataset.speed);l.style.transform='translate3d(0,'+(-window.scrollY*s).toFixed(1)+'px,0)';});
+    // 光景变化：随滚动进度，蓝→紫→金渐次浮现
+    const max=document.documentElement.scrollHeight-window.innerHeight;
+    const p=max>0?Math.min(1,Math.max(0,window.scrollY/max)):0;
+    nebB1.style.opacity=(0.55-0.38*p).toFixed(3);
+    nebB2.style.opacity=(0.30+0.28*p).toFixed(3);
+    nebB3.style.opacity=(0.16+0.55*p).toFixed(3);
+  }
+  onScroll();window.addEventListener('scroll',onScroll,{passive:true});
+  window.addEventListener('resize',onScroll,{passive:true});
+
+  // 进入视口淡入
+  const io=new IntersectionObserver((es)=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}}),{threshold:.12});
+  document.querySelectorAll('.reveal').forEach((el,i)=>{el.style.transitionDelay=(i%3)*80+'ms';io.observe(el);});
+
+  // 三章联动星图 + 打开理论介绍
+  const sky=document.getElementById('sky');
+  const chapters=[...document.querySelectorAll('.chapter')];
+  function activate(group){
+    sky.dataset.active=group;
+    chapters.forEach(c=>c.classList.toggle('active',c.dataset.group===group));
+  }
+  chapters.forEach(c=>{
+    c.addEventListener('mouseenter',()=>activate(c.dataset.group));
+    c.addEventListener('focus',()=>activate(c.dataset.group));
+  });
+
+  const THEORIES={
+    interest:{
+      tag:'兴趣 · RIASEC 霍兰德',
+      title:'你被什么吸走',
+      intro:'心理学家约翰·霍兰德发现，人的职业兴趣大致落在 6 个象限里：现实型 R、研究型 I、艺术型 A、社会型 S、企业型 E、常规型 C。你不是「对什么都不感兴趣」，只是你的兴趣有它自己的形状。',
+      color:'var(--sky)',
+      sections:[
+        {h:'定位「手先伸过去」的事',p:'测评会统计你被哪类活动自然吸引。不是为了给你贴标签，而是帮你缩小下一步该试的范围——先从你最常想做的事里找线索，而不是在全部世界里瞎撞。'},
+        {h:'允许你「矛盾」',p:'大多数人不是单一类型，而是两三个类型的组合（比如 IAS 或 SAE）。组合比单一标签更真实。我们会在报告里列出你的 Top 3，让你看见自己的复杂。'},
+        {h:'区分「喜欢」和「能持续」',p:'RIASEC 看的是你稳定的偏好模式，不是一时冲动。它帮你识别的是：哪些类型的事，即使没人逼、没钱拿，你也愿意一次次走回去。'}
+      ],
+      note:'它不是命运判决书。即使测出来你是某型，也不代表你只能做某一类工作，而是说明那类事更容易让你进入「自然投入」的状态。'
+    },
+    strength:{
+      tag:'优势 · VIA 24 项性格优势',
+      title:'你身上什么在漏光',
+      intro:'VIA 是 Peterson 和 Seligman 在积极心理学里提出的 24 项人格优势，分为智慧与知识、勇气、人道、正义、节制、超越 6 大类。它关心的不是你「会什么技能」，而是你「做人的时候，哪些特质会稳定地发光」。',
+      color:'var(--violet)',
+      sections:[
+        {h:'把你习以为常的特质「命名」出来',p:'比如好奇心、诚实、欣赏美、希望——你可能早就拥有，却以为大家都一样。命名之后，你才能有意识地使用它，而不是让它白白漏掉。'},
+        {h:'找到你的「内在杠杆」',p:'同样的努力，放在优势上会更容易进入正循环；放在短板上，往往是内耗。天赋星图会提示你最稳定的 5 个优势，让你知道该把力气投在哪里。'},
+        {h:'解释为什么有些事别人很累你却很轻松',p:'那不是天赋神力，是你的优势在替你托底。当你知道托底的是什么，就可以主动寻找更多能调用它、放大它的场景。'}
+      ],
+      note:'优势不等于已经变现的能力。它更像是一块肥沃的土壤——种什么更容易活，但不保证自动结果。'
+    },
+    flow:{
+      tag:'心流 · 契克森米哈赖',
+      title:'你什么时候「消失」过',
+      intro:'米哈赖·契克森米哈赖提出：心流是一种你全神贯注、忘记时间、自我意识暂时「消失」的状态。它不是「躺平爽」，而是「挑战刚好匹配能力」时，大脑全速运转又不觉得累的体验。',
+      color:'var(--mint)',
+      sections:[
+        {h:'用「你什么时候忘过时间」反向定位天赋',p:'心流时刻不会骗人，因为那是你身体和注意力共同投票的结果。测评会引导你回想这些瞬间，把它们从记忆里打捞出来。'},
+        {h:'区分「消遣爽」和「成长爽」',p:'刷短视频也会爽，但不会让你事后觉得「我变强了」；心流会。我们关心的是后者——那种做完之后，你既累又满足的时刻。'},
+        {h:'识别你的「能量地图」',p:'结合 RIASEC 和 VIA，我们会标出哪些活动最可能让你稳定地进入心流。这些活动，就是后续 21 天日记和 7 天微实验的最佳起点。'}
+      ],
+      note:'心流不是每时每刻都能发生。它需要一定技能和挑战的匹配，以及不被打断的环境。找到它，是后续行动页的起点。'
+    },
+    ikigai:{
+      tag:'现实校验 · IKIGAI 四圈',
+      title:'这块天赋，能不能落地',
+      intro:'IKIGAI 是日本流传很久的一个框架：把「你热爱的」「你擅长的」「世界需要的」「能谋生的」四个圆叠在一起。前三层（兴趣/优势/心流）帮你定位天赋区，而 IKIGAI 是把这块区域拿到真实世界里验一遍——光自己爽不够，还得有人需要、能养活自己，才算稳。',
+      color:'var(--gold)',
+      sections:[
+        {h:'把"自嗨"和"真天赋"分开',p:'很多人卡在"我喜欢，但好像没用"。IKIGAI 逼你问第三、第四个圈：这件事世界需不需要？能不能帮你谋生？能答上，天赋才从"爱好"变成"能托住你的东西"。'},
+        {h:'用四圈找"缺口"而不是"完美解"',p:'四圈全中当然理想，但现实里多半缺一两圈。我们会标出你当前最弱的圈——比如"能谋生"还空着，那下一步就不是换爱好，而是想怎么把现有天赋接上收入。'},
+        {h:'让天赋区从图上走到地上',p:'前面三层画出的星图，到这里变成可执行的判断：这块值不值得投入 21 天去验证？能不能先从"世界需要+能谋生"的交集里挑一个最小的切口试起来？'}
+      ],
+      note:'IKIGAI 不是一次测完就定终身。它更像一块持续校准的仪表——今天"能谋生"的圈空着，半年后可能就填上了。天赋是长出来的，现实校验也是动态的。'
+    }
+  };
+
+  const theoryOverlay=document.getElementById('theoryOverlay');
+  const theoryModal=document.getElementById('theoryModal');
+  let theoryLastFocus=null;
+  function openTheory(group){
+    const t=THEORIES[group];
+    if(!t) return;
+    theoryLastFocus=document.activeElement;
+    document.getElementById('theoryTag').textContent=t.tag;
+    document.getElementById('theoryTitle').textContent=t.title;
+    document.getElementById('theoryIntro').textContent=t.intro;
+    document.getElementById('theoryNote').textContent='注意：'+t.note;
+    document.getElementById('theoryContent').innerHTML=t.sections.map(s=>
+      '<div class="theory-section"><h4>'+s.h+'</h4><p>'+s.p+'</p></div>'
+    ).join('');
+    theoryModal.style.setProperty('--tc',t.color);
+    theoryOverlay.classList.add('open');
+    document.body.style.overflow='hidden';
+    const tc=document.getElementById('theoryClose');
+    if(tc) setTimeout(()=>tc.focus(),0);
+  }
+  function closeTheory(){
+    theoryOverlay.classList.remove('open');
+    document.body.style.overflow='';
+    if(theoryLastFocus && theoryLastFocus.focus) theoryLastFocus.focus();
+  }
+  chapters.forEach(c=>{
+    c.addEventListener('click',()=>openTheory(c.dataset.group));
+    c.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openTheory(c.dataset.group);}});
+  });
+  document.getElementById('theoryClose').addEventListener('click',closeTheory);
+  theoryOverlay.addEventListener('click',e=>{if(e.target===theoryOverlay)closeTheory();});
+  document.addEventListener('keydown',e=>{if(e.key==='Escape' && theoryOverlay.classList.contains('open'))closeTheory();});
+
+  // 微型自测
+  const overlay=document.getElementById('overlay');
+  const fb=document.getElementById('tasteFeedback');
+  let tasteLastFocus=null;
+  const openT=()=>{tasteLastFocus=document.activeElement;overlay.classList.add('open');fb.classList.remove('show');document.body.style.overflow='hidden';const c=document.getElementById('closeTaste');if(c)c.focus();};
+  const closeT=()=>{overlay.classList.remove('open');document.body.style.overflow='';if(tasteLastFocus&&tasteLastFocus.focus)tasteLastFocus.focus();};
+  document.getElementById('tasteBtn').addEventListener('click',openT);
+  document.getElementById('tasteBtn2').addEventListener('click',openT);
+  document.getElementById('closeTaste').addEventListener('click',closeT);
+  overlay.addEventListener('click',e=>{if(e.target===overlay)closeT();});
+  document.addEventListener('keydown',e=>{if(e.key==='Escape' && overlay.classList.contains('open'))closeT();});
+  document.querySelectorAll('.opt').forEach(b=>b.addEventListener('click',()=>{
+    activate('interest');
+    const label=b.dataset.label;
+    fb.innerHTML='你的手，先伸向了 <b>'+label+'</b>。<br>这只是冰山一角——完整测评会把它画成一张属于你的星图。';
+    fb.classList.add('show');
+    document.querySelector('.constellation').scrollIntoView({behavior:'smooth',block:'center'});
+  }));
+
+  // ===== 深空背景：生成星海 + 真实星座 + 点击脉冲 =====
+  const SVGNS='http://www.w3.org/2000/svg';
+  function seedStars(layer,count,extra){
+    const frag=document.createDocumentFragment();
+    for(let i=0;i<count;i++){
+      const s=document.createElement('i');s.className='star';
+      if(extra&&Math.random()<0.22)s.classList.add(extra[Math.floor(Math.random()*extra.length)]);
+      s.style.left=(Math.random()*100).toFixed(2)+'%';
+      s.style.top=(Math.random()*100).toFixed(2)+'%';
+      s.style.transform='scale('+(0.6+Math.random()*0.9).toFixed(2)+')';
+      if(Math.random()<0.4)s.style.animation='starTw '+(3+Math.random()*4).toFixed(1)+'s ease-in-out infinite';
+      frag.appendChild(s);
+    }
+    layer.appendChild(frag);
+  }
+  const isMobile=window.innerWidth<720;
+  seedStars(document.getElementById('layerFar'),isMobile?70:130,['blue']);
+  seedStars(document.getElementById('layerMid'),isMobile?34:64,['gold','bright']);
+
+  // 真实星座（归一化坐标 0-100，连线为可识别形状；top/left 为该层 320vh 内的位置）
+  const CONSTELS=[
+    {name:'北斗七星',left:'3%', top:'34%',
+      stars:[[6,12],[6,34],[26,42],[26,20],[46,18],[64,13],[84,7]],
+      edges:[[0,1],[1,2],[2,3],[3,4],[4,5],[5,6]]},
+    {name:'猎户座',left:'80%', top:'50%',
+      stars:[[16,22],[38,18],[24,56],[31,53],[40,50],[40,80],[17,82],[27,7]],
+      edges:[[7,0],[7,1],[0,1],[0,2],[1,4],[2,3],[3,4],[2,6],[4,5],[6,5]]},
+    {name:'仙后座',left:'6%', top:'70%',
+      stars:[[8,72],[30,40],[50,62],[70,34],[92,56]],
+      edges:[[0,1],[1,2],[2,3],[3,4]]},
+    {name:'天鹅座',left:'78%', top:'88%',
+      stars:[[50,10],[50,46],[50,90],[24,46],[76,46]],
+      edges:[[0,1],[1,2],[3,1],[1,4]]}
+  ];
+  function buildConstel(cfg){
+    const wrap=document.createElement('div');wrap.className='constel';
+    wrap.style.left=cfg.left;wrap.style.top=cfg.top;wrap.title=cfg.name+'（点一下，让它亮起来）';
+    const svg=document.createElementNS(SVGNS,'svg');svg.setAttribute('viewBox','0 0 100 100');
+    cfg.edges.forEach(([a,b])=>{
+      const p=document.createElementNS(SVGNS,'path');p.setAttribute('class','c-line');
+      p.setAttribute('d','M'+cfg.stars[a][0]+' '+cfg.stars[a][1]+' L'+cfg.stars[b][0]+' '+cfg.stars[b][1]);
+      svg.appendChild(p);
+    });
+    const halo=document.createElementNS(SVGNS,'circle');halo.setAttribute('class','c-halo');
+    halo.setAttribute('cx','50');halo.setAttribute('cy','50');halo.setAttribute('r','44');svg.appendChild(halo);
+    cfg.stars.forEach(([x,y])=>{
+      const c=document.createElementNS(SVGNS,'circle');c.setAttribute('class','c-dot');
+      c.setAttribute('cx',x);c.setAttribute('cy',y);c.setAttribute('r','2.4');svg.appendChild(c);
+    });
+    wrap.appendChild(svg);
+    wrap.addEventListener('click',()=>{wrap.classList.remove('pulse');void wrap.offsetWidth;wrap.classList.add('pulse');});
+    return wrap;
+  }
+  const near=document.getElementById('layerNear');
+  CONSTELS.forEach(c=>near.appendChild(buildConstel(c)));
+  onScroll(); // 初始应用视差与星云光景
+
+  // ===== 个性化恢复条：回访者自动识别 =====
+  (function(){
+    const bar=document.getElementById('recoverBar');
+    if(!bar) return;
+    let result=null,progress=null;
+    try{result=JSON.parse(localStorage.getItem('talentmap_result'));}catch(e){}
+    try{progress=JSON.parse(localStorage.getItem('talentmap_quiz_progress'));}catch(e){}
+    if(result){
+      const ria=(result.riaTop||[]).map(r=>r.label).join('、')||'';
+      bar.innerHTML='<a class="recover-card" href="report.html"><span class="rc-icon">✦</span><span class="rc-text">你已经有星图了'+(ria?' · '+ria:'')+'<br><b>查看我的完整星图报告 →</b></span></a>';
+      bar.classList.add('show');
+    } else if(progress){
+      const sn=progress.step===1?'第一关':progress.step===2?'第二关':progress.step===3?'第三关':'测评中途';
+      bar.innerHTML='<a class="recover-card" href="quiz.html"><span class="rc-icon">▶</span><span class="rc-text">上次测到'+sn+'，还没完<br><b>继续上次测评 →</b></span></a>';
+      bar.classList.add('show');
+    }
+  })();
+</script>
+</body>
+</html>

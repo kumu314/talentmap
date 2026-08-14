@@ -1,0 +1,40 @@
+# 天赋星图 · Umami 自托管（隐私友好、数据在自己手里）
+# 用法：
+#   1) 把本文件放到一台有 Docker 的机器（VPS / 树莓派 / 免费云）
+#   2) 改 UMAMI_SECRET 为你自己的随机串（openssl rand -hex 16）
+#   3) docker compose up -d
+#   4) 浏览器打开 http://<机器IP>:3000  → 注册账号 → Add website（填站点名 + 域名 talentmap）→ 复制 Website ID
+#   5) 把 Website ID 填进 talent-map/track.js 的 UMAMI_CFG.WEBSITE_ID，并把 URL 指向本机
+# 注意：CloudStudio 的静态沙箱只托管前端、不跑数据库，Umami 必须放在另一台持久主机上。
+
+services:
+  umami:
+    image: ghcr.io/umami-software/umami:postgresql-latest
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: postgresql://umami:umami@db:5432/umami
+      DATABASE_TYPE: postgres
+      APP_SECRET: ${UMAMI_SECRET:-change_me_to_a_random_string}
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+
+  db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: umami
+      POSTGRES_PASSWORD: umami
+      POSTGRES_DB: umami
+    volumes:
+      - umami-db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U umami"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+volumes:
+  umami-db:

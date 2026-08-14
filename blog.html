@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>天赋星图 · 博客 — 关于天赋，我们认真聊</title>
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="icon" href="logo-mark.svg" type="image/svg+xml">
+  <meta name="description" content="天赋星图博客：研究笔记、方法工具、真实故事、行动清单。关于兴趣、优势、心流与自我探索，我们认真聊。">
+<meta property="og:type" content="website">
+<meta property="og:title" content="天赋星图 · 博客">
+<meta property="og:description" content="关于天赋，我们认真聊。研究笔记、方法工具、真实故事、行动清单。">
+<meta property="og:image" content="https://46461dec3937411d970e0881cbfa0056.app.codebuddy.work/og-cover.png">
+<style>
+  :root{
+    --bg:#060912;--bg-1:#0a0f22;--ink:#eef2ff;--ink-soft:#9aa6cf;--ink-faint:#7f8bb3;
+    --gold:#f3c14b;--gold-soft:#ffe1a0;--sky:#6ea0ff;--violet:#a98bff;--mint:#54d8c4;
+    --line:rgba(255,255,255,.08);--line-2:rgba(255,255,255,.16);--radius:20px;
+    --maxw:1040px;--serif:"Songti SC","STSong","Noto Serif SC",Georgia,serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{font-family:"PingFang SC","Microsoft YaHei","Hiragino Sans GB",system-ui,sans-serif;
+    color:var(--ink);background:var(--bg);line-height:1.75;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+  .sky-bg{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none;
+    background:linear-gradient(180deg,#05070f 0%, #070b1c 50%, #060912 100%)}
+  .nebula{position:absolute;inset:-12% 0;z-index:0}
+  .neb-blob{position:absolute;border-radius:50%;filter:blur(70px);will-change:opacity}
+  .neb-b1{width:62vw;height:62vw;left:-12vw;top:-12vh;background:radial-gradient(circle,rgba(110,160,255,.5),transparent 65%)}
+  .neb-b2{width:56vw;height:56vw;right:-14vw;top:34vh;background:radial-gradient(circle,rgba(169,139,255,.45),transparent 65%)}
+  .neb-b3{width:52vw;height:52vw;left:18vw;bottom:-18vh;background:radial-gradient(circle,rgba(243,193,75,.35),transparent 65%)}
+  .star-layer{position:absolute;left:0;top:0;width:100%;height:320vh;will-change:transform}
+  .star{position:absolute;width:2px;height:2px;border-radius:50%;background:#fff}
+  .star.bright{width:3px;height:3px;box-shadow:0 0 6px rgba(255,255,255,.85)}
+  .star.gold{background:#ffe1a0;box-shadow:0 0 6px rgba(243,193,75,.8)}
+  .star.blue{background:#cfe0ff;box-shadow:0 0 6px rgba(110,160,255,.8)}
+  @keyframes starTw{0%,100%{opacity:.45}50%{opacity:1}}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 22px;position:relative;z-index:1}
+
+  header.nav{position:fixed;top:0;left:0;right:0;z-index:50;background:rgba(6,9,18,.72);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+  .nav-inner{display:flex;align-items:center;justify-content:space-between;height:60px;gap:10px}
+  .brand{display:flex;align-items:center;gap:9px;font-weight:700;font-size:15px;color:inherit;text-decoration:none;flex:0 0 auto}
+  .brand-mark{width:18px;height:18px;flex:0 0 auto;border-radius:50%;object-fit:contain;filter:drop-shadow(0 0 6px rgba(243,193,75,.55))}
+  .nav-links{display:flex;gap:16px;font-size:13.5px;min-width:0;overflow-x:auto;scrollbar-width:none}
+  .nav-links::-webkit-scrollbar{display:none}
+  .nav-links a{color:var(--ink-soft);text-decoration:none;transition:.2s;white-space:nowrap}
+  .nav-links a:hover{color:var(--ink)}
+  .nav-links a.active{color:var(--gold-soft,#f3c14b)}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;
+    padding:11px 22px;border-radius:999px;font-size:14px;font-weight:600;
+    border:1px solid transparent;cursor:pointer;text-decoration:none;transition:.2s;font-family:inherit}
+  .btn-primary{color:#1c1404;background:linear-gradient(135deg,var(--gold-soft),var(--gold));box-shadow:0 8px 30px rgba(243,193,75,.26)}
+  .btn-primary:hover{transform:translateY(-2px);box-shadow:0 12px 38px rgba(243,193,75,.4)}
+  .btn-ghost{color:var(--ink);border-color:var(--line-2);background:rgba(255,255,255,.04)}
+  .btn-ghost:hover{border-color:var(--gold);color:var(--gold-soft)}
+  .nav .btn{padding:8px 15px;flex:0 0 auto}
+  @media(max-width:860px){
+    .nav-links{flex:1;gap:13px;font-size:12.5px;margin:0 6px}
+    .nav .btn{padding:7px 12px;font-size:13px}
+    .neb-blob{filter:blur(40px)}
+  }
+
+  .st{padding:104px 0 80px}
+  .p-hero{text-align:center;margin-bottom:10px}
+  .p-hero .badge{display:inline-flex;align-items:center;gap:8px;font-size:12.5px;color:var(--gold-soft);
+    background:rgba(243,193,75,.09);border:1px solid rgba(243,193,75,.26);
+    padding:6px 14px;border-radius:999px;letter-spacing:1px;margin-bottom:18px}
+  .p-hero h1{font-size:clamp(27px,3.8vw,42px);font-weight:800;line-height:1.3}
+  .p-hero h1 .hl{font-family:var(--serif);font-style:italic;font-weight:600;
+    background:linear-gradient(120deg,var(--gold-soft),var(--gold) 55%,var(--mint));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .p-hero p{color:var(--ink-soft);margin:14px auto 0;font-size:15px;max-width:600px}
+
+  .sec{margin-top:48px}
+  .filters{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+  .fchip{padding:9px 18px;border-radius:999px;cursor:pointer;font-size:14px;font-weight:600;
+    border:1px solid var(--line-2);background:rgba(255,255,255,.03);color:var(--ink-soft);transition:.18s}
+  .fchip:hover{border-color:var(--gold);color:var(--gold-soft)}
+  .fchip.on{background:linear-gradient(135deg,var(--gold-soft),var(--gold));color:#1c1404;border-color:transparent}
+
+  /* 精选 */
+  .feature{display:grid;grid-template-columns:1.1fr 1fr;gap:0;border:1px solid var(--line-2);border-radius:var(--radius);overflow:hidden;
+    background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.015));transition:.25s}
+  .feature:hover{border-color:rgba(243,193,75,.4)}
+  .feature .ftext{padding:34px 32px;display:flex;flex-direction:column;justify-content:center}
+  .feature .ftag{align-self:flex-start;font-size:11.5px;font-weight:700;letter-spacing:1px;color:var(--gold-soft);
+    background:rgba(243,193,75,.12);border:1px solid rgba(243,193,75,.3);padding:4px 12px;border-radius:999px;margin-bottom:16px}
+  .feature h3{font-size:clamp(20px,2.4vw,27px);font-weight:800;line-height:1.4}
+  .feature .meta{font-size:13px;color:var(--ink-faint);margin-top:14px}
+  .feature .ex{font-size:14.5px;color:var(--ink-soft);margin-top:14px}
+  .feature .fbtn{margin-top:22px}
+  .feature .fvis{position:relative;min-height:220px;background:
+    radial-gradient(circle at 30% 30%, rgba(110,160,255,.35), transparent 60%),
+    radial-gradient(circle at 72% 64%, rgba(243,193,75,.3), transparent 60%),
+    linear-gradient(180deg,#0a0f22,#070b1c)}
+  .feature .fvis .star{position:absolute}
+  @media(max-width:820px){.feature{grid-template-columns:1fr}.feature .fvis{min-height:150px;order:-1}}
+
+  /* 列表 */
+  .list{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+  .post{border:1px solid var(--line);border-radius:var(--radius);padding:22px 22px 20px;transition:.25s;
+    background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.015));display:flex;flex-direction:column}
+  .post:hover{border-color:var(--line-2);transform:translateY(-3px)}
+  .post .ptag{font-size:11.5px;font-weight:700;letter-spacing:.5px;margin-bottom:10px}
+  .post.c-research .ptag{color:var(--sky)} .post.c-tool .ptag{color:var(--mint)}
+  .post.c-story .ptag{color:var(--violet)} .post.c-action .ptag{color:var(--gold)}
+  .post h4{font-size:18px;font-weight:700;line-height:1.45;margin-bottom:8px}
+  .post .ex{font-size:13.5px;color:var(--ink-soft);flex:1}
+  .post .meta{font-size:12.5px;color:var(--ink-faint);margin-top:14px}
+  @media(max-width:720px){.list{grid-template-columns:1fr}}
+
+  .noresult{display:none;text-align:center;color:var(--ink-faint);font-size:15px;padding:36px 0}
+  .noresult.show{display:block}
+
+  /* 订阅 */
+  .sub{border:1px solid var(--line-2);border-radius:var(--radius);padding:34px 28px;text-align:center;margin-top:48px;
+    background:linear-gradient(180deg,rgba(12,18,40,.5),rgba(9,14,32,.3))}
+  .sub h3{font-size:21px;font-weight:800;margin-bottom:8px}
+  .sub p{color:var(--ink-soft);font-size:14px;margin-bottom:20px}
+  .subform{display:flex;gap:10px;max-width:480px;margin:0 auto;flex-wrap:wrap;justify-content:center}
+  .subform input{flex:1;min-width:220px;padding:12px 16px;border-radius:12px;background:rgba(10,15,34,.7);
+    border:1px solid var(--line-2);color:var(--ink);font-family:inherit;font-size:14px;outline:none;transition:.2s}
+  .subform input:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(243,193,75,.12)}
+  .sub .ok{color:var(--mint);font-size:13.5px;margin-top:14px;display:none}
+  .sub .ok.show{display:block}
+
+  .cta{border:1px solid var(--line-2);border-radius:var(--radius);padding:40px 28px;text-align:center;margin-top:48px;
+    background:linear-gradient(180deg,rgba(12,18,40,.5),rgba(9,14,32,.3))}
+  .cta h3{font-size:clamp(20px,2.4vw,26px);font-weight:800;margin-bottom:12px}
+  .cta p{color:var(--ink-soft);font-size:14.5px;margin-bottom:22px;max-width:520px;margin-left:auto;margin-right:auto}
+
+  footer.foot{border-top:1px solid var(--line);margin-top:54px;padding:28px 0 10px;text-align:center;font-size:13px;color:var(--ink-faint)}
+  footer.foot .fl{display:flex;flex-wrap:wrap;justify-content:center;gap:4px 0}
+  footer.foot a{color:var(--ink-soft);text-decoration:none;margin:0 7px}
+  footer.foot a:hover{color:var(--gold-soft)}
+  footer.foot .slogan{margin-top:10px}
+
+  .reveal{opacity:0;transform:translateY(18px);transition:.7s ease}
+  .reveal.in{opacity:1;transform:none}
+  @media (prefers-reduced-motion: reduce){
+    *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}
+    .star-layer{transform:none!important}
+    .reveal{opacity:1;transform:none}
+  }
+</style>
+  <script src="track.js"></script>
+</head>
+<body>
+  <div class="sky-bg" id="skyBg" aria-hidden="true">
+    <div class="nebula" id="nebula">
+      <div class="neb-blob neb-b1"></div>
+      <div class="neb-blob neb-b2"></div>
+      <div class="neb-blob neb-b3"></div>
+    </div>
+    <div class="star-layer" id="layerFar" data-speed="0.12"></div>
+    <div class="star-layer" id="layerMid" data-speed="0.30"></div>
+  </div>
+
+  <header class="nav">
+    <div class="wrap nav-inner">
+      <a class="brand" href="index.html"><img class="brand-mark" src="logo-mark.svg" alt="天赋星图" width="18" height="18">天赋星图</a>
+      <nav class="nav-links">
+        <a href="index.html">首页</a>
+        <a href="quiz.html">测评</a>
+        <a href="report.html">报告</a>
+        <a href="action.html">行动</a>
+        <a href="stories.html">案例</a>
+        <a href="companion.html">伙伴</a>
+        <a href="me.html">我的星图</a>
+        <a href="pricing.html">价格</a>
+        <a href="blog.html" class="active">博客</a>
+        <a href="about.html">关于</a>
+        <a href="faq.html">FAQ</a>
+        <a href="contact.html">联系</a>
+      </nav>
+      <a href="quiz.html" class="btn btn-primary">绘制我的星图</a>
+    </div>
+  </header>
+
+  <div class="wrap">
+    <section class="st">
+      <!-- Hero -->
+      <div class="p-hero reveal">
+        <span class="badge">✦ 天赋星图博客</span>
+        <h1>关于天赋，我们<span class="hl">认真聊</span></h1>
+        <p>不灌鸡汤，不卖焦虑。研究笔记、方法工具、真实故事、行动清单——把「发现自己」这件大事，拆成你能用上的小事。</p>
+        <div class="filters reveal" id="filters" style="margin-top:26px">
+          <div class="fchip on" data-c="all">全部</div>
+          <div class="fchip" data-c="research">研究笔记</div>
+          <div class="fchip" data-c="tool">方法工具</div>
+          <div class="fchip" data-c="story">真实故事</div>
+          <div class="fchip" data-c="action">行动清单</div>
+        </div>
+      </div>
+
+      <!-- 精选 -->
+      <div class="sec">
+        <div class="feature reveal" id="feature">
+          <div class="ftext">
+            <span class="ftag">编辑精选 · 研究笔记</span>
+            <h3>为什么做自己擅长的事，是最被低估的翻身策略</h3>
+            <div class="meta">小羽 · 8 分钟阅读</div>
+            <p class="ex">我们总被教导「补短板」，但心理学里一条被反复验证的结论是：长期回报，更多来自你把已有的优势放到对的位置。这篇文章把 VIA 优势理论与真实案例串起来，告诉你「擅长」为什么值得被认真对待。</p>
+            <a class="btn btn-primary fbtn" href="blog.html#post-feature">读这篇 →</a>
+          </div>
+          <div class="fvis" id="fvis" aria-hidden="true"></div>
+        </div>
+      </div>
+
+      <!-- 列表 -->
+      <div class="sec">
+        <div class="list" id="postList"></div>
+        <div class="noresult" id="noResult">这个分类下还没有文章，换个标签看看 →</div>
+      </div>
+
+      <!-- 订阅 -->
+      <div class="sub reveal">
+        <h3>新文章，慢慢寄给你</h3>
+        <p>每两周一封，只发「关于天赋」的认真内容。不打扰，随时退订。</p>
+        <form class="subform" id="subForm" novalidate>
+          <input type="email" id="subEmail" placeholder="你的邮箱，如 name@example.com" autocomplete="email" />
+          <button type="submit" class="btn btn-primary">订阅</button>
+        </form>
+        <div class="ok" id="subOk">已记下你的邮箱 ✓ 下一篇出来第一时间通知你（示意：本站暂无后端，不会真正发送）</div>
+      </div>
+
+      <!-- CTA -->
+      <div class="cta reveal">
+        <h3>读得不过瘾？先画一张自己的星图</h3>
+        <p>文章是别人的思考，星图是你自己的线索。15 分钟，看看你「忘记时间」的时刻藏着什么。</p>
+        <a class="btn btn-primary" href="quiz.html">免费开始我的测评</a>
+      </div>
+
+      <footer class="foot">
+        <div class="fl">
+          <a href="index.html">首页</a>·<a href="quiz.html">测评</a>·<a href="report.html">报告</a>·<a href="action.html">行动</a>·<a href="stories.html">案例</a>·<a href="companion.html">伙伴</a>·<a href="me.html">我的星图</a>·<a href="pricing.html">价格</a>·<a href="blog.html">博客</a>·<a href="about.html">关于</a>·<a href="faq.html">FAQ</a>·<a href="contact.html">联系</a>
+        </div>
+        <div class="slogan">天赋星图 · 在共产主义尚未到来的时期，把生命力放大到它应该在的水平</div>
+      </footer>
+    </section>
+  </div>
+
+<script>
+/* ===== 文章数据（与 Ardot 博客页一致；新增文章直接往 POSTS 里加一项） =====
+   cat: research(研究笔记·sky) / tool(方法工具·mint) / story(真实故事·violet) / action(行动清单·gold) */
+const POSTS = [
+  {id:'p1', cat:'research', tag:'研究笔记', title:'六种兴趣代码，到底在说什么', min:6, ex:'RIASEC 不是六个标签，而是一张帮你定位「在哪类事里更自在」的坐标。用最直白的话讲清 R/I/A/S/E/C 各自意味着什么。'},
+  {id:'p2', cat:'tool', tag:'方法工具', title:'你的「缺点」，可能是没用对的优势', min:5, ex:'VIA 24 项优势换个角度就是 24 种「用过头会翻车」的方式。教你把刺眼的小毛病，翻译成可以重新摆放的天赋。'},
+  {id:'p3', cat:'tool', tag:'方法工具', title:'怎么知道自己进入了心流', min:7, ex:'心流不是「很专注」那么简单。三个可观察的信号 + 一个随身记录法，让你不再靠感觉，而是靠线索认出它。'},
+  {id:'p4', cat:'research', tag:'研究笔记', title:'兴趣 × 优势 × 世界需要：四圈交集才是天赋区', min:8, ex:'IKIGAI 的四圈模型为什么比「做热爱的事」更诚实？我们把它和三层漏斗叠在一起，讲清楚「天赋区」的边界。'},
+  {id:'p5', cat:'action', tag:'行动清单', title:'改变真的需要 21 天吗', min:6, ex:'21 天是个好记的整数，但不是魔法。一份可执行的微实验清单，帮你把「想改变」变成「在改变」。'},
+  {id:'p6', cat:'story', tag:'真实故事', title:'辞职去做喜欢的事，是勇气还是冲动', min:9, ex:'案例墙里一个真实的转身：他不是突然勇敢，而是先用 21 天日记确认了「忘记时间」的时刻真的存在。'}
+];
+
+let cat='all';
+const CATNAME={research:'研究笔记',tool:'方法工具',story:'真实故事',action:'行动清单'};
+function esc(s){return String(s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));}
+
+function render(){
+  const list=document.getElementById('postList');
+  const items = cat==='all' ? POSTS : POSTS.filter(p=>p.cat===cat);
+  list.innerHTML = items.map(p=>`
+    <a class="post c-${p.cat}" id="post-${p.id}" href="blog.html#post-${p.id}" style="text-decoration:none">
+      <div class="ptag">${esc(p.tag)}</div>
+      <h4>${esc(p.title)}</h4>
+      <div class="ex">${esc(p.ex)}</div>
+      <div class="meta">小羽 · ${p.min} 分钟阅读</div>
+    </a>`).join('');
+  document.getElementById('noResult').classList.toggle('show', items.length===0);
+  document.querySelectorAll('#filters .fchip').forEach(c=>c.classList.toggle('on', c.dataset.c===cat));
+}
+
+document.getElementById('filters').querySelectorAll('.fchip').forEach(c=>{
+  c.onclick=()=>{ cat=c.dataset.c; render(); };
+});
+render();
+
+/* ===== 精选卡视觉：随机星点 ===== */
+(function(){
+  var box=document.getElementById('fvis'); if(!box) return;
+  var h='';
+  for(var i=0;i<26;i++){
+    var l=(Math.random()*100).toFixed(2), t=(Math.random()*100).toFixed(2),
+        extra = Math.random()<.2 ? ' gold' : (Math.random()<.2 ? ' blue' : (Math.random()<.25?' bright':''));
+    h+='<i class="star'+extra+'" style="left:'+l+'%;top:'+t+'%;animation:starTw '+(2.6+Math.random()*3.4).toFixed(2)+'s ease-in-out infinite"></i>';
+  }
+  box.innerHTML=h;
+})();
+
+/* ===== 订阅（示意，无后端） ===== */
+(function(){
+  var f=document.getElementById('subForm'); if(!f) return;
+  f.onsubmit=function(e){
+    e.preventDefault();
+    var v=document.getElementById('subEmail').value.trim();
+    if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v)){ alert('邮箱格式好像不太对，再检查一下～'); return; }
+    document.getElementById('subOk').classList.add('show');
+    document.getElementById('subEmail').value='';
+  };
+})();
+
+/* ===== 星海（与全站一致） ===== */
+(function(){
+  var far=document.getElementById('layerFar'), mid=document.getElementById('layerMid');
+  if(!far||!mid) return;
+  function fill(el,n){
+    var h='';
+    for(var i=0;i<n;i++){
+      var l=(Math.random()*100).toFixed(2), t=(Math.random()*100).toFixed(2),
+          d=(Math.random()*4).toFixed(2), du=(2.6+Math.random()*3.4).toFixed(2),
+          extra = Math.random()<.14 ? ' gold' : (Math.random()<.16 ? ' blue' : (Math.random()<.2 ? ' bright' : ''));
+      h+='<i class="star'+extra+'" style="left:'+l+'%;top:'+t+'%;animation:starTw '+du+'s ease-in-out '+d+'s infinite"></i>';
+    }
+    el.innerHTML=h;
+  }
+  fill(far,150); fill(mid,90);
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if(!reduce){
+    var ticking=false;
+    window.addEventListener('scroll',function(){
+      if(ticking) return; ticking=true;
+      requestAnimationFrame(function(){
+        var y=window.pageYOffset||0;
+        far.style.transform='translateY('+(-y*0.12)+'px)';
+        mid.style.transform='translateY('+(-y*0.30)+'px)';
+        ticking=false;
+      });
+    },{passive:true});
+  }
+})();
+
+/* ===== reveal ===== */
+(function(){
+  var els=document.querySelectorAll('.reveal');
+  if(!('IntersectionObserver' in window)){ els.forEach(function(e){e.classList.add('in')}); return; }
+  var io=new IntersectionObserver(function(list){
+    list.forEach(function(en){ if(en.isIntersecting){ en.target.classList.add('in'); io.unobserve(en.target); } });
+  },{threshold:.12});
+  els.forEach(function(e){io.observe(e)});
+})();
+</script>
+</body>
+</html>

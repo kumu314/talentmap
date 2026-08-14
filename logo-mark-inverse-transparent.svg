@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="天赋星图（反色·透明底）">
+  <defs>
+    <linearGradient id="navy" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#6ea0ff"/>
+      <stop offset="100%" stop-color="#2a3d6b"/>
+    </linearGradient>
+  </defs>
+  <!-- 轨道（深蓝） -->
+  <circle cx="32" cy="32" r="23" fill="none" stroke="#3a5bbf" stroke-opacity="0.5" stroke-width="1.4"/>
+  <!-- 伴星（深蓝） -->
+  <path d="M48 12.8 L49.3 14.7 L51.2 16 L49.3 17.3 L48 19.2 L46.7 17.3 L44.8 16 L46.7 14.7 Z" fill="#3a5bbf"/>
+  <path d="M16 44.8 L17.3 46.7 L19.2 48 L17.3 49.3 L16 51.2 L14.7 49.3 L12.8 48 L14.7 46.7 Z" fill="#3a5bbf" opacity="0.85"/>
+  <!-- 主星：四角北辰星（深蓝渐变 + 金星心） -->
+  <path d="M32 6 L37 27 L58 32 L37 37 L32 58 L27 37 L6 32 L27 27 Z" fill="url(#navy)" stroke="#1b2a4a" stroke-opacity="0.4" stroke-width="0.6"/>
+  <circle cx="32" cy="32" r="3.2" fill="#f3c14b"/>
+</svg>

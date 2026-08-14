@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>天赋星图 · 行动 — 21 天心流日记</title>
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="icon" href="logo-mark.svg" type="image/svg+xml">
+  <meta name="description" content="天赋星图 · 用 RIASEC/VIA/心流/IKIGAI 三层定位 + 一层现实校验，8 分钟画出你的天赋星图，把被压住的生命力放大到它应该在的水平。">
+<meta property="og:type" content="website">
+<meta property="og:title" content="天赋星图 · 你做什么会忘记时间？">
+<meta property="og:description" content="三层定位 + 一层现实校验，8 分钟画出你的天赋星图。">
+<meta property="og:image" content="https://46461dec3937411d970e0881cbfa0056.app.codebuddy.work/og-cover.png">
+<style>
+  :root{
+    --bg:#060912;--bg-1:#0a0f22;--ink:#eef2ff;--ink-soft:#9aa6cf;--ink-faint:#7f8bb3;
+    --gold:#f3c14b;--gold-soft:#ffe1a0;--sky:#6ea0ff;--violet:#a98bff;--mint:#54d8c4;
+    --line:rgba(255,255,255,.08);--line-2:rgba(255,255,255,.16);--radius:20px;
+    --maxw:760px;--serif:"Songti SC","STSong","Noto Serif SC",Georgia,serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{font-family:"PingFang SC","Microsoft YaHei","Hiragino Sans GB",system-ui,sans-serif;
+    color:var(--ink);background:var(--bg);line-height:1.75;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+  /* ===== 深空背景：多层视差星海 + 真实星座（与首页一致） ===== */
+  .sky-bg{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none;
+    background:linear-gradient(180deg,#05070f 0%, #070b1c 50%, #060912 100%)}
+  .nebula{position:absolute;inset:-12% 0;z-index:0}
+  .neb-blob{position:absolute;border-radius:50%;filter:blur(70px);will-change:opacity}
+  .neb-b1{width:62vw;height:62vw;left:-12vw;top:-12vh;background:radial-gradient(circle,rgba(110,160,255,.5),transparent 65%)}
+  .neb-b2{width:56vw;height:56vw;right:-14vw;top:34vh;background:radial-gradient(circle,rgba(169,139,255,.45),transparent 65%)}
+  .neb-b3{width:52vw;height:52vw;left:18vw;bottom:-18vh;background:radial-gradient(circle,rgba(243,193,75,.35),transparent 65%)}
+  .star-layer{position:absolute;left:0;top:0;width:100%;height:320vh;will-change:transform}
+  .star{position:absolute;width:2px;height:2px;border-radius:50%;background:#fff}
+  .star.bright{width:3px;height:3px;box-shadow:0 0 6px rgba(255,255,255,.85)}
+  .star.gold{background:#ffe1a0;box-shadow:0 0 6px rgba(243,193,75,.8)}
+  .star.blue{background:#cfe0ff;box-shadow:0 0 6px rgba(110,160,255,.8)}
+  @keyframes starTw{0%,100%{opacity:.45}50%{opacity:1}}
+  .constel-layer{position:fixed;top:0;left:0;width:100%;height:320vh;z-index:2;pointer-events:none;will-change:transform}
+  .constel{position:absolute;width:150px;height:150px;pointer-events:auto;cursor:pointer}
+  .constel svg{width:100%;height:100%;overflow:visible;display:block;transform-box:fill-box;transform-origin:center}
+  .constel .c-line{stroke:rgba(243,193,75,.32);stroke-width:1;fill:none;stroke-dasharray:2 5;transition:stroke .4s}
+  .constel .c-dot{fill:#fff;transform-box:fill-box;transform-origin:center;transition:transform .25s,fill .25s}
+  .constel .c-halo{fill:none;stroke:rgba(243,193,75,0);stroke-width:1.6;transition:stroke .4s}
+  .constel:hover .c-dot{transform:scale(1.7);fill:var(--gold-soft)}
+  .constel:hover .c-line{stroke:rgba(243,193,75,.7)}
+  .constel:hover .c-halo{stroke:rgba(243,193,75,.55)}
+  .constel.pulse{animation:cPulse 1.6s cubic-bezier(.2,.8,.2,1)}
+  .constel.pulse .c-halo{stroke:rgba(243,193,75,.9);animation:halo 1.6s ease-out}
+  @keyframes cPulse{0%{transform:scale(1) rotate(0)}30%{transform:scale(1.18) rotate(-2deg)}55%{transform:scale(.95) rotate(1.8deg)}80%{transform:scale(1.07) rotate(-1deg)}100%{transform:scale(1) rotate(0)}}
+  @keyframes halo{0%{stroke-opacity:.9;transform:scale(.6)}100%{stroke-opacity:0;transform:scale(1.9)}}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 22px;position:relative;z-index:1}
+
+  header.nav{position:fixed;top:0;left:0;right:0;z-index:50;background:rgba(6,9,18,.72);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+  .nav-inner{display:flex;align-items:center;justify-content:space-between;height:60px}
+  .brand{display:flex;align-items:center;gap:9px;font-weight:700;font-size:15px}
+  .brand .dot{width:12px;height:12px;border-radius:50%;background:radial-gradient(circle at 30% 30%,#fff,var(--gold) 60%,#a87f24);box-shadow:0 0 12px var(--gold)}
+  .nav a.back{color:var(--ink-soft);text-decoration:none;font-size:14px}
+  .nav a.back:hover{color:var(--ink)}
+  .nav-links{display:flex;gap:24px;font-size:14px}
+  .nav-links a{color:var(--ink-soft);text-decoration:none;transition:.2s}
+  .nav-links a:hover{color:var(--ink)}
+  .nav-links a.active{color:var(--gold-soft,#f3c14b)}
+  .brand{color:inherit;text-decoration:none}
+  @media(max-width:720px){
+    .nav-links{display:flex !important;gap:14px;font-size:13px;flex:1;min-width:0;overflow-x:auto;margin:0 8px}
+    .nav-links a{white-space:nowrap}
+    .nav .btn{padding:7px 12px;font-size:13px}
+    .neb-blob{filter:blur(40px)}
+  }
+
+  .action{padding:108px 0 80px;min-height:100vh}
+  .a-hero{text-align:center;margin-bottom:30px}
+  .a-hero .a-no{font-family:var(--serif);font-style:italic;font-size:15px;color:var(--gold-soft);letter-spacing:2px;margin-bottom:12px}
+  .a-hero h1{font-size:clamp(27px,3.6vw,40px);font-weight:800;line-height:1.3}
+  .a-hero h1 .hl{font-family:var(--serif);font-style:italic;font-weight:600;
+    background:linear-gradient(120deg,var(--gold-soft),var(--gold) 55%,var(--mint));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .a-hero p{color:var(--ink-soft);margin-top:14px;font-size:15px;max-width:540px;margin-left:auto;margin-right:auto}
+
+  /* 统计条 */
+  .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:26px}
+  .stat{border:1px solid var(--line);border-radius:16px;padding:18px 14px;text-align:center;
+    background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.015))}
+  .stat .num{font-size:30px;font-weight:800;color:var(--gold-soft);line-height:1.1}
+  .stat .lab{font-size:12.5px;color:var(--ink-faint);margin-top:6px;letter-spacing:.5px}
+
+  /* 21 格 */
+  .grid-21{display:grid;grid-template-columns:repeat(7,1fr);gap:9px;margin-bottom:30px}
+  .cell{aspect-ratio:1/1;border:1px dashed var(--line-2);border-radius:12px;display:flex;flex-direction:column;
+    align-items:center;justify-content:center;position:relative;transition:.3s;overflow:hidden}
+  .cell .d{font-size:11px;color:var(--ink-faint)}
+  .cell.filled{border-style:solid;cursor:pointer}
+  .cell.filled.ria{border-color:color-mix(in srgb,var(--sky) 50%,transparent);background:color-mix(in srgb,var(--sky) 14%,transparent)}
+  .cell.filled.via{border-color:color-mix(in srgb,var(--violet) 50%,transparent);background:color-mix(in srgb,var(--violet) 14%,transparent)}
+  .cell.filled.flow{border-color:color-mix(in srgb,var(--mint) 50%,transparent);background:color-mix(in srgb,var(--mint) 14%,transparent)}
+  .cell .star{font-size:15px;line-height:1}
+  .cell.today{box-shadow:0 0 0 2px var(--gold)}
+
+  /* 表单 */
+  .card{border:1px solid var(--line);border-radius:var(--radius);padding:24px 24px;margin-bottom:22px;
+    background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.015))}
+  .card h3{font-size:18px;font-weight:800;margin-bottom:4px}
+  .card .csub{font-size:13px;color:var(--ink-soft);margin-bottom:18px}
+  label.fld{display:block;font-size:13.5px;color:var(--ink-soft);margin:16px 0 8px}
+  textarea,input[type=text]{width:100%;background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:12px;
+    color:var(--ink);font-family:inherit;font-size:15px;padding:12px 14px;resize:vertical;line-height:1.6}
+  textarea:focus,input[type=text]:focus{outline:none;border-color:var(--gold)}
+  textarea{min-height:74px}
+
+  .layers{display:flex;gap:10px;flex-wrap:wrap}
+  .lchip{flex:1;min-width:120px;text-align:center;padding:12px 10px;border-radius:14px;cursor:pointer;
+    border:1px solid var(--line);background:rgba(255,255,255,.03);transition:.18s;font-size:14px}
+  .lchip .lc{font-size:11px;letter-spacing:.5px;opacity:.8}
+  .lchip .lv{font-size:13px;margin-top:3px;color:var(--ink-soft)}
+  .lchip[data-k=ria]{--c:var(--sky)} .lchip[data-k=via]{--c:var(--violet)} .lchip[data-k=flow]{--c:var(--mint)}
+  .lchip:hover{border-color:var(--c)}
+  .lchip.on{border-color:var(--c);background:color-mix(in srgb,var(--c) 14%,transparent);color:var(--ink);font-weight:600}
+
+  .stars{display:flex;gap:6px;font-size:26px;cursor:pointer}
+  .stars span{color:var(--ink-faint);transition:.15s;user-select:none}
+  .stars span.on{color:var(--gold)}
+
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 26px;border-radius:999px;
+    font-size:15px;font-weight:600;border:1px solid transparent;cursor:pointer;transition:.2s;font-family:inherit;text-decoration:none}
+  .btn-primary{color:#1c1404;background:linear-gradient(135deg,var(--gold-soft),var(--gold));box-shadow:0 8px 30px rgba(243,193,75,.26)}
+  .btn-primary:hover{transform:translateY(-2px);box-shadow:0 12px 38px rgba(243,193,75,.4)}
+  .btn-ghost{color:var(--ink);border-color:var(--line-2);background:rgba(255,255,255,.04);padding:11px 20px;font-size:14px}
+  .btn-ghost:hover{border-color:var(--gold);color:var(--gold-soft)}
+  .form-actions{display:flex;gap:12px;margin-top:22px;flex-wrap:wrap;align-items:center}
+
+  /* 列表 */
+  .logs{display:flex;flex-direction:column;gap:12px}
+  .log{border:1px solid var(--line);border-radius:14px;padding:14px 16px;background:rgba(255,255,255,.025);position:relative}
+  .log .lt{font-size:15px;line-height:1.6}
+  .log .lm{font-size:12px;color:var(--ink-faint);margin-top:7px;display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+  .log .badge{padding:2px 9px;border-radius:999px;font-size:11.5px}
+  .log .badge.ria{background:color-mix(in srgb,var(--sky) 16%,transparent);color:var(--sky)}
+  .log .badge.via{background:color-mix(in srgb,var(--violet) 16%,transparent);color:var(--violet)}
+  .log .badge.flow{background:color-mix(in srgb,var(--mint) 16%,transparent);color:var(--mint)}
+  .log .del{position:absolute;top:12px;right:14px;color:var(--ink-faint);cursor:pointer;font-size:16px;line-height:1}
+  .log .del:hover{color:#ff8a8a}
+  .empty-log{text-align:center;color:var(--ink-faint);font-size:14px;padding:24px}
+
+  /* 微实验（C1） */
+  .exp-list{display:flex;flex-direction:column;gap:10px;margin-top:6px}
+  .exp-item{display:flex;align-items:flex-start;gap:12px;padding:13px 15px;border:1px solid var(--line);border-radius:13px;
+    background:rgba(255,255,255,.025);cursor:pointer;transition:.18s}
+  .exp-item:hover{border-color:var(--mint)}
+  .exp-item.done{border-color:color-mix(in srgb,var(--mint) 45%,transparent);background:color-mix(in srgb,var(--mint) 10%,transparent)}
+  .exp-item .box{flex:none;width:20px;height:20px;border-radius:6px;border:1.5px solid var(--line-2);display:flex;align-items:center;justify-content:center;
+    font-size:13px;color:var(--bg);margin-top:1px;transition:.18s}
+  .exp-item.done .box{background:var(--mint);border-color:var(--mint)}
+  .exp-item .et{font-size:14.5px;color:var(--ink-soft);line-height:1.6}
+  .exp-item.done .et{color:var(--ink);text-decoration:line-through;text-decoration-color:var(--ink-faint)}
+  .exp-prog{font-size:13px;color:var(--ink-faint);margin-top:4px}
+
+  /* 成就徽章（连续打卡激励） */
+  .badges{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin-top:6px}
+  .badge-x{display:flex;flex-direction:column;align-items:center;gap:8px;width:98px;text-align:center;padding:14px 6px;border-radius:16px;
+    border:1px solid var(--line);background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,.012));transition:.3s}
+  .badge-x .b-ic{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;
+    border:1px solid var(--line-2);color:var(--ink-faint);transition:.3s}
+  .badge-x .b-name{font-size:12px;color:var(--ink-soft);line-height:1.4}
+  .badge-x.got{border-color:color-mix(in srgb,var(--gold) 50%,transparent);background:color-mix(in srgb,var(--gold) 10%,transparent)}
+  .badge-x.got .b-ic{color:var(--bg);background:linear-gradient(135deg,var(--gold-soft),var(--gold));border-color:transparent;box-shadow:0 6px 18px rgba(243,193,75,.3)}
+  .badge-x.got .b-name{color:var(--gold-soft);font-weight:600}
+  .badge-x.justgot{animation:pop .6s cubic-bezier(.2,.9,.3,1.3)}
+  @keyframes pop{0%{transform:scale(.7);opacity:.4}60%{transform:scale(1.12)}100%{transform:scale(1);opacity:1}}
+
+  /* 每日观察提示（模板库） */
+  .hint-box{margin:-6px 0 4px;padding:11px 15px;border-radius:13px;background:color-mix(in srgb,var(--mint) 9%,transparent);
+    border:1px dashed color-mix(in srgb,var(--mint) 45%,transparent);font-size:13.5px;color:var(--ink-soft);line-height:1.7}
+  .hint-box b{color:var(--mint);font-weight:700}
+  .hint-box .hd{font-size:11px;letter-spacing:1.5px;color:var(--mint);opacity:.85;margin-bottom:2px;font-weight:600}
+
+  /* 周回顾 */
+  .wk{border:1px solid var(--line);border-radius:var(--radius);padding:24px;margin-bottom:22px;
+    background:radial-gradient(420px 180px at 50% 0%, rgba(110,160,255,.1), transparent 70%),linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.015))}
+  .wk h3{font-size:18px;font-weight:800;margin-bottom:4px}
+  .wk .csub{font-size:13px;color:var(--ink-soft);margin-bottom:16px}
+  .wk-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
+  .wk-stat{border:1px solid var(--line);border-radius:13px;padding:13px 10px;text-align:center;background:rgba(255,255,255,.025)}
+  .wk-stat .wn{font-size:21px;font-weight:800;color:var(--gold-soft);line-height:1.2}
+  .wk-stat .wl{font-size:11.5px;color:var(--ink-faint);margin-top:4px}
+  .wk-insight{font-size:14px;color:var(--ink-soft);line-height:1.8;padding:13px 15px;border-radius:12px;background:rgba(110,160,255,.07);border:1px solid rgba(110,160,255,.2);margin-bottom:14px}
+  .wk-insight b{color:var(--sky)}
+  .wk-empty{font-size:13.5px;color:var(--ink-faint);line-height:1.7;text-align:center;padding:8px 0 12px}
+  .wk-acts{display:flex;gap:10px;flex-wrap:wrap}
+
+  /* 每日提醒开关 */
+  .remind-row{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+  .switch{position:relative;display:inline-block;width:52px;height:28px;flex:0 0 auto}
+  .switch input{opacity:0;width:0;height:0}
+  .switch .slider{position:absolute;cursor:pointer;inset:0;border-radius:999px;background:rgba(255,255,255,.12);transition:.25s;border:1px solid var(--line-2)}
+  .switch .slider::before{content:"";position:absolute;width:20px;height:20px;left:3px;top:3px;border-radius:50%;background:var(--ink-soft);transition:.25s}
+  .switch input:checked + .slider{background:linear-gradient(135deg,var(--gold-soft),var(--gold));border-color:transparent}
+  .switch input:checked + .slider::before{transform:translateX(24px);background:#1c1404}
+  .remind-row input[type=time]{width:auto;min-width:110px;padding:8px 12px;background:rgba(255,255,255,.04);border:1px solid var(--line-2);border-radius:10px;color:var(--ink);font-family:inherit;font-size:14px}
+  .remind-note{font-size:12px;color:var(--ink-faint);margin-top:10px;line-height:1.7}
+
+  .reveal{opacity:0;transform:translateY(18px);transition:.7s ease}
+  .reveal.in{opacity:1;transform:none}
+  .toast{position:fixed;left:50%;bottom:32px;transform:translateX(-50%) translateY(20px);z-index:80;
+    background:rgba(20,26,48,.96);border:1px solid var(--line-2);color:var(--ink);padding:12px 22px;border-radius:999px;
+    font-size:14px;opacity:0;transition:.35s;pointer-events:none}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  footer.foot{border-top:1px solid var(--line);margin-top:40px;padding:26px 0 8px;text-align:center;font-size:13px;color:var(--ink-faint)}
+  footer.foot a{color:var(--ink-soft);text-decoration:none;margin:0 9px}
+  footer.foot a:hover{color:var(--gold-soft)}
+  @media(max-width:600px){.stats{grid-template-columns:repeat(3,1fr);gap:8px}.stat .num{font-size:24px}
+    .grid-21{gap:6px}.card{padding:20px 16px}}
+
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}
+  .layerFar,.layerMid,.layerNear,.constel-layer{transform:none!important}
+}
+
+  .brand-mark{width:18px;height:18px;flex:0 0 auto;border-radius:50%;object-fit:contain;filter:drop-shadow(0 0 6px rgba(243,193,75,.55))}
+</style>
+  <script src="track.js"></script>
+  <script src="https://beacon.cdn.qq.com/sdk/4.5.9/beacon_web.min.js" async></script>
+<script>
+(function(){
+  try{
+    window.addEventListener('load',function(){
+      if(!window.BeaconAction) return;
+      var beacon=new BeaconAction({
+        appkey:'0WEB06U85YBSLJNL',
+        versionCode:'1.0.0',
+        channelID:'share',
+        delay:1000,
+        sessionDuration:30*60*1000,
+        isOversea:false,
+        needReportRqdEvent:false
+      });
+      beacon.onDirectUserAction('preview_page_view',{
+        'url':location.href,
+        'referrer':document.referrer,
+        'title':document.title,
+        'sandbox_id':'46461dec3937411d970e0881cbfa0056'
+      });
+    });
+  }catch(e){}
+})();
+</script></head>
+<body>
+    <div class="sky-bg" id="skyBg" aria-hidden="true">
+    <div class="nebula" id="nebula">
+      <div class="neb-blob neb-b1" id="nebB1"></div>
+      <div class="neb-blob neb-b2" id="nebB2"></div>
+      <div class="neb-blob neb-b3" id="nebB3"></div>
+    </div>
+    <div class="star-layer" id="layerFar" data-speed="0.12"></div>
+    <div class="star-layer" id="layerMid" data-speed="0.30"></div>
+  </div>
+  <div class="constel-layer" id="layerNear" data-speed="0.50" aria-hidden="true"></div>
+  <header class="nav">
+    <div class="wrap nav-inner">
+      <a class="brand" href="index.html"><img class="brand-mark" src="logo-mark.svg" alt="天赋星图" width="18" height="18">天赋星图</a>
+    <nav class="nav-links">
+      <a href="index.html">首页</a>
+      <a href="quiz.html">测评</a>
+      <a href="report.html">报告</a>
+      <a href="action.html" class="active">行动</a>
+      <a href="stories.html">案例</a>
+      <a href="companion.html">伙伴</a>
+      <a href="me.html">我的星图</a>
+<a href="pricing.html">价格</a>
+<a href="blog.html">博客</a>
+<a href="about.html">关于</a>
+<a href="faq.html">FAQ</a>
+<a href="contact.html">联系</a>
+    </nav>
+    <a href="quiz.html" class="btn btn-primary">绘制我的星图</a>
+    </div>
+  </header>
+
+  <div class="wrap">
+    <section class="action">
+      <div class="a-hero reveal">
+        <div class="a-no">第四站 · 把天赋养成习惯</div>
+        <h1>记录 <span class="hl">21 天</span> 心流日记</h1>
+        <p>不是逼自己坚持，是让自己<b>留意</b>——那些让你忘记时间的瞬间，才是生命力在它该在的位置上发光。</p>
+      </div>
+
+      <div class="stats reveal">
+        <div class="stat"><div class="num" id="sCount">0</div><div class="lab">已记录天数</div></div>
+        <div class="stat"><div class="num" id="sStreak">0</div><div class="lab">最长连续</div></div>
+        <div class="stat"><div class="num" id="sTop">—</div><div class="lab">最常被点亮</div></div>
+      </div>
+
+      <div class="wk reveal">
+        <h3>这一周，你的心流长这样</h3>
+        <div class="csub">不需要等到 21 天——每 7 天回望一次，你会看见自己在哪里发光。</div>
+        <div id="wkBody"></div>
+      </div>
+
+      <div class="card reveal" style="text-align:center">
+        <h3>成就徽章</h3>
+        <div class="csub">天赋是长出来的——每走一步，就亮一枚。</div>
+        <div class="badges" id="badges"></div>
+      </div>
+
+      <div class="grid-21 reveal" id="grid21"></div>
+
+      <div class="card reveal">
+        <h3>今天，什么让你投入了？</h3>
+        <div class="csub">不要求惊天动地。哪怕只是认真整理了 20 分钟桌面，只要当时你是「在的」，就值得记。</div>
+        <div class="hint-box" id="dailyHint"></div>
+
+        <label class="fld">它属于你星图的哪一层？（测过的人会看到自己的线索）</label>
+        <div class="layers" id="layers"></div>
+
+        <label class="fld">那一刻你在做什么？</label>
+        <textarea id="fText" placeholder="例如：把攒了一周的代码 bug 一点点顺明白了，抬头发现食堂快关门了。"></textarea>
+
+        <label class="fld">心流强度</label>
+        <div class="stars" id="stars">
+          <span data-v="1">★</span><span data-v="2">★</span><span data-v="3">★</span><span data-v="4">★</span><span data-v="5">★</span>
+        </div>
+
+        <label class="fld">当时和谁 / 几点（选填）</label>
+        <input type="text" id="fWho" placeholder="例如：一个人 · 晚上 9 点" />
+
+        <div class="form-actions">
+          <button class="btn btn-primary" id="saveBtn">点亮今天 ✦</button>
+          <button class="btn btn-ghost" id="expBtn">复制文本</button>
+          <button class="btn btn-ghost" id="dlBtn">下载备份</button>
+          <button class="btn btn-ghost" id="impBtn">导入备份</button>
+          <input type="file" id="impFile" accept="application/json,.json" style="display:none" />
+        </div>
+        <div class="ropt-tip" style="margin-top:10px">换手机 / 清缓存前点「下载备份」存个文件，新设备点「导入备份」就能续上你的星图。</div>
+      </div>
+
+      <div class="card reveal">
+        <h3>你的记录</h3>
+        <div class="csub">点格子上的记录可以回看；不想要了就划掉。</div>
+        <div class="logs" id="logs"></div>
+      </div>
+
+      <div class="card reveal" id="expCard">
+        <h3>7 天微实验 · 把"测"接上"做"</h3>
+        <div class="csub">天赋是做出来的，不是测出来的。下面 7 件小事，是为<b>你的星图</b>定制的——不用全做，挑顺眼的，做完勾掉。</div>
+        <div class="exp-list" id="expList"></div>
+        <div class="exp-prog" id="expProg"></div>
+      </div>
+
+      <div class="card reveal">
+        <h3>每日提醒 · 别忘了回来记一笔</h3>
+        <div class="csub">打开网站时，到点弹一条「记得记心流」的通知。纯本地，不出门，可随时关。</div>
+        <div class="remind-row">
+          <label class="switch" title="开 / 关每日提醒">
+            <input type="checkbox" id="rmOn"><span class="slider"></span>
+          </label>
+          <span style="font-size:14px;color:var(--ink-soft)">每天</span>
+          <input type="time" id="rmTime" value="21:00" title="提醒时间" />
+          <button class="btn btn-ghost" id="rmTest">测试通知</button>
+        </div>
+        <div class="remind-note" id="rmNote">提醒只在「打开本站」时生效（浏览器不允许网页常驻后台弹通知）——所以把它当成回访时的温柔提示，而不是闹钟。</div>
+      </div>
+
+      <footer class="foot">
+        <a href="index.html">首页</a>·<a href="quiz.html">测评</a>·<a href="report.html">报告</a>·<a href="action.html">行动</a>·<a href="stories.html">案例</a>·        <a href="companion.html">伙伴</a>·<a href="me.html">我的星图</a>·<a href="pricing.html">价格</a>·<a href="blog.html">博客</a>·<a href="about.html">关于</a>·<a href="faq.html">FAQ</a>·<a href="contact.html">联系</a>
+        <div style="margin-top:10px">天赋星图 · 在共产主义尚未到来的时期，把生命力放大到它应该在的水平</div>
+      </footer>
+    </section>
+  </div>
+  <div class="toast" id="toast"></div>
+
+<script>
+const RESULT = (()=>{try{return JSON.parse(localStorage.getItem('talentmap_result'));}catch(e){return null;}})();
+const KEY='talentmap_diary';
+const LAYER_META={
+  ria:{name:'兴趣',color:'var(--sky)',hint:RESULT&&RESULT.riaTop&&RESULT.riaTop[0]?RESULT.riaTop[0].label:'你被什么吸走'},
+  via:{name:'优势',color:'var(--violet)',hint:RESULT&&RESULT.viaTop&&RESULT.viaTop[0]?RESULT.viaTop[0][0]:'你身上什么在漏光'},
+  flow:{name:'心流',color:'var(--mint)',hint:RESULT&&RESULT.flowTop&&RESULT.flowTop[0]?RESULT.flowTop[0][0]:'你什么时候消失过'}
+};
+
+let entries = (()=>{try{return JSON.parse(localStorage.getItem(KEY))||[];}catch(e){return [];}})();
+let pickLayer = 'flow';
+let pickStar = 3;
+
+function todayStr(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+function fmt(d){const p=d.split('-');return p[1]+'/'+p[2];}
+
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1800);}
+
+/* ---- 层选择 ---- */
+function renderLayers(){
+  const box=document.getElementById('layers');
+  box.innerHTML=Object.entries(LAYER_META).map(([k,m])=>`
+    <div class="lchip ${pickLayer===k?'on':''}" data-k="${k}">
+      <div class="lc">${m.name}</div>
+      <div class="lv">${m.hint}</div>
+    </div>`).join('');
+  box.querySelectorAll('.lchip').forEach(c=>c.onclick=()=>{pickLayer=c.dataset.k;renderLayers();});
+}
+/* ---- 星 ---- */
+function renderStars(){
+  document.querySelectorAll('#stars span').forEach(s=>{
+    s.classList.toggle('on', +s.dataset.v<=pickStar);
+    s.onclick=()=>{pickStar=+s.dataset.v;renderStars();};
+  });
+}
+/* ---- 21 格 ---- */
+function renderGrid(){
+  const grid=document.getElementById('grid21');
+  grid.innerHTML='';
+  for(let i=1;i<=21;i++){
+    const e=entries[i-1];
+    const cell=document.createElement('div');
+    cell.className='cell'+(e?' filled '+e.layer:'')+(e&&e.date===todayStr()?' today':'');
+    if(e){
+      const lv=LAYER_META[e.layer];
+      cell.innerHTML=`<div class="star" style="color:${lv.color}">★</div><div class="d">${fmt(e.date)}</div>`;
+      cell.title=e.text.slice(0,40);
+      cell.onclick=()=>jumpToLog(e.date);
+    } else {
+      cell.innerHTML=`<div class="d">${i}</div>`;
+    }
+    grid.appendChild(cell);
+  }
+}
+function jumpToLog(date){
+  const el=document.querySelector(`.log[data-date="${date}"]`);
+  if(el){el.scrollIntoView({behavior:'smooth',block:'center'});el.style.transition='.4s';el.style.boxShadow='0 0 0 2px var(--gold)';setTimeout(()=>el.style.boxShadow='',900);}
+}
+/* ---- 统计 ---- */
+function renderStats(){
+  document.getElementById('sCount').textContent=entries.length;
+  // 最长连续天数（按日期）
+  let max=0,cur=0,prev=null;
+  const ds=[...new Set(entries.map(e=>e.date))].sort();
+  ds.forEach(d=>{
+    if(prev && dayDiff(prev,d)===1){cur++;} else {cur=1;}
+    max=Math.max(max,cur); prev=d;
+  });
+  document.getElementById('sStreak').textContent=max;
+  // 最常被点亮的层
+  const cnt={ria:0,via:0,flow:0};
+  entries.forEach(e=>cnt[e.layer]++);
+  const top=Object.entries(cnt).sort((a,b)=>b[1]-a[1])[0];
+  document.getElementById('sTop').textContent=top&&top[1]>0?LAYER_META[top[0]].name:'—';
+}
+function dayDiff(a,b){const da=new Date(a),db=new Date(b);return Math.round((db-da)/86400000);}
+
+/* ---- 成就徽章（连续打卡激励） ---- */
+function maxStreak(){
+  let max=0,cur=0,prev=null;
+  const ds=[...new Set(entries.map(e=>e.date))].sort();
+  ds.forEach(d=>{ if(prev && dayDiff(prev,d)===1){cur++;} else {cur=1;} max=Math.max(max,cur); prev=d; });
+  return max;
+}
+const BADGES=[
+  {id:'first_test',icon:'✦',name:'初测星图',test:()=>!!RESULT},
+  {id:'first_entry',icon:'★',name:'首次点亮',test:()=>entries.length>=1},
+  {id:'streak7',icon:'7',name:'连续 7 天',test:()=>maxStreak()>=7},
+  {id:'streak21',icon:'21',name:'连续 21 天',test:()=>maxStreak()>=21},
+  {id:'full21',icon:'☀',name:'全格点亮',test:()=>entries.length>=21},
+  {id:'exp',icon:'⚡',name:'微实验启动',test:()=>{let d=[];try{d=JSON.parse(localStorage.getItem('talentmap_exp'))||[];}catch(e){}return d.length>0;}},
+  {id:'growing',icon:'➜',name:'星图在长',test:()=>{let h=[];try{h=JSON.parse(localStorage.getItem('talentmap_history'))||[];}catch(e){}return h.length>=2;}}
+];
+function renderBadges(){
+  const box=document.getElementById('badges');
+  if(!box) return;
+  const prevGot={};
+  box.querySelectorAll('.badge-x.got').forEach(el=>prevGot[el.dataset.id]=true);
+  box.innerHTML=BADGES.map(b=>{
+    const got=b.test();
+    const just=got && !prevGot[b.id] ? ' justgot':'';
+    return `<div class="badge-x ${got?'got':''}${just}" data-id="${b.id}" title="${b.name}">
+      <div class="b-ic">${b.icon}</div><div class="b-name">${b.name}</div></div>`;
+  }).join('');
+}
+
+/* ---- 列表 ---- */
+function renderLogs(){
+  const box=document.getElementById('logs');
+  if(!entries.length){box.innerHTML='<div class="empty-log">还没有记录。今天的那一下，从你开始。</div>';return;}
+  box.innerHTML=[...entries].reverse().map(e=>{
+    const lv=LAYER_META[e.layer];
+    const stars='★'.repeat(e.star)+'☆'.repeat(5-e.star);
+    return `<div class="log" data-date="${e.date}">
+      <div class="lt">${esc(e.text)}</div>
+      <div class="lm">
+        <span class="badge ${e.layer}">${lv.name} · ${lv.hint}</span>
+        <span style="color:var(--gold)">${stars}</span>
+        ${e.who?`<span>${esc(e.who)}</span>`:''}
+        <span>${fmt(e.date)}</span>
+      </div>
+      <div class="del" data-date="${e.date}" title="删除">×</div>
+    </div>`;
+  }).join('');
+  box.querySelectorAll('.del').forEach(d=>d.onclick=()=>{
+    entries=entries.filter(x=>x.date!==d.dataset.date);
+    save();renderAll();toast('已划掉这条');
+  });
+}
+function esc(s){return String(s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));}
+
+/* ---- 7 天微实验（C1，基于测评结果定制） ---- */
+const EXP_KEY='talentmap_exp';
+function buildExp(){
+  const r=RESULT&&RESULT.riaTop&&RESULT.riaTop[0]?RESULT.riaTop[0].label:'探索';
+  const v=RESULT&&RESULT.viaTop&&RESULT.viaTop[0]?RESULT.viaTop[0][0]:'你的某个特质';
+  const f=RESULT&&RESULT.flowTop&&RESULT.flowTop[0]?RESULT.flowTop[0][0]:'投入';
+  return [
+    `这周挑一件带「${r}」味道的小事，只做 20 分钟，不为成果。`,
+    `用你最亮的特质「${v}」去做一件不是必须做的事。`,
+    `主动制造一次「${f}」的缝隙：关掉通知，留出不被打扰的一小时。`,
+    `找一件"刚好够得着"的难事，做完立刻给自己一点反馈（发出来/记一笔）。`,
+    `做一件"做完会充电"的事，留意它和哪些人在一起时发生。`,
+    `问一个信任的人："你眼里的我，最像在做什么时最发光？" 记下来。`,
+    `把今天这页截图/星图码发给一个朋友，邀他也来画一张。`
+  ];
+}
+function renderExp(){
+  const box=document.getElementById('expList');
+  if(!box) return;
+  let done=[]; try{done=JSON.parse(localStorage.getItem(EXP_KEY))||[];}catch(e){}
+  const list=buildExp();
+  box.innerHTML=list.map((t,i)=>`<div class="exp-item ${done.includes(i)?'done':''}" data-i="${i}">
+    <div class="box">${done.includes(i)?'✓':''}</div><div class="et">${esc(t)}</div></div>`).join('');
+  box.querySelectorAll('.exp-item').forEach(el=>el.onclick=()=>{
+    let d=[]; try{d=JSON.parse(localStorage.getItem(EXP_KEY))||[];}catch(e){}
+    const i=+el.dataset.i;
+    if(d.includes(i)) d=d.filter(x=>x!==i); else d.push(i);
+    localStorage.setItem(EXP_KEY,JSON.stringify(d)); renderExp();
+  });
+  const n=done.length;
+  document.getElementById('expProg').textContent=`已完成 ${n} / 7 · 做完 3 件，你对自己的判断会比现在清楚很多。`;
+}
+
+function save(){localStorage.setItem(KEY,JSON.stringify(entries));}
+
+function renderAll(){renderGrid();renderStats();renderLogs();renderBadges();renderHint();renderWeek();}
+
+/* ---- 每日观察提示（模板库） ---- */
+const DAILY_HINTS=[
+  '今天哪件事，让你忘了看时间？',
+  '有没有一件小事，做完你反而更有力气？',
+  '此刻最想动手做的那件事，是什么？',
+  '谁在做什么的时候，让你觉得「我也想这样」？',
+  '今天有没有「刚好够得着」的挑战？感觉如何？',
+  '哪一刻你觉得「这才是我的节奏」？',
+  '有没有被什么吸走 10 分钟以上？记下它。',
+  '今天有没有拒绝被打断的瞬间？那时你在做什么？',
+  '哪件事你做完想再做一遍？哪怕只是想想。',
+  '留意：今天什么让你「忘了饿」？',
+  '有没有一个时刻，你希望它再长一点？',
+  '今天「顺手」做的事里，哪件最让你满足？',
+  '哪件事你做得比平时好？因为什么？',
+  '有没有一瞬间，你觉得「我就是在做我」？',
+  '今天什么让你抬头发现天黑了？',
+  '哪个场景里，你听不见周围的噪音？',
+  '有没有一件事，让你忘了手机在哪？',
+  '今天哪次投入，事后让你觉得「值」？',
+  '有没有一件小事，你重复做也不烦？',
+  '哪一刻你的身体先于大脑动了？',
+  '第 21 天：回头看这 21 条，哪一条最像「你」？'
+];
+function renderHint(){
+  const box=document.getElementById('dailyHint');
+  if(!box) return;
+  const day=Math.min(21,entries.length+1);
+  const done=entries.length>=21;
+  box.innerHTML='<div class="hd">第 '+day+' 天 · 今天观察什么</div><b>'+(done?'你已经走完 21 天。':DAILY_HINTS[day-1])+'</b>'+(done?' 选一条你还没写过的提示，看看还能不能挖出新东西。':' 不用答得很漂亮，一句话就够。');
+}
+
+/* ---- 周回顾：自动汇总最近 7 天 ---- */
+function weekEntries(){
+  const now=new Date();
+  const start=new Date(now.getTime()-6*86400000);
+  start.setHours(0,0,0,0);
+  return entries.filter(e=>{const d=new Date(e.date);return d>=start&&d<=now;});
+}
+function renderWeek(){
+  const box=document.getElementById('wkBody');
+  if(!box) return;
+  const wk=weekEntries();
+  if(!wk.length){
+    box.innerHTML='<div class="wk-empty">这 7 天还没有记录。从今天开始记下第一笔——哪怕一句话，一周后这里就会长出你的「心流地图」。</div>';
+    return;
+  }
+  const days=wk.length;
+  const avg=wk.reduce((a,e)=>a+e.star,0)/wk.length;
+  const cnt={ria:0,via:0,flow:0};
+  wk.forEach(e=>cnt[e.layer]++);
+  const top=Object.entries(cnt).sort((a,b)=>b[1]-a[1])[0];
+  const topName=LAYER_META[top[0]].name, topHint=LAYER_META[top[0]].hint;
+  const starTxt='★'.repeat(Math.round(avg))+'☆'.repeat(5-Math.round(avg));
+  let insight;
+  if(avg>=4) insight='这周你的心流强度相当高（均值 '+starTxt+'）——你大概正被某件事「吸」着走。这不是巧合，是你的<strong>'+topName+'</strong>在发信号。';
+  else if(avg<=2) insight='这周的心流强度偏弱（均值 '+starTxt+'）——也许太累、太散。先别急着「找天赋」，照顾好自己的节奏，<strong>'+topName+'</strong>（'+topHint+'）这条线索下次可以再轻轻推一下。';
+  else insight='这周平均强度 '+starTxt+'，很稳。你的心流最常落在<strong>'+topName+'</strong>（'+topHint+'）——最近能让你「在」的事，大多和它有关。';
+  box.innerHTML='<div class="wk-stats">'+
+      '<div class="wk-stat"><div class="wn">'+days+'</div><div class="wl">本周记录天数</div></div>'+
+      '<div class="wk-stat"><div class="wn">'+starTxt+'</div><div class="wl">平均心流强度</div></div>'+
+      '<div class="wk-stat"><div class="wn">'+topName+'</div><div class="wl">最常被点亮</div></div>'+
+    '</div>'+
+    '<div class="wk-insight">'+insight+'</div>'+
+    '<div class="wk-acts"><button class="btn btn-ghost" id="wkCopy">复制本周摘要</button><button class="btn btn-ghost" id="wkDl">存为文本</button></div>';
+  const plain=insight.replace(/<[^>]+>/g,'');
+  document.getElementById('wkCopy').onclick=async()=>{
+    const txt='这一周，你的心流长这样（天赋星图）\n记录 '+days+' 天 · 平均强度 '+starTxt+' · 最常点亮：'+topName+'\n\n'+plain+'\n—— 21 天，把「发现」养成「习惯」。';
+    try{await navigator.clipboard.writeText(txt);toast('本周摘要已复制 ✓');}
+    catch(e){toast('复制失败，可用「存为文本」');}
+  };
+  document.getElementById('wkDl').onclick=()=>{
+    const txt='这一周，你的心流长这样（天赋星图）\n记录 '+days+' 天 · 平均强度 '+starTxt+' · 最常点亮：'+topName+'\n\n'+plain+'\n\n—— 本周明细 ——\n'+wk.map(e=>fmt(e.date)+' · '+LAYER_META[e.layer].name+' · '+'★'.repeat(e.star)+'｜'+e.text).join('\n');
+    const blob=new Blob([txt],{type:'text/plain;charset=utf-8'});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');a.href=url;a.download='天赋星图-本周心流回顾.txt';
+    document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);
+    toast('已下载本周回顾文本');
+  };
+}
+
+/* ---- 每日提醒（Notification API，纯本地） ---- */
+const RM_KEY='talentmap_remind';
+function loadRemind(){try{const r=JSON.parse(localStorage.getItem(RM_KEY));return r&&typeof r==='object'?r:{on:false,time:'21:00',last:''};}catch(e){return {on:false,time:'21:00',last:''};}}
+function saveRemind(r){try{localStorage.setItem(RM_KEY,JSON.stringify(r));}catch(e){}}
+function checkRemind(){
+  const r=loadRemind();
+  if(!r.on||!r.time) return;
+  if(!('Notification' in window)||Notification.permission!=='granted') return;
+  if(r.last===todayStr()) return;
+  const now=new Date();
+  const p=r.time.split(':').map(Number);
+  if(now.getHours()>p[0]||(now.getHours()===p[0]&&now.getMinutes()>=p[1])){
+    r.last=todayStr(); saveRemind(r);
+    try{ new Notification('天赋星图 · 记得记心流',{body:'今天，有没有哪一刻让你忘记了时间？打开日记记一笔。'}); }catch(e){}
+  }
+}
+(function initRemind(){
+  const rmOn=document.getElementById('rmOn'), rmTime=document.getElementById('rmTime'), rmTest=document.getElementById('rmTest');
+  if(!rmOn||!rmTime||!rmTest) return;
+  const rm=loadRemind();
+  rmOn.checked=!!rm.on; rmTime.value=rm.time||'21:00';
+  rmOn.onchange=()=>{
+    const r=loadRemind(); r.on=rmOn.checked;
+    if(r.on && 'Notification' in window && Notification.permission==='default'){ Notification.requestPermission(); }
+    saveRemind(r); toast(r.on?'已开启每日提醒 ✓':'已关闭提醒');
+  };
+  rmTime.onchange=()=>{const r=loadRemind();r.time=rmTime.value;saveRemind(r);toast('提醒时间改为 '+rmTime.value);};
+  rmTest.onclick=()=>{
+    if(!('Notification' in window)){toast('当前浏览器不支持通知');return;}
+    Notification.requestPermission().then(p=>{
+      if(p==='granted'){try{new Notification('天赋星图',{body:'提醒已生效。到点我会来找你记心流。'});}catch(e){}}
+      else toast('未授权，浏览器会阻止通知');
+    });
+  };
+  checkRemind();
+})();
+
+/* ---- 保存 ---- */
+document.getElementById('saveBtn').onclick=()=>{
+  const text=document.getElementById('fText').value.trim();
+  if(!text){toast('先写写那一刻你在做什么吧');return;}
+  const today=todayStr();
+  const existing=entries.findIndex(e=>e.date===today);
+  const rec={date:today,layer:pickLayer,star:pickStar,text,who:document.getElementById('fWho').value.trim()};
+  if(existing>=0){entries[existing]=rec;} else {entries.push(rec);}
+  // 保持 21 格按时间顺序
+  entries.sort((a,b)=>a.date.localeCompare(b.date));
+  if(entries.length>21) entries=entries.slice(entries.length-21);
+  save();renderAll();
+  document.getElementById('fText').value='';document.getElementById('fWho').value='';
+  pickStar=3;renderStars();
+  toast('今天已点亮 ✦');
+};
+
+/* ---- 导出（复制文本） ---- */
+document.getElementById('expBtn').onclick=async()=>{
+  if(!entries.length){toast('还没有可导出的记录');return;}
+  const head=`我的 21 天心流日记（天赋星图）\n`;
+  const body=entries.map(e=>`${fmt(e.date)} · ${LAYER_META[e.layer].name} · ${'★'.repeat(e.star)}｜${e.text}${e.who?'（'+e.who+'）':''}`).join('\n');
+  const txt=head+body+'\n—— 在共产主义尚未到来的时期，把生命力放大到它应该在的水平。';
+  try{await navigator.clipboard.writeText(txt);toast('已复制，去粘贴到你的笔记/朋友圈');}
+  catch(e){toast('复制失败，可手动截图');}
+};
+
+/* ---- 下载备份（JSON 文件） ---- */
+document.getElementById('dlBtn').onclick=()=>{
+  if(!entries.length){toast('还没有可备份的记录');return;}
+  const data=JSON.stringify({type:'talentmap_diary',entries:entries,exp:loadExp(),ts:Date.now()});
+  const blob=new Blob([data],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;a.download='天赋星图-21天日记备份.json';
+  document.body.appendChild(a);a.click();a.remove();
+  URL.revokeObjectURL(url);
+  toast('已下载备份文件，新设备导入即可续记');
+};
+
+/* ---- 导入备份 ---- */
+document.getElementById('impBtn').onclick=()=>document.getElementById('impFile').click();
+document.getElementById('impFile').onchange=(e)=>{
+  const f=e.target.files[0]; if(!f) return;
+  const reader=new FileReader();
+  reader.onload=()=>{
+    try{
+      const obj=JSON.parse(reader.result);
+      const imp=Array.isArray(obj)?obj:(obj.entries||[]);
+      if(!imp.length){toast('文件里没有记录');return;}
+      const map={};
+      entries.forEach(en=>{ if(en&&en.date) map[en.date]=en; });
+      let added=0;
+      imp.forEach(en=>{ if(en&&en.date){ if(!map[en.date]) added++; map[en.date]=en; } });
+      entries=Object.values(map);
+      entries.sort((a,b)=>a.date.localeCompare(b.date));
+      if(entries.length>21) entries=entries.slice(entries.length-21);
+      if(obj.exp&&Array.isArray(obj.exp)) localStorage.setItem(EXP_KEY,JSON.stringify(obj.exp));
+      save();renderAll();if(obj.exp) renderExp();
+      toast(`已导入 ${imp.length} 条（新增 ${added}）· 续上你的星图`);
+    }catch(err){toast('文件格式不对，换一个试试');}
+    e.target.value='';
+  };
+  reader.readAsText(f);
+};
+function loadExp(){try{return JSON.parse(localStorage.getItem(EXP_KEY))||[];}catch(e){return [];}}
+
+renderLayers();renderStars();renderAll();renderExp();
+
+const io=new IntersectionObserver((es)=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}}),{threshold:.1});
+document.querySelectorAll('.reveal').forEach((el,i)=>{el.style.transitionDelay=(i%3)*70+'ms';io.observe(el);});
+</script>
+  <script>
+  /* ===== 深空背景：视差星海 + 真实星座（与首页一致） ===== */
+  (function(){
+    var layers=[].slice.call(document.querySelectorAll('[data-speed]'));
+    var nebB1=document.getElementById('nebB1'),nebB2=document.getElementById('nebB2'),nebB3=document.getElementById('nebB3');
+    function onScroll(){
+      layers.forEach(function(l){var s=parseFloat(l.dataset.speed);l.style.transform='translate3d(0,'+(-window.scrollY*s).toFixed(1)+'px,0)';});
+      var max=document.documentElement.scrollHeight-window.innerHeight;
+      var p=max>0?Math.min(1,Math.max(0,window.scrollY/max)):0;
+      if(nebB1)nebB1.style.opacity=(0.55-0.38*p).toFixed(3);
+      if(nebB2)nebB2.style.opacity=(0.30+0.28*p).toFixed(3);
+      if(nebB3)nebB3.style.opacity=(0.16+0.55*p).toFixed(3);
+    }
+    onScroll();window.addEventListener('scroll',onScroll,{passive:true});window.addEventListener('resize',onScroll,{passive:true});
+    var SVGNS='http://www.w3.org/2000/svg';
+    function seedStars(layer,count,extra){
+      if(!layer)return;var frag=document.createDocumentFragment();
+      for(var i=0;i<count;i++){var s=document.createElement('i');s.className='star';
+        if(extra&&Math.random()<0.22)s.classList.add(extra[Math.floor(Math.random()*extra.length)]);
+        s.style.left=(Math.random()*100).toFixed(2)+'%';s.style.top=(Math.random()*100).toFixed(2)+'%';
+        s.style.transform='scale('+(0.6+Math.random()*0.9).toFixed(2)+')';
+        if(Math.random()<0.4)s.style.animation='starTw '+(3+Math.random()*4).toFixed(1)+'s ease-in-out infinite';
+        frag.appendChild(s);}
+      layer.appendChild(frag);
+    }
+    const isMobile=window.innerWidth<720;
+    seedStars(document.getElementById('layerFar'),isMobile?70:130,['blue']);
+    seedStars(document.getElementById('layerMid'),isMobile?34:64,['gold','bright']);
+    var CONSTELS=[
+      {name:'北斗七星',left:'3%',top:'34%',stars:[[6,12],[6,34],[26,42],[26,20],[46,18],[64,13],[84,7]],edges:[[0,1],[1,2],[2,3],[3,4],[4,5],[5,6]]},
+      {name:'猎户座',left:'80%',top:'50%',stars:[[16,22],[38,18],[24,56],[31,53],[40,50],[40,80],[17,82],[27,7]],edges:[[7,0],[7,1],[0,1],[0,2],[1,4],[2,3],[3,4],[2,6],[4,5],[6,5]]},
+      {name:'仙后座',left:'6%',top:'70%',stars:[[8,72],[30,40],[50,62],[70,34],[92,56]],edges:[[0,1],[1,2],[2,3],[3,4]]},
+      {name:'天鹅座',left:'78%',top:'88%',stars:[[50,10],[50,46],[50,90],[24,46],[76,46]],edges:[[0,1],[1,2],[3,1],[1,4]]}
+    ];
+    function buildConstel(cfg){
+      var wrap=document.createElement('div');wrap.className='constel';
+      wrap.style.left=cfg.left;wrap.style.top=cfg.top;wrap.title=cfg.name+'（点一下，让它亮起来）';
+      var svg=document.createElementNS(SVGNS,'svg');svg.setAttribute('viewBox','0 0 100 100');
+      cfg.edges.forEach(function(e){var p=document.createElementNS(SVGNS,'path');p.setAttribute('class','c-line');p.setAttribute('d','M'+cfg.stars[e[0]][0]+' '+cfg.stars[e[0]][1]+' L'+cfg.stars[e[1]][0]+' '+cfg.stars[e[1]][1]);svg.appendChild(p);});
+      var halo=document.createElementNS(SVGNS,'circle');halo.setAttribute('class','c-halo');halo.setAttribute('cx','50');halo.setAttribute('cy','50');halo.setAttribute('r','44');svg.appendChild(halo);
+      cfg.stars.forEach(function(st){var c=document.createElementNS(SVGNS,'circle');c.setAttribute('class','c-dot');c.setAttribute('cx',st[0]);c.setAttribute('cy',st[1]);c.setAttribute('r','2.4');svg.appendChild(c);});
+      wrap.appendChild(svg);
+      wrap.addEventListener('click',function(){wrap.classList.remove('pulse');void wrap.offsetWidth;wrap.classList.add('pulse');});
+      return wrap;
+    }
+    var near=document.getElementById('layerNear');
+    if(near)CONSTELS.forEach(function(c){near.appendChild(buildConstel(c));});
+    onScroll();
+  })();
+  </script>
+</body>
+</html>
