@@ -10,7 +10,7 @@
 <meta property="og:type" content="website">
 <meta property="og:title" content="天赋星图 · 常见问题 FAQ">
 <meta property="og:description" content="关于测评、报告、行动与隐私，你想知道的都在这。">
-<meta property="og:image" content="https://46461dec3937411d970e0881cbfa0056.app.codebuddy.work/og-cover.png">
+<meta property="og:image" content="https://kumu314.github.io/talentmap/og-cover.png">
 <style>
   :root{
     --bg:#060912;--bg-1:#0a0f22;--ink:#eef2ff;--ink-soft:#9aa6cf;--ink-faint:#7f8bb3;
@@ -308,14 +308,17 @@ function render(){
   document.querySelectorAll('#filters .fchip').forEach(c=>c.classList.toggle('on', c.dataset.c===(onCat||'__none__')));
 }
 
-/* —— 分类 chip：点击 = 过滤 + 锚点跳转 —— */
+/* —— 分类 chip：点击 = 过滤 + 锚点跳转 + 写入可分享哈希 —— */
 document.getElementById('filters').querySelectorAll('.fchip').forEach(c=>{
   c.onclick=()=>{
     catActive=c.dataset.c;
     q=''; document.getElementById('faqSearch').value='';
     render();
-    if(catActive==='all'){ document.getElementById('filters').scrollIntoView({behavior:'smooth',block:'center'}); }
-    else {
+    if(catActive==='all'){
+      history.replaceState(null,'',location.pathname+location.search);
+      document.getElementById('filters').scrollIntoView({behavior:'smooth',block:'center'});
+    } else {
+      history.replaceState(null,'','#sec-'+catActive);
       const el=document.getElementById('sec-'+catActive);
       if(el) el.scrollIntoView({behavior:'smooth',block:'start'});
     }

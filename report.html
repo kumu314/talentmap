@@ -10,7 +10,7 @@
 <meta property="og:type" content="website">
 <meta property="og:title" content="天赋星图 · 你做什么会忘记时间？">
 <meta property="og:description" content="三层定位 + 一层现实校验，8 分钟画出你的天赋星图。">
-<meta property="og:image" content="https://46461dec3937411d970e0881cbfa0056.app.codebuddy.work/og-cover.png">
+<meta property="og:image" content="https://kumu314.github.io/talentmap/og-cover.png">
 <style>
   :root{
     --bg:#060912;--ink:#eef2ff;--ink-soft:#9aa6cf;--ink-faint:#7f8bb3;
@@ -934,7 +934,7 @@ else {
     x.fillStyle='#7c89b0'; x.font='400 24px '+F;
     x.fillText('天赋星图 · 在还必须为生存奔波的时期，也别埋没自己', cx, H-72);
     // 真实二维码：扫码直达测评页
-    const qrText=(location.origin||'https://46461dec3937411d970e0881cbfa0056.app.codebuddy.work')+'/quiz.html?from=share';
+    const qrText=(location.origin||'https://kumu314.github.io/talentmap')+'/quiz.html?from=share';
     const qrSize=220, qrY=H-250;
     x.fillStyle='#f3c14b'; x.font='600 24px '+F;
     x.fillText('扫码测你的天赋星图 →', cx, qrY-52);
@@ -975,7 +975,7 @@ else {
     };
     let encoded;
     try{ encoded=btoa(unescape(encodeURIComponent(JSON.stringify(payload)))); }catch(e){ toast('编码失败，请重试'); return; }
-    const base=(location.origin||'https://46461dec3937411d970e0881cbfa0056.app.codebuddy.work')+location.pathname;
+    const base=(location.origin||'https://kumu314.github.io/talentmap')+location.pathname;
     const shareUrl=base+'?d='+encoded;
     try{ await navigator.clipboard.writeText(shareUrl); toast('已复制分享链接，发给朋友吧 ✓'); }
     catch(e){ prompt('复制这个链接发给朋友：', shareUrl); }
