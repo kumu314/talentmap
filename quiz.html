@@ -67,7 +67,7 @@
     .nav-links{display:flex;gap:16px;font-size:13.5px;min-width:0;overflow-x:auto;scrollbar-width:none}
   .nav-links::-webkit-scrollbar{display:none}
     .nav-links a{white-space:nowrap}
-    .nav .btn{padding:7px 12px;font-size:13px;flex:0 0 auto}
+    .nav .btn{padding:7px 12px;font-size:13px;flex:0 0 auto;white-space:nowrap}
   }
 
   @media(max-width:720px){
@@ -87,11 +87,12 @@
   .gate .gsub{color:var(--ink-soft);font-size:15px;max-width:480px;margin:0 auto 14px}
   .gate .gnote{color:var(--ink-faint);font-size:13px;margin-bottom:28px}
   .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 28px;border-radius:999px;
-    font-size:15px;font-weight:600;border:1px solid transparent;cursor:pointer;transition:.2s;font-family:inherit}
+    font-size:15px;font-weight:600;border:1px solid transparent;cursor:pointer;transition:.2s;font-family:inherit;white-space:nowrap}
   .btn-primary{color:#1c1404;background:linear-gradient(135deg,var(--gold-soft),var(--gold));box-shadow:0 8px 30px rgba(243,193,75,.26)}
   .btn-primary:hover{transform:translateY(-2px);box-shadow:0 12px 38px rgba(243,193,75,.4)}
   .btn-ghost{color:var(--ink);border-color:var(--line-2);background:rgba(255,255,255,.04);padding:11px 22px;font-size:14px}
   .btn-ghost:hover{border-color:var(--gold);color:var(--gold-soft)}
+  .nav .btn{padding:8px 15px;flex:0 0 auto;white-space:nowrap}
 
   /* 中间反馈 */
   .feedback .gsub{max-width:560px}

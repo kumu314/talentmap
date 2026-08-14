@@ -67,7 +67,7 @@
     .nav-links{display:flex;gap:16px;font-size:13.5px;min-width:0;overflow-x:auto;scrollbar-width:none}
   .nav-links::-webkit-scrollbar{display:none}
     .nav-links a{white-space:nowrap}
-    .nav .btn{padding:7px 12px;font-size:13px;flex:0 0 auto}
+    .nav .btn{padding:7px 12px;font-size:13px;flex:0 0 auto;white-space:nowrap}
   }
 
   .report{padding:108px 0 80px;min-height:100vh}
@@ -157,11 +157,13 @@
   .r-share h3{font-size:18px;font-weight:800;margin-bottom:8px}
   .r-share p{font-size:14px;color:var(--ink-soft);margin-bottom:16px;max-width:560px}
   .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:11px 20px;border-radius:999px;
-    font-size:14px;font-weight:600;border:1px solid transparent;cursor:pointer;transition:.2s;font-family:inherit;text-decoration:none}
+    font-size:14px;font-weight:600;border:1px solid transparent;cursor:pointer;transition:.2s;font-family:inherit;text-decoration:none;white-space:nowrap}
   .btn-primary{color:#1c1404;background:linear-gradient(135deg,var(--gold-soft),var(--gold));box-shadow:0 8px 30px rgba(243,193,75,.26)}
   .btn-primary:hover{transform:translateY(-2px);box-shadow:0 12px 38px rgba(243,193,75,.4)}
   .btn-ghost{color:var(--ink);border-color:var(--line-2);background:rgba(255,255,255,.04)}
   .btn-ghost:hover{border-color:var(--gold);color:var(--gold-soft)}
+  .nav .btn{padding:8px 15px;flex:0 0 auto;white-space:nowrap}
+
   .r-share .row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
 
   /* 好友对比 + 他人镜子（B4/A3） */
@@ -247,7 +249,7 @@
   .shared-banner .sb-text{font-size:15px;color:var(--ink)}
   .shared-banner .sb-text b{color:var(--gold-soft)}
   .shared-cta{text-align:center;padding:24px 0 40px}
-  .shared-cta .btn{margin:0 8px}
+  .shared-cta .btn{margin:0 8px;white-space:nowrap}
   /* 答题轨迹 */
   .r-trail{border:1px solid var(--line);border-radius:var(--radius);padding:26px 28px;margin-bottom:24px;background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,.015))}
   .r-trail h3{font-size:18px;font-weight:800;margin-bottom:6px;display:flex;align-items:center;gap:9px}
