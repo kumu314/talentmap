@@ -166,32 +166,7 @@
 
   .brand-mark{width:18px;height:18px;flex:0 0 auto;border-radius:50%;object-fit:contain;filter:drop-shadow(0 0 6px rgba(243,193,75,.55))}
 </style>
-  <script src="track.js"></script>
-  <script src="https://beacon.cdn.qq.com/sdk/4.5.9/beacon_web.min.js" async></script>
-<script>
-(function(){
-  try{
-    window.addEventListener('load',function(){
-      if(!window.BeaconAction) return;
-      var beacon=new BeaconAction({
-        appkey:'0WEB06U85YBSLJNL',
-        versionCode:'1.0.0',
-        channelID:'share',
-        delay:1000,
-        sessionDuration:30*60*1000,
-        isOversea:false,
-        needReportRqdEvent:false
-      });
-      beacon.onDirectUserAction('preview_page_view',{
-        'url':location.href,
-        'referrer':document.referrer,
-        'title':document.title,
-        'sandbox_id':'46461dec3937411d970e0881cbfa0056'
-      });
-    });
-  }catch(e){}
-})();
-</script></head>
+  <script src="track.js"></script></head>
 <body>
     <div class="sky-bg" id="skyBg" aria-hidden="true">
     <div class="nebula" id="nebula">
