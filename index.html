@@ -199,7 +199,6 @@
   .theory-close{position:absolute;top:18px;right:22px;color:var(--ink-faint);cursor:pointer;font-size:24px;line-height:1;transition:.2s;
     background:none;border:none;padding:4px;font-family:inherit}
   .theory-close:hover{color:var(--ink)}
-  button:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
   .theory-tag{font-size:12px;letter-spacing:1.5px;text-transform:uppercase;color:var(--tc);margin-bottom:8px;font-weight:600}
   .theory-title{font-size:clamp(22px,3vw,30px);margin-bottom:14px;font-weight:800}
   .theory-intro{font-size:15.5px;color:var(--ink-soft);line-height:1.8;margin-bottom:26px;padding-bottom:22px;border-bottom:1px solid var(--line)}
@@ -279,9 +278,15 @@
   .recover-card .rc-text{font-size:13.5px;color:var(--ink-soft);line-height:1.5}
   .recover-card .rc-text b{color:var(--gold-soft);font-weight:600}
   @media(max-width:880px){.recover-card{padding:9px 18px}.recover-card .rc-text{font-size:13px}}
+
+  /* 无障碍：跳转链接 + 统一键盘焦点环 */
+  .skip-link{position:fixed;left:16px;top:-64px;z-index:1000;background:var(--gold);color:#0a0f22;padding:10px 18px;border-radius:12px;font-weight:700;transition:top .2s;box-shadow:0 10px 34px rgba(0,0,0,.45)}
+  .skip-link:focus{top:16px}
+  a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--gold);outline-offset:3px;border-radius:6px}
 </style>
   <script src="track.js"></script></head>
 <body>
+  <a class="skip-link" href="#main">跳到主内容</a>
   <div class="sky-bg" id="skyBg" aria-hidden="true">
     <div class="nebula" id="nebula">
       <div class="neb-blob neb-b1" id="nebB1"></div>
@@ -314,7 +319,7 @@
     </div>
   </header>
 
-  <div class="wrap">
+  <div class="wrap" id="main" tabindex="-1">
     <section class="hero">
       <div class="recover-bar" id="recoverBar"></div>
       <div class="hero-copy reveal">
@@ -569,8 +574,9 @@
     nebB2.style.opacity=(0.30+0.28*p).toFixed(3);
     nebB3.style.opacity=(0.16+0.55*p).toFixed(3);
   }
-  onScroll();window.addEventListener('scroll',onScroll,{passive:true});
-  window.addEventListener('resize',onScroll,{passive:true});
+  let _ticking=false;function _onScroll(){if(_ticking)return;_ticking=true;requestAnimationFrame(()=>{onScroll();_ticking=false;});}
+  _onScroll();window.addEventListener('scroll',_onScroll,{passive:true});
+  window.addEventListener('resize',_onScroll,{passive:true});
 
   // 进入视口淡入
   const io=new IntersectionObserver((es)=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}}),{threshold:.12});
@@ -726,7 +732,7 @@
       edges:[[0,1],[1,2],[3,1],[1,4]]}
   ];
   function buildConstel(cfg){
-    const wrap=document.createElement('div');wrap.className='constel';
+    const wrap=document.createElement('div');wrap.className='constel';wrap.setAttribute('role','button');wrap.setAttribute('tabindex','0');wrap.setAttribute('aria-label',cfg.name+' 星座，回车或空格激活以高亮');
     wrap.style.left=cfg.left;wrap.style.top=cfg.top;wrap.title=cfg.name+'（点一下，让它亮起来）';
     const svg=document.createElementNS(SVGNS,'svg');svg.setAttribute('viewBox','0 0 100 100');
     cfg.edges.forEach(([a,b])=>{
@@ -742,6 +748,7 @@
     });
     wrap.appendChild(svg);
     wrap.addEventListener('click',()=>{wrap.classList.remove('pulse');void wrap.offsetWidth;wrap.classList.add('pulse');});
+    wrap.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();wrap.classList.remove('pulse');void wrap.offsetWidth;wrap.classList.add('pulse');}});
     return wrap;
   }
   const near=document.getElementById('layerNear');

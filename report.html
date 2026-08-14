@@ -194,7 +194,6 @@
   .theory-close{position:absolute;top:18px;right:22px;color:var(--ink-faint);cursor:pointer;font-size:24px;line-height:1;transition:.2s;
     background:none;border:none;padding:4px;font-family:inherit}
   .theory-close:hover{color:var(--ink)}
-  button:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
   .share-card{width:100%;max-width:340px;background:linear-gradient(180deg,#0c1228,#0a0f22);border:1px solid var(--line-2);border-radius:24px;padding:18px;position:relative;text-align:center}
   .share-card canvas{width:100%;height:auto;border-radius:14px;display:block;background:#060912}
   .share-acts{display:flex;gap:10px;align-items:center;justify-content:center;margin-top:14px;flex-wrap:wrap}
@@ -308,9 +307,15 @@
     background:rgba(10,14,28,.95);border:1px solid var(--line-2);box-shadow:0 8px 30px rgba(0,0,0,.5)}
   .utm-debug b{color:var(--gold)}
   .utm-debug .hint{color:var(--ink-faint);font-size:11px}
+
+  /* 无障碍：跳转链接 + 统一键盘焦点环 */
+  .skip-link{position:fixed;left:16px;top:-64px;z-index:1000;background:var(--gold);color:#0a0f22;padding:10px 18px;border-radius:12px;font-weight:700;transition:top .2s;box-shadow:0 10px 34px rgba(0,0,0,.45)}
+  .skip-link:focus{top:16px}
+  a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--gold);outline-offset:3px;border-radius:6px}
 </style>
   <script src="track.js"></script></head>
 <body>
+  <a class="skip-link" href="#main">跳到主内容</a>
     <div class="sky-bg" id="skyBg" aria-hidden="true">
     <div class="nebula" id="nebula">
       <div class="neb-blob neb-b1" id="nebB1"></div>
@@ -342,7 +347,7 @@
     </div>
   </header>
 
-  <div class="wrap">
+  <div class="wrap" id="main" tabindex="-1">
     <section class="report" id="app"></section>
   </div>
   <div class="toast" id="toast"></div>
@@ -1027,7 +1032,8 @@ document.querySelectorAll('.reveal').forEach((el,i)=>{el.style.transitionDelay=(
       if(nebB2)nebB2.style.opacity=(0.30+0.28*p).toFixed(3);
       if(nebB3)nebB3.style.opacity=(0.16+0.55*p).toFixed(3);
     }
-    onScroll();window.addEventListener('scroll',onScroll,{passive:true});window.addEventListener('resize',onScroll,{passive:true});
+    let _ticking=false;function _onScroll(){if(_ticking)return;_ticking=true;requestAnimationFrame(()=>{onScroll();_ticking=false;});}
+    _onScroll();window.addEventListener('scroll',_onScroll,{passive:true});window.addEventListener('resize',_onScroll,{passive:true});
     var SVGNS='http://www.w3.org/2000/svg';
     function seedStars(layer,count,extra){
       if(!layer)return;var frag=document.createDocumentFragment();
@@ -1049,7 +1055,7 @@ document.querySelectorAll('.reveal').forEach((el,i)=>{el.style.transitionDelay=(
       {name:'天鹅座',left:'78%',top:'88%',stars:[[50,10],[50,46],[50,90],[24,46],[76,46]],edges:[[0,1],[1,2],[3,1],[1,4]]}
     ];
     function buildConstel(cfg){
-      var wrap=document.createElement('div');wrap.className='constel';
+      var wrap=document.createElement('div');wrap.className='constel';wrap.setAttribute('role','button');wrap.setAttribute('tabindex','0');wrap.setAttribute('aria-label',cfg.name+' 星座，回车或空格激活以高亮');
       wrap.style.left=cfg.left;wrap.style.top=cfg.top;wrap.title=cfg.name+'（点一下，让它亮起来）';
       var svg=document.createElementNS(SVGNS,'svg');svg.setAttribute('viewBox','0 0 100 100');
       cfg.edges.forEach(function(e){var p=document.createElementNS(SVGNS,'path');p.setAttribute('class','c-line');p.setAttribute('d','M'+cfg.stars[e[0]][0]+' '+cfg.stars[e[0]][1]+' L'+cfg.stars[e[1]][0]+' '+cfg.stars[e[1]][1]);svg.appendChild(p);});
@@ -1057,6 +1063,7 @@ document.querySelectorAll('.reveal').forEach((el,i)=>{el.style.transitionDelay=(
       cfg.stars.forEach(function(st){var c=document.createElementNS(SVGNS,'circle');c.setAttribute('class','c-dot');c.setAttribute('cx',st[0]);c.setAttribute('cy',st[1]);c.setAttribute('r','2.4');svg.appendChild(c);});
       wrap.appendChild(svg);
       wrap.addEventListener('click',function(){wrap.classList.remove('pulse');void wrap.offsetWidth;wrap.classList.add('pulse');});
+    wrap.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();wrap.classList.remove('pulse');void wrap.offsetWidth;wrap.classList.add('pulse');}});
       return wrap;
     }
     var near=document.getElementById('layerNear');
