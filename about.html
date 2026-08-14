@@ -65,7 +65,7 @@
   .p-hero .badge{display:inline-flex;align-items:center;gap:8px;font-size:12.5px;color:var(--gold-soft);
     background:rgba(243,193,75,.09);border:1px solid rgba(243,193,75,.26);
     padding:6px 14px;border-radius:999px;letter-spacing:1px;margin-bottom:18px}
-  .p-hero h1{font-size:clamp(27px,3.8vw,42px);font-weight:800;line-height:1.3}
+  .p-hero h1{font-size:clamp(27px,3.8vw,42px);font-weight:800;line-height:1.3;word-break:keep-all}
   .p-hero h1 .hl{font-family:var(--serif);font-style:italic;font-weight:600;
     background:linear-gradient(120deg,var(--gold-soft),var(--gold) 55%,var(--mint));-webkit-background-clip:text;background-clip:text;color:transparent}
   .p-hero p{color:var(--ink-soft);margin:14px auto 0;font-size:15px;max-width:600px}
@@ -144,6 +144,35 @@
   .skip-link{position:fixed;left:16px;top:-64px;z-index:1000;background:var(--gold);color:#0a0f22;padding:10px 18px;border-radius:12px;font-weight:700;transition:top .2s;box-shadow:0 10px 34px rgba(0,0,0,.45)}
   .skip-link:focus{top:16px}
   a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--gold);outline-offset:3px;border-radius:6px}
+
+/* ===== 移动端汉堡菜单 ===== */
+.nav-toggle{display:none;width:40px;height:40px;border:1px solid var(--line);border-radius:10px;background:transparent;cursor:pointer;align-items:center;justify-content:center;flex-direction:column;gap:5px;padding:0;transition:.2s}
+.nav-toggle:hover,.nav-toggle:focus-visible{background:rgba(243,193,75,.12);border-color:var(--gold);outline:none}
+.nav-toggle span{display:block;width:18px;height:2px;background:var(--ink);border-radius:1px;transition:.2s}
+.nav-toggle[aria-expanded="true"]{background:rgba(243,193,75,.12);border-color:var(--gold)}
+.nav-toggle[aria-expanded="true"] span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+.nav-toggle[aria-expanded="true"] span:nth-child(2){opacity:0}
+.nav-toggle[aria-expanded="true"] span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+.nav-cta-mobile{display:none}
+
+@media (max-width:768px){
+  header.nav .nav-inner,header.cm-nav{position:relative;flex-wrap:nowrap;gap:10px}
+  header.nav .nav-inner{height:auto;padding:10px 16px}
+  header.cm-nav{padding:10px 16px;flex-wrap:nowrap}
+  .nav-toggle{display:flex;flex:0 0 auto;margin-left:auto}
+  header.nav .btn-primary{display:none !important}
+  .nav-links{display:none;position:fixed;top:64px;left:12px;right:12px;background:rgba(10,15,34,.98);border:1px solid var(--line);border-radius:16px;padding:12px;flex-direction:column;gap:4px;z-index:9999;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);max-height:calc(100vh - 90px);overflow:auto;box-shadow:0 20px 50px rgba(0,0,0,.4)}
+  .nav-links.open{display:flex}
+  .nav-links a{padding:12px 16px;border-radius:10px;color:var(--ink);text-decoration:none;white-space:nowrap;font-size:14px}
+  .nav-links a:hover,.nav-links a:focus-visible{background:rgba(243,193,75,.12);color:var(--gold);outline:none}
+  .nav-links a.active{background:rgba(243,193,75,.15);color:var(--gold)}
+  .nav-cta-mobile{display:flex;margin-top:6px;padding:12px 16px;border-radius:10px;background:linear-gradient(90deg,var(--gold),var(--sun,#f3a84b));color:#0a0f22;font-weight:700;text-align:center;justify-content:center;align-items:center}
+  .nav-cta-mobile:hover,.nav-cta-mobile:focus-visible{filter:brightness(1.08);outline:none}
+}
+@media (min-width:769px){
+  .nav-toggle,.nav-cta-mobile{display:none !important}
+}
+
 </style>
   <script src="track.js"></script>
 </head>
@@ -162,7 +191,7 @@
   <header class="nav">
     <div class="wrap nav-inner">
       <a class="brand" href="index.html"><img class="brand-mark" src="logo-mark.svg" alt="天赋星图" width="18" height="18">天赋星图</a>
-      <nav class="nav-links">
+      <nav class="nav-links" id="nav-links">
         <a href="index.html">首页</a>
         <a href="quiz.html">测评</a>
         <a href="report.html">报告</a>
@@ -175,9 +204,12 @@
         <a href="about.html" class="active">关于</a>
         <a href="faq.html">FAQ</a>
         <a href="contact.html">联系</a>
-      </nav>
+      
+    <a href="quiz.html" class="nav-cta-mobile">绘制我的星图</a>
+  </nav>
       <a href="quiz.html" class="btn btn-primary">绘制我的星图</a>
     </div>
+    <button class="nav-toggle" aria-label="打开导航" aria-expanded="false" aria-controls="nav-links"><span></span><span></span><span></span></button>
   </header>
 
   <div class="wrap" id="main" tabindex="-1">
@@ -360,6 +392,21 @@
     list.forEach(function(en){ if(en.isIntersecting){ en.target.classList.add('in'); io.unobserve(en.target); } });
   },{threshold:.12});
   els.forEach(function(e){io.observe(e)});
+})();
+</script>
+<script>
+(function(){
+  var toggle=document.querySelector('.nav-toggle');
+  var links=document.getElementById('nav-links');
+  if(!toggle||!links)return;
+  function setOpen(open){
+    links.classList.toggle('open',open);
+    toggle.setAttribute('aria-expanded',String(open));
+  }
+  toggle.addEventListener('click',function(e){e.stopPropagation();setOpen(!links.classList.contains('open'));});
+  links.querySelectorAll('a').forEach(function(a){a.addEventListener('click',function(){setOpen(false);});});
+  document.addEventListener('click',function(e){if(!links.contains(e.target)&&!toggle.contains(e.target))setOpen(false);});
+  document.addEventListener('keydown',function(e){if(e.key==='Escape')setOpen(false);});
 })();
 </script>
 </body>
