@@ -130,6 +130,10 @@
     background:rgba(255,255,255,.08);border:1px solid var(--line-2);
     box-shadow:0 6px 18px rgba(0,0,0,.18);transition:transform .12s ease;}
   .survey-fb:active{transform:scale(.96)}
+  .survey-embed{margin:14px 0 6px;border:1px solid var(--line-2);border-radius:18px;overflow:hidden;background:var(--bg-1);}
+  .survey-embed iframe{display:block;width:100%;height:min(70vh,720px);border:0;}
+  .survey-fb-mini{display:inline-block;margin:8px 14px 12px;color:var(--sky);font-size:14px;text-decoration:none;}
+  .survey-fb-mini:hover{text-decoration:underline;}
   .cm-send{padding:0 22px;height:46px;border-radius:14px;border:none;cursor:pointer;font-weight:700;font-size:14px;
     color:#1c1404;background:linear-gradient(135deg,var(--gold-soft),var(--gold));transition:.2s;font-family:inherit}
   .cm-send:hover{transform:translateY(-1px);box-shadow:0 8px 24px rgba(243,193,75,.35)}
@@ -399,11 +403,22 @@
   }
 
   const SURVEY_URL='https://v.wjx.cn/vm/QNK6V01.aspx#';
+  // 金数据真后端接入点：授权并建表后，把嵌入地址填入 SURVEY_EMBED_URL 即可站内 iframe 嵌入，其余代码无需改动
+  const SURVEY_EMBED_URL='';
+  function surveyHtml(){
+    if(SURVEY_EMBED_URL){
+      return '<div class="survey-embed">'
+        +'<iframe src="'+SURVEY_EMBED_URL+'" title="天赋星图问卷" loading="lazy"></iframe>'
+        +'<a class="survey-fb-mini" href="'+SURVEY_EMBED_URL+'" target="_blank" rel="noopener">新窗口打开问卷 ↗</a>'
+        +'</div>';
+    }
+    return '<a class="survey-fb" href="'+SURVEY_URL+'" target="_blank" rel="noopener">填结构化问卷 →</a>';
+  }
 
   function ansFeedback(){
     feedbackMode=true;
     input.placeholder='直接写你的反馈、吐槽或建议，回车发送…';
-    return '最稳的反馈通道有两条：<br><br>① 去<b>公众号「木焚心」</b>留言——微信搜这个号，发「星图 / 反馈 / 建议」会触发自动回复引导你接着写，我每条都看。<br>② 想认真填，可以直接<a class="jump" href="'+SURVEY_URL+'" target="_blank" rel="noopener">点这里填结构化问卷 →</a><br><br>你也可以直接写在下面，写完后我给你一个能一键复制的版本，方便粘到微信发我。';
+    return '最稳的反馈通道有两条：<br><br>① 去<b>公众号「木焚心」</b>留言——微信搜这个号，发「星图 / 反馈 / 建议」会触发自动回复引导你接着写，我每条都看。<br>② 想认真填，可以直接'+surveyHtml()+'<br><br>你也可以直接写在下面，写完后我给你一个能一键复制的版本，方便粘到微信发我。';
   }
 
   function saveFeedback(text){
@@ -416,7 +431,7 @@
     }catch(e){}
     const box='<div class="fb-box" id="fbBox">'+esc(text)+'</div>';
     const btn='<button class="copy-fb" id="copyFb" onclick="copyFB()">复制并去公众号「木焚心」发给我</button>';
-    const surveyBtn='<a class="survey-fb" href="'+SURVEY_URL+'" target="_blank" rel="noopener">填结构化问卷 →</a>';
+    const surveyBtn=surveyHtml();
     return '收到啦，谢谢你愿意帮星图长本事 🌌<br><br>复制下面这段，去微信搜 <b>木焚心</b> 发给我就行（发「星图 / 反馈 / 建议」会触发自动回复引导）：'+box+btn+surveyBtn+'<br><br>想继续聊现状或卡点，随时说；或去 <a class="jump" href="stories.html">案例墙</a> 看别人怎么走出来。';
   }
 
