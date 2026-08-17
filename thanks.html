@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>天赋星图 · 收到啦</title>
+<meta name="description" content="你的天赋信号已进星图——你是星图的第一批共创者。" />
+<style>
+  :root{
+    --bg:#060912;--ink:#eef2ff;--ink-soft:#9aa6cf;--ink-faint:#7f8bb3;
+    --gold:#f3c14b;--gold-soft:#ffe1a0;--sky:#6ea0ff;
+    --line:rgba(255,255,255,.08);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    font-family:"PingFang SC","Microsoft YaHei","Hiragino Sans GB",system-ui,sans-serif;
+    color:var(--ink);background:var(--bg);line-height:1.75;
+    -webkit-font-smoothing:antialiased;overflow:hidden;
+    display:flex;align-items:center;justify-content:center;min-height:100vh;padding:24px;
+  }
+  .sky{position:fixed;inset:0;z-index:0;background:linear-gradient(180deg,#05070f 0%,#070b1c 50%,#060912 100%);overflow:hidden;pointer-events:none}
+  .neb{position:absolute;border-radius:50%;filter:blur(70px)}
+  .neb1{width:60vw;height:60vw;left:-10vw;top:-10vh;background:radial-gradient(circle,rgba(110,160,255,.4),transparent 65%)}
+  .neb2{width:52vw;height:52vw;right:-12vw;bottom:-14vh;background:radial-gradient(circle,rgba(243,193,75,.32),transparent 65%)}
+  .star{position:absolute;width:2px;height:2px;border-radius:50%;background:#fff;opacity:.7}
+  .star.gold{background:var(--gold-soft);box-shadow:0 0 6px rgba(243,193,75,.8)}
+  .star.blue{background:#cfe0ff;box-shadow:0 0 6px rgba(110,160,255,.8)}
+  @keyframes tw{0%,100%{opacity:.35}50%{opacity:1}}
+  @keyframes pop{0%{transform:scale(.4);opacity:0}60%{transform:scale(1.08)}100%{transform:scale(1);opacity:1}}
+  @keyframes ring{0%{transform:scale(.6);opacity:.9}100%{transform:scale(2.2);opacity:0}}
+
+  .card{position:relative;z-index:1;max-width:480px;width:100%;text-align:center;
+    background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.02));
+    border:1px solid var(--line);border-radius:22px;padding:40px 30px 32px;
+    box-shadow:0 24px 70px rgba(0,0,0,.45);backdrop-filter:blur(8px);animation:pop .5s cubic-bezier(.2,.8,.2,1) both}
+  .orb{position:relative;width:96px;height:96px;margin:0 auto 22px}
+  .orb .ring{position:absolute;inset:0;border-radius:50%;border:2px solid rgba(243,193,75,.6);animation:ring 1.8s ease-out infinite}
+  .orb .disc{position:absolute;inset:10px;border-radius:50%;
+    background:radial-gradient(circle at 32% 30%,#fff,var(--gold) 58%,#a87f24);
+    box-shadow:0 0 26px rgba(243,193,75,.6);display:flex;align-items:center;justify-content:center}
+  .orb svg{width:42px;height:42px}
+  .orb svg path{stroke:#1c1404;stroke-width:6;fill:none;stroke-linecap:round;stroke-linejoin:round}
+  h1{font-size:23px;font-weight:800;margin-bottom:12px}
+  h1 .hl{font-family:"Songti SC","STSong",serif;font-style:italic;
+    background:linear-gradient(120deg,var(--gold-soft),var(--gold) 55%,#a98bff);
+    -webkit-background-clip:text;background-clip:text;color:transparent}
+  p.lead{font-size:14.5px;color:var(--ink-soft);margin-bottom:8px}
+  p.next{font-size:13.5px;color:var(--ink-faint);margin:18px 0 22px;line-height:1.8}
+  p.next b{color:var(--gold-soft);font-weight:700}
+  .actions{display:flex;flex-direction:column;gap:11px;align-items:stretch}
+  .btn{display:block;width:100%;padding:13px 18px;border-radius:999px;font-size:14.5px;font-weight:700;
+    text-decoration:none;cursor:pointer;border:none;font-family:inherit;transition:transform .12s ease}
+  .btn-gold{color:#1c1404;background:linear-gradient(135deg,var(--gold-soft),var(--gold));box-shadow:0 8px 22px rgba(243,193,75,.3)}
+  .btn-gold:active{transform:scale(.97)}
+  .btn-ghost{color:var(--ink-soft);background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.16)}
+  .btn-ghost:active{transform:scale(.97)}
+  .foot{margin-top:22px;font-size:12px;color:var(--ink-faint)}
+  @media (prefers-reduced-motion: reduce){
+    *,*::before,*::after{animation:none!important}
+  }
+</style>
+</head>
+<body>
+  <div class="sky" aria-hidden="true">
+    <div class="neb neb1"></div><div class="neb neb2"></div>
+  </div>
+
+  <main class="card" role="status" aria-live="polite">
+    <div class="orb">
+      <span class="ring"></span>
+      <span class="disc"><svg viewBox="0 0 52 52"><path d="M14 27 l8 8 l16 -18"/></svg></span>
+    </div>
+    <h1>收到啦 <span class="hl">🌌</span></h1>
+    <p class="lead">你的天赋信号已经写进星图。</p>
+    <p class="lead">你是星图的第一批共创者——下一代模型会因你，更懂「像你这样的人」。</p>
+    <p class="next">下一步：去微信搜公众号 <b>木焚心</b>，发「星图」。<br>星图每迭代一版，你会优先收到属于你的天赋信号速览。</p>
+    <div class="actions">
+      <button id="copyWx" class="btn btn-gold" type="button">复制公众号「木焚心」</button>
+      <a class="btn btn-ghost" href="https://kumu314.github.io/talentmap/" target="_blank" rel="noopener">回天赋星图首页 ↗</a>
+    </div>
+    <div class="foot">天赋星图 · 用 8 分钟，读懂你的天赋信号</div>
+  </main>
+
+  <script>
+  (function(){
+    // 轻量星海
+    var sky=document.querySelector('.sky');
+    for(var i=0;i<70;i++){
+      var s=document.createElement('i');s.className='star';
+      if(Math.random()<.25)s.classList.add(Math.random()<.5?'gold':'blue');
+      s.style.left=(Math.random()*100).toFixed(2)+'%';
+      s.style.top=(Math.random()*100).toFixed(2)+'%';
+      s.style.transform='scale('+(0.6+Math.random()*0.9).toFixed(2)+')';
+      if(Math.random()<.4)s.style.animation='tw '+(3+Math.random()*4).toFixed(1)+'s ease-in-out infinite';
+      sky.appendChild(s);
+    }
+    // 复制公众号名
+    var btn=document.getElementById('copyWx');
+    btn.addEventListener('click',function(){
+      var name='木焚心';
+      var done=function(){btn.textContent='已复制 ✓ 去微信搜即可';};
+      if(navigator.clipboard&&navigator.clipboard.writeText){
+        navigator.clipboard.writeText(name).then(done).catch(function(){fallback(name,done);});
+      }else{fallback(name,done);}
+    });
+    function fallback(txt,done){
+      try{var ta=document.createElement('textarea');ta.value=txt;ta.style.position='fixed';ta.style.opacity='0';
+        document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);done();}catch(e){}
+    }
+  })();
+  </script>
+</body>
+</html>
