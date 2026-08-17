@@ -134,6 +134,8 @@
   .survey-embed iframe{display:block;width:100%;height:min(70vh,720px);border:0;}
   .survey-fb-mini{display:inline-block;margin:8px 14px 12px;color:var(--sky);font-size:14px;text-decoration:none;}
   .survey-fb-mini:hover{text-decoration:underline;}
+  .survey-tip{font-size:12.5px;color:var(--ink-soft);margin:10px 14px 2px;line-height:1.6;}
+  .survey-privacy{font-size:11.5px;color:var(--ink-faint);margin:2px 14px 10px;}
   /* 常驻问卷入口（提升可发现性） */
   .cm-survey{margin:16px 0 6px;}
   .cm-survey-cta{display:block;width:100%;box-sizing:border-box;padding:14px 18px;border:1px solid var(--gold-soft);border-radius:14px;background:linear-gradient(180deg,rgba(243,193,75,.16),rgba(243,193,75,.06));color:var(--gold-soft);font-size:15px;font-weight:600;cursor:pointer;text-align:left;line-height:1.5;}
@@ -238,7 +240,7 @@
         <p>读得懂你的星图，专门接你的现状、卡点、和「这结果好像不太准」</p>
       </div>
       <div class="cm-survey" id="cmSurvey">
-        <button class="cm-survey-cta" id="surveyCta" type="button">📝 填天赋星图问卷（约 2 分钟）<span class="sub">你的回答直接进金数据后台，帮星图越画越准</span></button>
+        <button class="cm-survey-cta" id="surveyCta" type="button">📝 填天赋星图问卷（约 2 分钟）<span class="sub">2 分钟，留一份你的天赋信号，帮我把星图打磨得更准 🌌</span></button>
         <div class="cm-survey-body" id="surveyBody" hidden></div>
       </div>
       <div class="cm-chat" id="chat"></div>
@@ -418,9 +420,13 @@
   const SURVEY_EMBED_URL='https://k68wjncs.jsjform.com/f/do4TtQ';
   function surveyHtml(){
     if(SURVEY_EMBED_URL){
+      const tip='<p class="survey-tip">提交后，窗口里出现「提交成功」即代表收到啦 ✅ 填完想聊聊，回来点底部按钮即可。</p>';
+      const privacy='<p class="survey-privacy">🔒 邮箱仅用于向你反馈星图进展，绝不外发、不发广告。</p>';
       return '<div class="survey-embed">'
-        +'<iframe src="'+SURVEY_EMBED_URL+'" title="天赋星图问卷" loading="lazy"></iframe>'
-        +'<a class="survey-fb-mini" href="'+SURVEY_EMBED_URL+'" target="_blank" rel="noopener">新窗口打开问卷 ↗</a>'
+        +'<iframe src="'+SURVEY_EMBED_URL+'" title="天赋星图问卷"></iframe>'
+        +tip
+        +'<a class="survey-fb-mini" href="'+SURVEY_EMBED_URL+'" target="_blank" rel="noopener">打不开？点此在新窗口打开问卷 ↗</a>'
+        +privacy
         +'</div>';
     }
     return '<a class="survey-fb" href="'+SURVEY_URL+'" target="_blank" rel="noopener">填结构化问卷 →</a>';
@@ -429,7 +435,7 @@
   function ansFeedback(){
     feedbackMode=true;
     input.placeholder='直接写你的反馈、吐槽或建议，回车发送…';
-    return '最稳的反馈通道有两条：<br><br>① 去<b>公众号「木焚心」</b>留言——微信搜这个号，发「星图 / 反馈 / 建议」会触发自动回复引导你接着写，我每条都看。<br>② 想认真填，可以直接'+surveyHtml()+'<br><br>你也可以直接写在下面，写完后我给你一个能一键复制的版本，方便粘到微信发我。';
+    return '最稳的反馈通道：去<b>公众号「木焚心」</b>留言——微信搜这个号，发「星图 / 反馈 / 建议」会触发自动回复引导你接着写，我每条都看。<br><br>你也可以直接写在下面，写完后我给你一个能一键复制的版本，方便粘到微信发我。想认真填结构化问卷，点页面上方那枚金色「填天赋星图问卷」按钮就行。';
   }
 
   function saveFeedback(text){
@@ -442,8 +448,7 @@
     }catch(e){}
     const box='<div class="fb-box" id="fbBox">'+esc(text)+'</div>';
     const btn='<button class="copy-fb" id="copyFb" onclick="copyFB()">复制并去公众号「木焚心」发给我</button>';
-    const surveyBtn=surveyHtml();
-    return '收到啦，谢谢你愿意帮星图长本事 🌌<br><br>复制下面这段，去微信搜 <b>木焚心</b> 发给我就行（发「星图 / 反馈 / 建议」会触发自动回复引导）：'+box+btn+surveyBtn+'<br><br>想继续聊现状或卡点，随时说；或去 <a class="jump" href="stories.html">案例墙</a> 看别人怎么走出来。';
+    return '收到啦，谢谢你愿意帮星图长本事 🌌<br><br>复制下面这段，去微信搜 <b>木焚心</b> 发给我就行（发「星图 / 反馈 / 建议」会触发自动回复引导）：'+box+btn+'<br><br>想继续聊现状或卡点，随时说；或去 <a class="jump" href="stories.html">案例墙</a> 看别人怎么走出来。';
   }
 
   function copyFB(){
