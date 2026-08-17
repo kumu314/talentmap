@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>星图伙伴 · 天赋星图</title>
+  <title>天赋星图 · 问卷｜2 分钟帮星图更准你</title>
   <link rel="icon" type="image/x-icon" href="favicon.ico">
   <link rel="icon" href="logo-mark.svg" type="image/svg+xml">
   <meta name="description" content="天赋星图 · 用 RIASEC/VIA/心流/IKIGAI 三层定位 + 一层现实校验，8 分钟画出你的天赋星图，把被压住的生命力放大到它应该在的水平。">
@@ -218,19 +218,9 @@
     <nav class="nav-links" id="nav-links">
       <a href="index.html">首页</a>
       <a href="quiz.html">测评</a>
-      <a href="report.html">报告</a>
-      <a href="action.html">行动</a>
-      <a href="stories.html">案例</a>
-        <a href="companion.html" class="active">伙伴</a>
-        <a href="me.html">我的星图</a>
-<a href="pricing.html">价格</a>
-<a href="blog.html">博客</a>
-<a href="about.html">关于</a>
-<a href="faq.html">FAQ</a>
-<a href="contact.html">联系</a>
-      
-    <a href="quiz.html" class="nav-cta-mobile">绘制我的星图</a>
-  </nav>
+      <a href="companion.html" class="active">伙伴</a>
+      <a href="quiz.html" class="nav-cta-mobile">绘制我的星图</a>
+    </nav>
     <button class="nav-toggle" aria-label="打开导航" aria-expanded="false" aria-controls="nav-links"><span></span><span></span><span></span></button>
   </header>
 
@@ -238,307 +228,22 @@
     <div class="cm-wrap">
       <div class="cm-head">
         <h1>天赋<span class="hl">星图</span> · 问卷</h1>
-        <p>2 分钟，留一份你的天赋信号，帮我把星图打磨得更准 🌌</p>
+        <p>留 2 分钟，讲讲你的心流、优势与卡点——你是星图的第一批共创者，你的信号会直接写进下一代模型，让它更懂「像你这样的人」🌌</p>
       </div>
       <div class="cm-survey" id="cmSurvey">
         <p class="cm-survey-lead">下面这份问卷，会问到你的<b>心流、优势、兴趣、卡点</b>，以及想不想继续收到星图进展。填完你会立刻看到「提交成功」，你的信号就进星图了。</p>
         <div class="cm-survey-body" id="surveyBody">
           <div class="survey-embed">
             <iframe src="https://k68wjncs.jsjform.com/f/do4TtQ" title="天赋星图问卷"></iframe>
-            <p class="survey-tip">提交后，窗口里出现「提交成功」即代表收到啦 ✅ 想继续聊，去公众号「木焚心」。</p>
+            <p class="survey-tip">📨 提交后，窗口里出现「提交成功」就代表收到啦 ✅ 你的信号已进星图。想继续聊，去公众号「木焚心」。</p>
             <a class="survey-fb-mini" href="https://k68wjncs.jsjform.com/f/do4TtQ" target="_blank" rel="noopener">打不开？点此在新窗口打开问卷 ↗</a>
-            <p class="survey-privacy">🔒 邮箱仅用于向你反馈星图进展，绝不外发、不发广告。</p>
+            <p class="survey-privacy">🔒 邮箱由公众号「木焚心」运营收集，仅用于向你反馈星图进展，绝不外发、不发广告；随时回复「退订」即可停止接收。</p>
           </div>
         </div>
       </div>
     </div>
   </div>
 
-  <div class="cm-foot" style="text-align:center">
-    <p style="font-size:13px;color:#9aa6cf">有想法想聊？去微信搜公众号 <b style="color:#ffe1a0">木焚心</b>，发「星图 / 反馈 / 建议」即可。</p>
-  </div>
-
-<script>
-  const RAW = (()=>{try{return JSON.parse(localStorage.getItem('talentmap_result'));}catch(e){return null;}})();
-  const chat = document.getElementById('chat');
-  const input = document.getElementById('input');
-  const sendBtn = document.getElementById('send');
-  let feedbackMode = false;
-
-  function esc(s){return String(s==null?'':s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));}
-
-  function addMsg(role, html){
-    const div=document.createElement('div');
-    div.className='msg '+(role==='me'?'me':'bot');
-    div.innerHTML='<div class="who">'+(role==='me'?'你':'星图伙伴')+'</div>'+html;
-    chat.appendChild(div);
-    chat.scrollTop=chat.scrollHeight;
-    return div;
-  }
-
-  // 数据摘要
-  function data(){return {
-    ria:(RAW&&RAW.riaTop)||[],
-    via:(RAW&&RAW.viaTop)||[],
-    flow:(RAW&&RAW.flowTop)||[],
-    energy:(RAW&&RAW.energy)||{type:'看情况',charge:0,drain:0},
-    signals:(RAW&&RAW.signals)||[],
-    ikigai:(RAW&&RAW.ikigai)||{},
-    verdict:(RAW&&RAW.verdict)||'',
-    narrative:(RAW&&RAW.narrative)||'',
-    confidence:(RAW&&RAW.confidence)||0,
-    past:(RAW&&RAW.past)||[]
-  };}
-
-  // 兼容两种数据结构：新版 [名称, 次数] / 旧版 "名称"，统一取可读名称
-  function nameOf(a){ return Array.isArray(a) ? String(a[0]||'') : String(a==null?'':a); }
-  function names(arr){ return (arr||[]).map(nameOf); }
-  // RIASEC 条目可能是 {k,label,v}（测评实时结果）或 [代号, 中文名, 次数]，统一取中文名
-  function riaName(a){
-    if(a==null) return '';
-    if(Array.isArray(a)) return String(a[1]||a[0]||'');
-    if(typeof a==='object') return String(a.label||a.k||'');
-    return String(a);
-  }
-  function namesRia(arr){ return (arr||[]).map(riaName); }
-
-  function noData(){
-    return '我还没读到你的星图。<br>先去画一张吧——完整测评约 8 分钟，画完回来，我能照着你真实的结果跟你聊。<br><br><a class="jump" href="quiz.html">去画我的星图 →</a>';
-  }
-
-  // 四类回答
-  function ansStatus(d){
-    const e=d.energy;
-    const eType = e.type==='充电型'?'充电型——同样的事常给你补能，这很珍贵'
-      : e.type==='耗尽型'?'耗尽型——你容易在投入里耗干，要挑「刚够得着、有反馈」的事'
-      : '看情况型——能量随场景起伏，值得留意哪些事在充电、哪些在漏';
-    let html='这是你星图现在的样子：<br><br>';
-    html+='· <b>兴趣</b>最亮的是 '+(namesRia(d.ria).slice(0,3).join(' / ')||'还没测出')+'<br>';
-    html+='· <b>优势</b>稳定发光的 5 个是 '+(names(d.via).slice(0,5).join('、')||'还没测出')+'<br>';
-    html+='· <b>心流</b>信号里最常被点亮的 '+(names(d.flow).slice(0,3).join('、')||'还没测出')+'<br>';
-    html+='· <b>能量</b>偏 <b>'+eType+'</b><br>';
-    if(d.ikigai.love||d.ikigai.good){
-      html+='· <b>IKIGAI</b>里你认领了：热爱 = '+esc(d.ikigai.love||'—')+'，擅长 = '+esc(d.ikigai.good||'—')+'<br>';
-    }
-    if(d.verdict) html+='<br>拼在一起，你的<b>天赋区</b>大致是：'+esc(d.verdict);
-    html+='<br><br>这只是静态快照。真正让天赋长出来的，是你接下来 21 天里那些具体的、会忘记时间的小事。';
-    html+='<br><a class="jump" href="action.html">去记 21 天心流日记 →</a>';
-    return html;
-  }
-
-  function ansStuck(d){
-    const e=d.energy;
-    let html='执行卡住，太正常了——天赋不是想明白的，是做出来的。我们别急着「坚持」，先看抓手。<br><br>';
-    if(e.type==='耗尽型'){
-      html+='你偏<b>耗尽型</b>，所以卡点大概率不是「懒」，是上一件事把电耗光了。别硬扛大目标，挑一件<b>刚够得着、能立刻看到反馈</b>的小事开头。';
-    }else if(e.type==='充电型'){
-      html+='你偏<b>充电型</b>，那卡点常是「没排进去」——把最充电的那件事，放在你精力最好的那段时间，哪怕每天只 15 分钟。';
-    }else{
-      html+='你的能量随场景起伏，卡点往往出现在「在漏电的事上耗太久」。先用一件小事把状态点着，再碰难的。';
-    }
-    html+='<br><br>具体从哪下手：<br>';
-    if(d.flow.length) html+='· 找一件会让你<b>'+nameOf(d.flow[0])+'</b>的事，做成 7 天微实验<br>';
-    if(d.via.length) html+='· 用你的优势 <b>'+nameOf(d.via[0])+'</b> 当杠杆，别用短板死磕<br>';
-    if(d.ria.length) html+='· 兴趣先做 <b>'+riaName(d.ria[0])+'</b> 这一类，别一口气铺太大<br>';
-    html+='<br>把上面任意一条变成本周的一个小动作，记进行动页。做完比做对重要。';
-    html+='<br><br>如果你的卡点更具体——比如「兴趣太多都不深」「想变现但怕」「工作太忙没时间」「优势和兴趣打架」——直接把这些词发给我，我给你更对准的下一步。';
-    html+='<br><a class="jump" href="action.html">打开 21 天日记 + 7 天微实验 →</a>';
-    return html;
-  }
-
-  function ansOff(d){
-    let html='觉得不准，先别急着否定自己——这恰恰说明你在认真用。几个角度：<br><br>';
-    html+='· <b>测评是「此刻的剪影」，不是判决书。</b>你今天累、刚分手、考前焦虑，结果都会偏。天赋是长出来的，不是测出来的。<br>';
-    html+='· <b>自评有偏差。</b>我们用了三关交叉 + 能量双轴 + 他人信号来对冲，但 8 分钟本就有限。题量小，个别维度难免抖。<br>';
-    if(d.past.length){
-      html+='· 你填过的「过去成就瞬间」里其实藏着更稳的线索：'+esc(d.past.slice(0,2).join('；'))+'。如果和结果对不上，往往不是结果错，是题目没问到那块。<br>';
-    }
-    html+='· <b>用行动验证，别用重测确认。</b>去记 21 天日记，看哪些事真让你忘时间；再看案例墙里别人怎么绕出来。身体和注意力投票，比任何题都准。<br><br>';
-    html+='如果你愿意，把「哪里不对」发到公众号 <b>木焚心</b>（发「星图 / 反馈 / 建议」会触发自动回复），我每条都看，拿去打磨星图。<br>';
-    html+='<a class="jump" href="quiz.html">重新测一次 →</a> <a class="jump" href="action.html">去 21 天验证 →</a>';
-    return html;
-  }
-
-  // 常见纠结场景：读真实数据 + 给「第一天可以这样」的具体动作
-  function ansScene(d, scene){
-    const e=d.energy;
-    if(scene==='conflict'){
-      let html='优势和兴趣「打架」，不是你分裂，是它们还没找到配合方式。别急着二选一。<br><br>';
-      if(d.via.length && d.ria.length){
-        html+='你的优势在 <b>'+names(d.via).join('、')+'</b>，兴趣被 <b>'+namesRia(d.ria).join(' / ')+'</b> 这类事吸走。常见的错法，是用短板去硬刚兴趣。';
-      }else{
-        html+='先别急着否定任何一方，它们往往能互相供能。';
-      }
-      html+='<br><br>更稳的路：用优势当燃料，去烧兴趣。<br>';
-      html+='· <b>第一天可以这样</b>：挑一件你感兴趣的小事，但故意用你最亮的那个优势（'+(nameOf(d.via[0])||'你的长处')+'）去完成它。看体验，不看成果。<br>';
-      html+='· 如果冲突来自「想做 A，但觉得自己该做 B」——先把 B 的最小版本做一周，验证它是否真适合，再决定去留。<br><br>';
-      html+='天赋区常长在这条「优势 × 兴趣」的交叉带上，不是非此即彼。';
-      return html;
-    }
-    if(scene==='scattered'){
-      let html='兴趣多、但都「不够深」——这种状态很常见，而且不一定是缺点。<br><br>';
-      html+='广度让你能连点成线，深度是后面长出来的。急着「选定一个坚持到底」，反而容易把自己掐死。';
-      if(d.flow.length) html+='<br><br>更准的信号是<b>心流</b>，不是「坚持」。你最常被点亮的是 '+names(d.flow).join('、')+'——挑这里面最轻的一个，做 7 天微实验，看它是不是真让你忘时间。是真忘，就值得往深走；不是，就放过，别内耗。';
-      html+='<br><br><b>第一天可以这样</b>：从你列的这些兴趣里，只选一件「今晚就能花 20 分钟碰一下」的，别计划，先动。';
-      html+='<br><a class="jump" href="action.html">去记 21 天日记，专门逮心流 →</a>';
-      return html;
-    }
-    if(scene==='money'){
-      let html='想让天赋「能谋生」，但又怕——这个怕很正常，它保护你不在没验证前裸奔。<br><br>';
-      html+='别一上来就琢磨「怎么赚钱」，分两阶段：<br>';
-      html+='· <b>阶段一（现在）</b>：用 21 天日记确认这件事你真能忘时间、真能持续，而不是一时上头。<br>';
-      if(d.ikigai.paid||d.ikigai.need){
-        html+='· 你 IKIGAI 里「能谋生」填的是 '+esc(d.ikigai.paid||'—')+'，「世界需要」是 '+esc(d.ikigai.need||'—')+'。先让这两圈有交集，变现才不是空中楼阁。<br>';
-      }
-      html+='· <b>阶段二</b>：有了真实反馈（哪怕 3 个人说"这个对我有用"），再做最小成本尝试——发一条内容、接一个小单、开一次无偿咨询。怕的事，用小成本试错去拆。<br><br>';
-      html+='<b>第一天可以这样</b>：今晚花 10 分钟，写下一句"如果不用考虑钱，我最想做成哪件小事"。从这句开始，不急。';
-      return html;
-    }
-    if(scene==='time'){
-      let html='「没时间」几乎都是能量问题，不是时长问题。我们不从「挤时间」入手，从「排对事」入手。<br><br>';
-      if(e.type==='耗尽型'){
-        html+='你偏<b>耗尽型</b>，下班那点电很贵。别把天赋塞进「剩下的时间」，塞进你精力最好的那 15 分钟——早起半小时，或通勤路上听相关的东西。';
-      }else if(e.type==='充电型'){
-        html+='你偏<b>充电型</b>，那件充电的事本身就是回血。把它当 daily dose，哪怕只 15 分钟，反而让你更有电应付工作。';
-      }else{
-        html+='你能量随场景起伏，先在日记里标记「什么时候最清醒」，把天赋相关的小事钉在那个窗口。';
-      }
-      if(d.flow.length) html+='<br><br>具体抓手：挑一件会让你 <b>'+nameOf(d.flow[0])+'</b> 的事，切成「每次只做一步」的微实验，写进行动页。做完一步就记一笔，别等"有整块时间"。';
-      html+='<br><br><b>第一天可以这样</b>：今晚就在日历上圈出明天一个 15 分钟空档，只做上面那一步。';
-      html+='<br><a class="jump" href="action.html">打开行动页排微实验 →</a>';
-      return html;
-    }
-    return ansSingle(d,scene);
-  }
-
-  const SURVEY_URL='https://v.wjx.cn/vm/QNK6V01.aspx#';
-  // 金数据真后端接入点：授权并建表后，把嵌入地址填入 SURVEY_EMBED_URL 即可站内 iframe 嵌入，其余代码无需改动
-  const SURVEY_EMBED_URL='https://k68wjncs.jsjform.com/f/do4TtQ';
-  function surveyHtml(){
-    if(SURVEY_EMBED_URL){
-      const tip='<p class="survey-tip">提交后，窗口里出现「提交成功」即代表收到啦 ✅ 填完想聊聊，回来点底部按钮即可。</p>';
-      const privacy='<p class="survey-privacy">🔒 邮箱仅用于向你反馈星图进展，绝不外发、不发广告。</p>';
-      return '<div class="survey-embed">'
-        +'<iframe src="'+SURVEY_EMBED_URL+'" title="天赋星图问卷"></iframe>'
-        +tip
-        +'<a class="survey-fb-mini" href="'+SURVEY_EMBED_URL+'" target="_blank" rel="noopener">打不开？点此在新窗口打开问卷 ↗</a>'
-        +privacy
-        +'</div>';
-    }
-    return '<a class="survey-fb" href="'+SURVEY_URL+'" target="_blank" rel="noopener">填结构化问卷 →</a>';
-  }
-
-  function ansFeedback(){
-    feedbackMode=true;
-    input.placeholder='直接写你的反馈、吐槽或建议，回车发送…';
-    return '最稳的反馈通道：去<b>公众号「木焚心」</b>留言——微信搜这个号，发「星图 / 反馈 / 建议」会触发自动回复引导你接着写，我每条都看。<br><br>你也可以直接写在下面，写完后我给你一个能一键复制的版本，方便粘到微信发我。想认真填结构化问卷，点页面上方那枚金色「填天赋星图问卷」按钮就行。';
-  }
-
-  function saveFeedback(text){
-    feedbackMode=false;
-    input.placeholder='直接问，或选上面的按钮…';
-    try{
-      const arr=JSON.parse(localStorage.getItem('talentmap_feedback')||'[]');
-      arr.push({t:Date.now(),text,via:'公众号木焚心'});
-      localStorage.setItem('talentmap_feedback',JSON.stringify(arr));
-    }catch(e){}
-    const box='<div class="fb-box" id="fbBox">'+esc(text)+'</div>';
-    const btn='<button class="copy-fb" id="copyFb" onclick="copyFB()">复制并去公众号「木焚心」发给我</button>';
-    return '收到啦，谢谢你愿意帮星图长本事 🌌<br><br>复制下面这段，去微信搜 <b>木焚心</b> 发给我就行（发「星图 / 反馈 / 建议」会触发自动回复引导）：'+box+btn+'<br><br>想继续聊现状或卡点，随时说；或去 <a class="jump" href="stories.html">案例墙</a> 看别人怎么走出来。';
-  }
-
-  function copyFB(){
-    const t=document.getElementById('fbBox');
-    const b=document.getElementById('copyFb');
-    if(!t) return;
-    const txt=t.innerText;
-    const done=()=>{if(b){b.textContent='已复制 ✓ 去微信搜「木焚心」发我';b.classList.add('done');}};
-    if(navigator.clipboard&&navigator.clipboard.writeText){
-      navigator.clipboard.writeText(txt).then(done).catch(()=>{fallbackCopy(txt,done);});
-    } else { fallbackCopy(txt,done); }
-  }
-  function fallbackCopy(txt,done){
-    try{
-      const ta=document.createElement('textarea');
-      ta.value=txt; ta.style.position='fixed'; ta.style.opacity='0';
-      document.body.appendChild(ta); ta.select();
-      document.execCommand('copy'); document.body.removeChild(ta); done();
-    }catch(e){}
-  }
-
-  // 关键词路由
-  function route(text){
-    const t=text.toLowerCase();
-    const has=(...kw)=>kw.some(k=>t.includes(k));
-    if(has('反馈','建议','意见','吐槽','bug','改进','想说','想提')) return {type:'feedback'};
-    if(has('现状','现在','怎么样','如何','目前','近况','我咋样','我怎样')) return {type:'status'};
-    if(has('心流','沉浸','忘记时间','flow','投入','忘我')) return {type:'flow'};
-    if(has('优势','性格','特质','擅长','via','亮点','发光')) return {type:'via'};
-    if(has('兴趣','喜欢','热爱','想做','感兴趣','ria','想干')) return {type:'ria'};
-    if(has('能量','充电','累','耗尽','耗','精力')) return {type:'energy'};
-    if(has('ikigai','意义','活着','谋生','世界需要','值不值','为啥')) return {type:'ikigai'};
-    if(has('冲突','矛盾','二选一','两个都','相反','打架')) return {type:'conflict'};
-    if(has('兴趣太多','太多','不够深','都不深','三分钟','贪多','样样','广而不深','分散','浅尝','博而不深')) return {type:'scattered'};
-    if(has('变现','赚钱','挣钱','收入','商业','怎么卖','卖','赚钱吗','谋生吗')) return {type:'money'};
-    if(has('没时间','没空','加班','工作忙','挤不出','顾不上','时间不够','精力不够','太忙','没空做')) return {type:'time'};
-    if(has('卡','执行','拖延','难','做不下去','坚持','行动','开始','懒','没动力','怎么办')) return {type:'stuck'};
-    if(has('不准','不对','错','怀疑','符合','准吗','好像','离谱','瞎')) return {type:'off'};
-    return {type:'default'};
-  }
-
-  function ansSingle(d,type){
-    if(type==='flow') return '你填过的<b>心流信号</b>里最常被点亮的是：'+(names(d.flow).join('、')||'还没测出')+'。<br>心流是天赋最诚实的证据——它发生在「挑战刚好匹配能力、又不被打断」的时候。如果最近没心流，多半不是你不行，是环境或难度没调好。去 21 天日记里专门逮它。';
-    if(type==='via') return '你身上稳定发光的<b>优势</b>是：'+(names(d.via).join('、')||'还没测出')+'。<br>把力气投在优势上，更容易进正循环；投在短板上，常常是内耗。别人说你「'+(d.signals.join('、')||'…')+'」——这五个信号是优势最准的路标。';   
-    if(type==='ria') return '你被吸走最多的<b>兴趣类型</b>是：'+(namesRia(d.ria).join(' / ')||'还没测出')+'。<br>兴趣不是「喜欢」这么轻。它是一旦出现，你手会先伸过去的那类事。先从这个类型里挑一件最小的做起来。';
-    if(type==='energy'){const e=d.energy;return '你的<b>能量类型</b>是 <b>'+(e.type||'看情况')+'</b>（充电 '+e.charge+' · 耗尽 '+e.drain+'）。'+(e.type==='充电型'?'同样的事常给你补能，值得围绕它排布生活。':e.type==='耗尽型'?'你容易耗干，要挑刚够得着、有反馈的事，别硬扛。':'你的能量随场景起伏，留意哪些事在充电、哪些在漏。');}
-    if(type==='ikigai') return '你的 <b>IKIGAI</b> 四圈里认领了：热爱='+esc(d.ikigai.love||'—')+'，擅长='+esc(d.ikigai.good||'—')+'，世界需要='+esc(d.ikigai.need||'—')+'，能谋生='+esc(d.ikigai.paid||'—')+'。<br>四圈重合的那块，才是最稳的天赋区。重合得少别慌，很多人一开始都散——用 21 天日记往中间凑。';
-    return '我读得懂你的星图，但这句话我还没对应上具体的维度。<br><br>你可以直接点下面的按钮，或者这样问我：<br>· 「我的兴趣/优势/心流是什么」<br>· 「我卡在执行上了」<br>· 「结果好像不太准」<br>· 「我要反馈」<br><br>也可以去 <a class="jump" href="stories.html">案例墙</a> 看别人怎么走出来。';
-  }
-
-  function handlePreset(q){
-    const d=data();
-    if(!RAW){addMsg('bot',noData());return;}
-    if(q==='status') addMsg('bot',ansStatus(d));
-    else if(q==='stuck') addMsg('bot',ansStuck(d));
-    else if(q==='off') addMsg('bot',ansOff(d));
-    else if(q==='feedback') addMsg('bot',ansFeedback());
-  }
-
-  function submit(){
-    const text=input.value.trim();
-    if(!text) return;
-    addMsg('me',esc(text));
-    input.value='';
-    input.style.height='auto';
-    if(feedbackMode){addMsg('bot',saveFeedback(text));return;}
-    if(!RAW){addMsg('bot',noData());return;}
-    const d=data();
-    const r=route(text);
-    if(r.type==='feedback'){addMsg('bot',ansFeedback());return;}
-    if(r.type==='status') addMsg('bot',ansStatus(d));
-    else if(r.type==='stuck') addMsg('bot',ansStuck(d));
-    else     if(r.type==='off') addMsg('bot',ansOff(d));
-    else if(r.type==='conflict'||r.type==='scattered'||r.type==='money'||r.type==='time') addMsg('bot',ansScene(d,r.type));
-    else addMsg('bot',ansSingle(d,r.type));
-  }
-
-  // 纯问卷回收页：无聊天输入/事件
-
-  // 常驻问卷入口：点击就地展开 iframe（提升可发现性）
-  (function(){
-    const cta=document.getElementById('surveyCta');
-    const body=document.getElementById('surveyBody');
-    if(!cta||!body) return;
-    if(!SURVEY_EMBED_URL){cta.style.display='none';return;}
-    cta.addEventListener('click',()=>{
-      if(!body.innerHTML) body.innerHTML=surveyHtml();
-      body.hidden=!body.hidden;
-      if(!body.hidden) body.scrollIntoView({behavior:'smooth',block:'nearest'});
-    });
-  })();
-
-  // 纯问卷回收页：无聊天开场白
-</script>
   <script>
   /* ===== 深空背景：视差星海 + 真实星座（与首页一致） ===== */
   (function(){
@@ -592,8 +297,9 @@
   })();
   </script>
   <footer style="border-top:1px solid rgba(255,255,255,.08);margin-top:54px;padding:26px 0 14px;text-align:center;font-size:13px;color:#7f8bb3">
-    <a href="index.html" style="color:#9aa6cf;text-decoration:none;margin:0 6px">首页</a>·<a href="quiz.html" style="color:#9aa6cf;text-decoration:none;margin:0 6px">测评</a>·<a href="report.html" style="color:#9aa6cf;text-decoration:none;margin:0 6px">报告</a>·<a href="action.html" style="color:#9aa6cf;text-decoration:none;margin:0 6px">行动</a>·<a href="stories.html" style="color:#9aa6cf;text-decoration:none;margin:0 6px">案例</a>·<a href="companion.html" style="color:#9aa6cf;text-decoration:none;margin:0 6px">伙伴</a>·<a href="me.html" style="color:#9aa6cf;text-decoration:none;margin:0 6px">我的星图</a>·<a href="pricing.html" style="color:#9aa6cf;text-decoration:none;margin:0 6px">价格</a>·<a href="blog.html" style="color:#9aa6cf;text-decoration:none;margin:0 6px">博客</a>·<a href="about.html" style="color:#9aa6cf;text-decoration:none;margin:0 6px">关于</a>·<a href="faq.html" style="color:#9aa6cf;text-decoration:none;margin:0 6px">FAQ</a>·<a href="contact.html" style="color:#9aa6cf;text-decoration:none;margin:0 6px">联系</a>
-    <div style="margin-top:10px">天赋星图 · 在共产主义尚未到来的时期，把生命力放大到它应该在的水平</div>
+    <p style="font-size:13.5px;color:#9aa6cf;margin-bottom:14px">有想法想聊？去微信搜公众号 <b style="color:#ffe1a0">木焚心</b>，发「星图 / 反馈 / 建议」即可。</p>
+    <div style="margin-bottom:14px"><a href="index.html" style="color:#9aa6cf;text-decoration:none;margin:0 6px">首页</a>·<a href="quiz.html" style="color:#9aa6cf;text-decoration:none;margin:0 6px">测评</a>·<a href="report.html" style="color:#9aa6cf;text-decoration:none;margin:0 6px">报告</a>·<a href="action.html" style="color:#9aa6cf;text-decoration:none;margin:0 6px">行动</a>·<a href="stories.html" style="color:#9aa6cf;text-decoration:none;margin:0 6px">案例</a>·<a href="companion.html" style="color:#9aa6cf;text-decoration:none;margin:0 6px">伙伴</a>·<a href="me.html" style="color:#9aa6cf;text-decoration:none;margin:0 6px">我的星图</a>·<a href="pricing.html" style="color:#9aa6cf;text-decoration:none;margin:0 6px">价格</a>·<a href="blog.html" style="color:#9aa6cf;text-decoration:none;margin:0 6px">博客</a>·<a href="about.html" style="color:#9aa6cf;text-decoration:none;margin:0 6px">关于</a>·<a href="faq.html" style="color:#9aa6cf;text-decoration:none;margin:0 6px">FAQ</a>·<a href="contact.html" style="color:#9aa6cf;text-decoration:none;margin:0 6px">联系</a></div>
+    <div style="margin-top:10px;opacity:.85">天赋星图 · 用 8 分钟，读懂你的天赋信号</div>
   </footer>
 <script>
 (function(){
