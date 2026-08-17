@@ -74,7 +74,8 @@
   .nav-links a:hover{color:var(--ink)}
   .nav-links a.active{color:var(--gold-soft)}
 
-  .cm-main{flex:1;display:flex;flex-direction:column;min-height:0;position:relative;z-index:1}
+  .cm-main{flex:1;display:flex;flex-direction:column;min-height:0;position:relative;z-index:1;overflow-y:auto}
+  .cm-survey-lead{font-size:13.5px;color:var(--ink-soft);line-height:1.7;margin:4px 2px 14px;}
   .cm-wrap{max-width:760px;width:100%;margin:0 auto;padding:18px 18px 0;flex:1;display:flex;flex-direction:column;min-height:0}
 
   .cm-head{text-align:center;padding:8px 0 14px}
@@ -236,30 +237,25 @@
   <div id="main" tabindex="-1" class="cm-main">
     <div class="cm-wrap">
       <div class="cm-head">
-        <h1>星图<span class="hl">伙伴</span></h1>
-        <p>读得懂你的星图，专门接你的现状、卡点、和「这结果好像不太准」</p>
+        <h1>天赋<span class="hl">星图</span> · 问卷</h1>
+        <p>2 分钟，留一份你的天赋信号，帮我把星图打磨得更准 🌌</p>
       </div>
       <div class="cm-survey" id="cmSurvey">
-        <button class="cm-survey-cta" id="surveyCta" type="button">📝 填天赋星图问卷（约 2 分钟）<span class="sub">2 分钟，留一份你的天赋信号，帮我把星图打磨得更准 🌌</span></button>
-        <div class="cm-survey-body" id="surveyBody" hidden></div>
+        <p class="cm-survey-lead">下面这份问卷，会问到你的<b>心流、优势、兴趣、卡点</b>，以及想不想继续收到星图进展。填完你会立刻看到「提交成功」，你的信号就进星图了。</p>
+        <div class="cm-survey-body" id="surveyBody">
+          <div class="survey-embed">
+            <iframe src="https://k68wjncs.jsjform.com/f/do4TtQ" title="天赋星图问卷"></iframe>
+            <p class="survey-tip">提交后，窗口里出现「提交成功」即代表收到啦 ✅ 想继续聊，去公众号「木焚心」。</p>
+            <a class="survey-fb-mini" href="https://k68wjncs.jsjform.com/f/do4TtQ" target="_blank" rel="noopener">打不开？点此在新窗口打开问卷 ↗</a>
+            <p class="survey-privacy">🔒 邮箱仅用于向你反馈星图进展，绝不外发、不发广告。</p>
+          </div>
+        </div>
       </div>
-      <div class="cm-chat" id="chat"></div>
     </div>
   </div>
 
-  <div class="cm-foot">
-    <div class="cm-foot-inner">
-      <div class="cm-presets" id="presets">
-        <button data-q="status">🌗 我的现状怎么样</button>
-        <button data-q="stuck">🚧 我卡在执行上了</button>
-        <button data-q="off">🤔 结果好像不太准</button>
-        <button data-q="feedback">💬 我要反馈</button>
-      </div>
-      <div class="cm-input">
-        <textarea id="input" rows="1" placeholder="直接问，或选上面的按钮…"></textarea>
-        <button class="cm-send" id="send">发送</button>
-      </div>
-    </div>
+  <div class="cm-foot" style="text-align:center">
+    <p style="font-size:13px;color:#9aa6cf">有想法想聊？去微信搜公众号 <b style="color:#ffe1a0">木焚心</b>，发「星图 / 反馈 / 建议」即可。</p>
   </div>
 
 <script>
@@ -526,13 +522,7 @@
     else addMsg('bot',ansSingle(d,r.type));
   }
 
-  // 事件
-  document.getElementById('presets').addEventListener('click',e=>{
-    const b=e.target.closest('button');if(!b)return;handlePreset(b.dataset.q);
-  });
-  sendBtn.addEventListener('click',submit);
-  input.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();submit();}});
-  input.addEventListener('input',()=>{input.style.height='auto';input.style.height=Math.min(input.scrollHeight,120)+'px';});
+  // 纯问卷回收页：无聊天输入/事件
 
   // 常驻问卷入口：点击就地展开 iframe（提升可发现性）
   (function(){
@@ -547,14 +537,7 @@
     });
   })();
 
-  // 开场
-  if(!RAW){
-    addMsg('bot','嗨，我是<b>星图伙伴</b>。我专门帮你看懂自己的天赋星图——回答你的现状、执行卡点、还有「这结果好像不太准」的怀疑。');
-    addMsg('bot',noData());
-  }else{
-    const d=data();
-    addMsg('bot','嗨，我是<b>星图伙伴</b>。我刚读了你的星图——兴趣偏向 <b>'+(riaName(d.ria[0])||'…')+'</b>，优势里 <b>'+(nameOf(d.via[0])||'…')+'</b> 最亮。有什么想聊的？现状、卡点、还是觉得哪不准，都可以直接说。');
-  }
+  // 纯问卷回收页：无聊天开场白
 </script>
   <script>
   /* ===== 深空背景：视差星海 + 真实星座（与首页一致） ===== */
