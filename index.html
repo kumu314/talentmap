@@ -86,7 +86,7 @@
   .btn-primary{color:#1c1404;background:linear-gradient(135deg,var(--gold-soft),var(--gold));
     box-shadow:0 8px 30px rgba(243,193,75,.26)}
   .btn-primary:hover{transform:translateY(-2px);box-shadow:0 12px 38px rgba(243,193,75,.4)}
-  .btn-ghost{color:var(--ink);border-color:var(--line-2);background:rgba(255,255,255,.04)}
+  .btn-ghost{color:var(--ink);border-color:rgba(255,255,255,.34);background:rgba(255,255,255,.04)}
   .btn-ghost:hover{border-color:var(--gold);color:var(--gold-soft)}
   .nav .btn{padding:8px 15px;flex:0 0 auto;white-space:nowrap}
 
@@ -154,10 +154,10 @@
   /* 三层章节（可点击联动星图+查看理论） */
   .chapters{display:flex;flex-direction:column;gap:14px;max-width:840px;margin:0 auto}
   .chapter{display:grid;grid-template-columns:auto 1fr;gap:22px;align-items:start;
-    padding:24px 26px;border:1px solid var(--line);border-radius:var(--radius);
+    padding:24px 26px;border:1px solid rgba(255,255,255,.34);border-radius:var(--radius);
     background:linear-gradient(180deg,rgba(255,255,255,.045),rgba(255,255,255,.015));
     cursor:pointer;transition:.25s;position:relative}
-  .chapter:hover{transform:translateX(4px);border-color:var(--line-2)}
+  .chapter:hover{transform:translateX(4px);border-color:rgba(255,255,255,.48)}
   .chapter.active{border-color:var(--c)}
   .chapter .no{font-family:var(--serif);font-size:40px;font-weight:700;line-height:1;
     color:var(--c);opacity:.9;font-style:italic}
@@ -181,7 +181,7 @@
   .taste h3{font-size:20px;margin-bottom:6px}
   .taste .sub{font-size:13px;color:var(--ink-faint);margin-bottom:20px}
   .opt{display:block;width:100%;text-align:left;padding:14px 16px;margin-bottom:10px;
-    border:1px solid var(--line);border-radius:14px;background:rgba(255,255,255,.03);
+    border:1px solid rgba(255,255,255,.34);border-radius:14px;background:rgba(255,255,255,.03);
     color:var(--ink);font-size:15px;cursor:pointer;transition:.2s;font-family:inherit}
   .opt:hover{border-color:var(--sky);background:rgba(110,160,255,.08)}
   .taste .back{position:absolute;top:18px;right:20px;color:var(--ink-faint);cursor:pointer;font-size:20px;line-height:1;
@@ -285,7 +285,7 @@
   a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--gold);outline-offset:3px;border-radius:6px}
 
 /* ===== 移动端汉堡菜单 ===== */
-.nav-toggle{display:none;width:40px;height:40px;border:1px solid var(--line);border-radius:10px;background:transparent;cursor:pointer;align-items:center;justify-content:center;flex-direction:column;gap:5px;padding:0;transition:.2s}
+.nav-toggle{display:none;width:40px;height:40px;border:1px solid rgba(255,255,255,.34);border-radius:10px;background:transparent;cursor:pointer;align-items:center;justify-content:center;flex-direction:column;gap:5px;padding:0;transition:.2s}
 .nav-toggle:hover,.nav-toggle:focus-visible{background:rgba(243,193,75,.12);border-color:var(--gold)}
 .nav-toggle span{display:block;width:18px;height:2px;background:var(--ink);border-radius:1px;transition:.2s}
 .nav-toggle[aria-expanded="true"]{background:rgba(243,193,75,.12);border-color:var(--gold)}

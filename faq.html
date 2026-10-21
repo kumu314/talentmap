@@ -65,7 +65,7 @@
     border:1px solid transparent;cursor:pointer;text-decoration:none;transition:.2s;font-family:inherit;white-space:nowrap}
   .btn-primary{color:#1c1404;background:linear-gradient(135deg,var(--gold-soft),var(--gold));box-shadow:0 8px 30px rgba(243,193,75,.26)}
   .btn-primary:hover{transform:translateY(-2px);box-shadow:0 12px 38px rgba(243,193,75,.4)}
-  .btn-ghost{color:var(--ink);border-color:var(--line-2);background:rgba(255,255,255,.04)}
+  .btn-ghost{color:var(--ink);border-color:rgba(255,255,255,.34);background:rgba(255,255,255,.04)}
   .btn-ghost:hover{border-color:var(--gold);color:var(--gold-soft)}
   .nav .btn{padding:8px 15px;flex:0 0 auto;white-space:nowrap}
   @media(max-width:720px){
@@ -104,7 +104,7 @@
   /* 分类 chip */
   .filters{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:24px 0 8px}
   .fchip{font-family:inherit;padding:9px 18px;border-radius:999px;cursor:pointer;font-size:14px;font-weight:600;
-    border:1px solid var(--line-2);background:rgba(255,255,255,.03);color:var(--ink-soft);transition:.18s}
+    border:1px solid rgba(255,255,255,.34);background:rgba(255,255,255,.03);color:var(--ink-soft);transition:.18s}
   .fchip:hover{border-color:var(--gold);color:var(--gold-soft)}
   .fchip.on{background:linear-gradient(135deg,var(--gold-soft),var(--gold));color:#1c1404;border-color:transparent}
 
@@ -157,7 +157,7 @@
   a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--gold);outline-offset:3px;border-radius:6px}
 
 /* ===== 移动端汉堡菜单 ===== */
-.nav-toggle{display:none;width:40px;height:40px;border:1px solid var(--line);border-radius:10px;background:transparent;cursor:pointer;align-items:center;justify-content:center;flex-direction:column;gap:5px;padding:0;transition:.2s}
+.nav-toggle{display:none;width:40px;height:40px;border:1px solid rgba(255,255,255,.34);border-radius:10px;background:transparent;cursor:pointer;align-items:center;justify-content:center;flex-direction:column;gap:5px;padding:0;transition:.2s}
 .nav-toggle:hover,.nav-toggle:focus-visible{background:rgba(243,193,75,.12);border-color:var(--gold)}
 .nav-toggle span{display:block;width:18px;height:2px;background:var(--ink);border-radius:1px;transition:.2s}
 .nav-toggle[aria-expanded="true"]{background:rgba(243,193,75,.12);border-color:var(--gold)}

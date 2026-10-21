@@ -51,7 +51,7 @@
     border:1px solid transparent;cursor:pointer;text-decoration:none;transition:.2s;font-family:inherit}
   .btn-primary{color:#1c1404;background:linear-gradient(135deg,var(--gold-soft),var(--gold));box-shadow:0 8px 30px rgba(243,193,75,.26)}
   .btn-primary:hover{transform:translateY(-2px);box-shadow:0 12px 38px rgba(243,193,75,.4)}
-  .btn-ghost{color:var(--ink);border-color:var(--line-2);background:rgba(255,255,255,.04)}
+  .btn-ghost{color:var(--ink);border-color:rgba(255,255,255,.34);background:rgba(255,255,255,.04)}
   .btn-ghost:hover{border-color:var(--gold);color:var(--gold-soft)}
   .nav .btn{padding:8px 15px;flex:0 0 auto}
   @media(max-width:860px){
@@ -96,19 +96,21 @@
   .field{margin-bottom:16px}
   .field label{display:block;font-size:13.5px;color:var(--ink-soft);margin-bottom:7px}
   .field input,.field textarea{width:100%;padding:12px 15px;border-radius:12px;background:rgba(10,15,34,.7);
-    border:1px solid var(--line-2);color:var(--ink);font-family:inherit;font-size:14.5px;outline:none;transition:.2s;resize:vertical}
+    border:1px solid rgba(255,255,255,.34);color:var(--ink);font-family:inherit;font-size:14.5px;outline:none;transition:.2s;resize:vertical}
   .field input:focus,.field textarea:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(243,193,75,.12)}
   .form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
   .form-actions{display:flex;justify-content:center;margin-top:8px}
   .form-ok{display:none;text-align:center;color:var(--mint);font-size:14px;margin-top:16px}
   .form-ok.show{display:block}
+  .form-err{display:none;text-align:center;color:#ffb4a6;font-size:14px;margin-top:16px}
+  .form-err.show{display:block}
   @media(max-width:640px){.form-row{grid-template-columns:1fr}}
 
   /* 快捷入口 */
   .quick{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
-  .qlink{border:1px solid var(--line);border-radius:var(--radius);padding:22px;display:flex;align-items:center;gap:14px;transition:.25s;text-decoration:none;
+  .qlink{border:1px solid rgba(255,255,255,.34);border-radius:var(--radius);padding:22px;display:flex;align-items:center;gap:14px;transition:.25s;text-decoration:none;
     background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.015))}
-  .qlink:hover{border-color:var(--line-2);transform:translateY(-3px)}
+  .qlink:hover{border-color:rgba(255,255,255,.48);transform:translateY(-3px)}
   .qlink .qic{width:42px;height:42px;border-radius:12px;flex:0 0 auto;display:flex;align-items:center;justify-content:center;
     background:rgba(110,160,255,.12);border:1px solid rgba(110,160,255,.3)}
   .qlink .qic svg{width:20px;height:20px;color:var(--sky)}
@@ -141,7 +143,7 @@
   a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--gold);outline-offset:3px;border-radius:6px}
 
 /* ===== 移动端汉堡菜单 ===== */
-.nav-toggle{display:none;width:40px;height:40px;border:1px solid var(--line);border-radius:10px;background:transparent;cursor:pointer;align-items:center;justify-content:center;flex-direction:column;gap:5px;padding:0;transition:.2s}
+.nav-toggle{display:none;width:40px;height:40px;border:1px solid rgba(255,255,255,.34);border-radius:10px;background:transparent;cursor:pointer;align-items:center;justify-content:center;flex-direction:column;gap:5px;padding:0;transition:.2s}
 .nav-toggle:hover,.nav-toggle:focus-visible{background:rgba(243,193,75,.12);border-color:var(--gold)}
 .nav-toggle span{display:block;width:18px;height:2px;background:var(--ink);border-radius:1px;transition:.2s}
 .nav-toggle[aria-expanded="true"]{background:rgba(243,193,75,.12);border-color:var(--gold)}
@@ -271,6 +273,7 @@
             <div class="form-actions">
               <button type="submit" class="btn btn-primary">发送留言</button>
             </div>
+            <div class="form-err" id="msgErr" role="alert"></div>
             <div class="form-ok" id="msgOk">收到啦 ✓ 这是示意提交，若真要联系我们，直接发邮件到 hello@talentmap.app 即可。</div>
           </form>
         </div>
@@ -318,14 +321,20 @@
 /* ===== 写信表单（示意，无后端） ===== */
 (function(){
   var f=document.getElementById('msgForm'); if(!f) return;
+  var errEl=document.getElementById('msgErr');
+  function showErr(m,el){errEl.textContent='\u26a0 '+m;errEl.classList.add('show');
+    if(el){el.setAttribute('aria-invalid','true');el.setAttribute('aria-describedby','msgErr');el.focus();}}
+  function clearErr(){errEl.classList.remove('show');errEl.textContent='';
+    ['mEmail','mBody'].forEach(function(id){var x=document.getElementById(id);x.removeAttribute('aria-invalid');x.removeAttribute('aria-describedby');});}
+  ['mEmail','mBody'].forEach(function(id){document.getElementById(id).addEventListener('input',clearErr);});
   f.onsubmit=function(e){
     e.preventDefault();
     var name=document.getElementById('mName').value.trim();
     var email=document.getElementById('mEmail').value.trim();
     var body=document.getElementById('mBody').value.trim();
-    if(!body){ alert('至少留一句话给我们吧～'); return; }
-    if(email && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){ alert('邮箱格式好像不太对，再检查一下～'); return; }
-    document.getElementById('msgOk').classList.add('show');
+    if(!body){ clearErr();showErr('至少留一句话给我们吧～',document.getElementById('mBody')); return; }
+    if(email && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){ clearErr();showErr('邮箱格式好像不太对，再检查一下～',document.getElementById('mEmail')); return; }
+    clearErr();document.getElementById('msgOk').classList.add('show');
     f.reset();
     setTimeout(function(){ document.getElementById('msgOk').classList.remove('show'); }, 6000);
   };

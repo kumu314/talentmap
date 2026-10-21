@@ -82,7 +82,7 @@
 
   .filters{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:26px}
   .fchip{font-family:inherit;padding:9px 18px;border-radius:999px;cursor:pointer;font-size:14px;font-weight:600;
-    border:1px solid var(--line-2);background:rgba(255,255,255,.03);color:var(--ink-soft);transition:.18s}
+    border:1px solid rgba(255,255,255,.34);background:rgba(255,255,255,.03);color:var(--ink-soft);transition:.18s}
   .fchip:hover{border-color:var(--gold);color:var(--gold-soft)}
   .fchip.on{background:linear-gradient(135deg,var(--gold-soft),var(--gold));color:#1c1404;border-color:transparent}
 
@@ -110,19 +110,22 @@
   .card h3{font-size:18px;font-weight:800;margin-bottom:4px}
   .card .csub{font-size:13px;color:var(--ink-soft);margin-bottom:18px}
   label.fld{display:block;font-size:13.5px;color:var(--ink-soft);margin:16px 0 8px}
-  textarea,input[type=text]{width:100%;background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:12px;
+  textarea,input[type=text]{width:100%;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.34);border-radius:12px;
     color:var(--ink);font-family:inherit;font-size:15px;padding:12px 14px;line-height:1.6}
   textarea:focus,input[type=text]:focus{outline:none;border-color:var(--gold)}
   textarea{min-height:110px;resize:vertical}
   .layers{display:flex;gap:10px;flex-wrap:wrap}
   .lchip{font-family:inherit;flex:1;min-width:110px;text-align:center;padding:12px 10px;border-radius:14px;cursor:pointer;
-    border:1px solid var(--line);background:rgba(255,255,255,.03);transition:.18s;font-size:14px}
+    border:1px solid rgba(255,255,255,.34);background:rgba(255,255,255,.03);transition:.18s;font-size:14px}
   .lchip .lc{display:block;font-size:11px;letter-spacing:.5px;opacity:.8}
   .lchip .lv{display:block;font-size:13px;margin-top:3px;color:var(--ink-soft)}
   .lchip[data-k=ria]{--c:var(--sky)} .lchip[data-k=via]{--c:var(--violet)} .lchip[data-k=flow]{--c:var(--mint)}
   .lchip:hover{border-color:var(--c)}
   .lchip.on{border-color:var(--c);background:color-mix(in srgb,var(--c) 14%,transparent);color:var(--ink);font-weight:600}
   .form-actions{display:flex;gap:12px;margin-top:22px;flex-wrap:wrap}
+  .sub-ok{display:none;color:var(--mint);font-size:13.5px;margin-top:14px;line-height:1.7}
+  .sub-err{display:none;color:#ffb4a6;font-size:13.5px;margin-top:14px;line-height:1.7}
+  .sub-ok.show,.sub-err.show{display:block}
 
 
   .cta{border:1px solid var(--line-2);border-radius:var(--radius);padding:30px 28px;text-align:center;margin-top:30px;
@@ -133,7 +136,7 @@
     font-size:15px;font-weight:600;border:1px solid transparent;cursor:pointer;transition:.2s;font-family:inherit;text-decoration:none;white-space:nowrap}
   .btn-primary{color:#1c1404;background:linear-gradient(135deg,var(--gold-soft),var(--gold));box-shadow:0 8px 30px rgba(243,193,75,.26)}
   .btn-primary:hover{transform:translateY(-2px);box-shadow:0 12px 38px rgba(243,193,75,.4)}
-  .btn-ghost{color:var(--ink);border-color:var(--line-2);background:rgba(255,255,255,.04);padding:11px 20px;font-size:14px}
+  .btn-ghost{color:var(--ink);border-color:rgba(255,255,255,.34);background:rgba(255,255,255,.04);padding:11px 20px;font-size:14px}
   .btn-ghost:hover{border-color:var(--gold);color:var(--gold-soft)}
   .nav .btn{padding:8px 15px;flex:0 0 auto;white-space:nowrap}
 
@@ -158,7 +161,7 @@
   a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--gold);outline-offset:3px;border-radius:6px}
 
 /* ===== 移动端汉堡菜单 ===== */
-.nav-toggle{display:none;width:40px;height:40px;border:1px solid var(--line);border-radius:10px;background:transparent;cursor:pointer;align-items:center;justify-content:center;flex-direction:column;gap:5px;padding:0;transition:.2s}
+.nav-toggle{display:none;width:40px;height:40px;border:1px solid rgba(255,255,255,.34);border-radius:10px;background:transparent;cursor:pointer;align-items:center;justify-content:center;flex-direction:column;gap:5px;padding:0;transition:.2s}
 .nav-toggle:hover,.nav-toggle:focus-visible{background:rgba(243,193,75,.12);border-color:var(--gold)}
 .nav-toggle span{display:block;width:18px;height:2px;background:var(--ink);border-radius:1px;transition:.2s}
 .nav-toggle[aria-expanded="true"]{background:rgba(243,193,75,.12);border-color:var(--gold)}
@@ -264,6 +267,8 @@
           <button class="btn btn-primary" id="subBtn">保存我的故事种子</button>
           <button class="btn btn-ghost" type="button" id="subExport">导出我的草稿</button>
         </div>
+        <div class="sub-ok" id="subOk" role="status"></div>
+        <div class="sub-err" id="subErr" role="alert"></div>
         <div class="s-note" style="margin-top:14px">本地保存，仅存于你当前设备；清空浏览器数据会丢失。投稿通道开放后这里会提示如何提交。</div>
       </div>
 
@@ -324,11 +329,19 @@ let subLayer='flow';
   });
   layers.querySelector('.lchip').classList.add('on');
   const btn=document.getElementById('subBtn');
+  const okEl=document.getElementById('subOk'), errEl=document.getElementById('subErr');
+  function say(m){okEl.textContent=m;okEl.classList.add('show');errEl.classList.remove('show');}
+  function fail(m,el){errEl.textContent='\u26a0 '+m;errEl.classList.add('show');okEl.classList.remove('show');
+    if(el){el.setAttribute('aria-invalid','true');el.setAttribute('aria-describedby','subErr');el.focus();}}
+  function quiet(){okEl.classList.remove('show');errEl.classList.remove('show');
+    ['subBody','subWho','subTitle','subClue'].forEach(function(id){var x=document.getElementById(id);
+      x.removeAttribute('aria-invalid');x.removeAttribute('aria-describedby');});}
+  ['subBody','subWho','subTitle','subClue'].forEach(function(id){document.getElementById(id).addEventListener('input',quiet);});
   btn.onclick=()=>{
     const who=document.getElementById('subWho').value.trim();
     const title=document.getElementById('subTitle').value.trim();
     const body=document.getElementById('subBody').value.trim();
-    if(!body){alert('先写写你的那段过程吧～');return;}
+    if(!body){quiet();fail('先写写你的那段过程吧～',document.getElementById('subBody'));return;}
     const arr=getUserStories();
     arr.unshift({layer:subLayer,who:who||'匿名 · 一只路过的星',title:title||'我的天赋种子',body,clue:document.getElementById('subClue').value.trim()});
     localStorage.setItem(SUB_KEY,JSON.stringify(arr));
@@ -337,20 +350,20 @@ let subLayer='flow';
     cur='all';document.querySelectorAll('.fchip').forEach(x=>{const on=(x.dataset.f==='all');x.classList.toggle('on',on);x.setAttribute('aria-pressed',on?'true':'false');});
     render();
     const card=document.getElementById('submitCard');card.scrollIntoView({behavior:'smooth',block:'center'});
-    alert('已存为你的故事种子 ★ 它会显示在案例墙最前面。');
+    say('已存为你的故事种子 ★ 它会显示在案例墙最前面（只存在这台设备上）。');
   };
   const expBtn=document.getElementById('subExport');
   if(expBtn) expBtn.onclick=()=>{
     const arr=getUserStories();
-    if(!arr.length){ alert('还没有保存的故事种子。先写下你的那段过程吧～'); return; }
+    if(!arr.length){ fail('还没有保存的故事种子。先写下你的那段过程吧～',document.getElementById('subBody')); return; }
     const body=arr.map((s,i)=>`【${i+1}】${s.who||'匿名'} · ${s.title||'我的天赋种子'}\n层：${s.layer}\n星图线索：${s.clue||'（无）'}\n\n${s.body}`).join('\n'+'-'.repeat(24)+'\n\n');
     const header='天赋星图 · 我的故事种子（本地导出，可发给运营者人工精选）\n导出时间：'+new Date().toLocaleString()+'\n\n';
     try{
       const blob=new Blob([header+body],{type:'text/plain;charset=utf-8'});
       const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='我的天赋星图故事种子.txt'; document.body.appendChild(a); a.click(); a.remove();
       setTimeout(()=>URL.revokeObjectURL(a.href),2000);
-      alert('已导出 '+arr.length+' 条故事种子为 .txt 文件。可发给运营者人工精选，等投稿通道开放后一键提交。');
-    }catch(e){ alert('导出失败：'+e.message); }
+      say('已导出 '+arr.length+' 条故事种子为 .txt 文件。可发给运营者人工精选，等投稿通道开放后一键提交。');
+    }catch(e){ fail('导出失败：'+e.message,null); }
   };
 })();
 

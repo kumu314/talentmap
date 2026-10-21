@@ -51,7 +51,7 @@
     border:1px solid transparent;cursor:pointer;text-decoration:none;transition:.2s;font-family:inherit}
   .btn-primary{color:#1c1404;background:linear-gradient(135deg,var(--gold-soft),var(--gold));box-shadow:0 8px 30px rgba(243,193,75,.26)}
   .btn-primary:hover{transform:translateY(-2px);box-shadow:0 12px 38px rgba(243,193,75,.4)}
-  .btn-ghost{color:var(--ink);border-color:var(--line-2);background:rgba(255,255,255,.04)}
+  .btn-ghost{color:var(--ink);border-color:rgba(255,255,255,.34);background:rgba(255,255,255,.04)}
   .btn-ghost:hover{border-color:var(--gold);color:var(--gold-soft)}
   .nav .btn{padding:8px 15px;flex:0 0 auto}
   @media(max-width:860px){
@@ -73,7 +73,7 @@
   .sec{margin-top:48px}
   .filters{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
   .fchip{font-family:inherit;padding:9px 18px;border-radius:999px;cursor:pointer;font-size:14px;font-weight:600;
-    border:1px solid var(--line-2);background:rgba(255,255,255,.03);color:var(--ink-soft);transition:.18s}
+    border:1px solid rgba(255,255,255,.34);background:rgba(255,255,255,.03);color:var(--ink-soft);transition:.18s}
   .fchip:hover{border-color:var(--gold);color:var(--gold-soft)}
   .fchip.on{background:linear-gradient(135deg,var(--gold-soft),var(--gold));color:#1c1404;border-color:transparent}
 
@@ -97,9 +97,9 @@
 
   /* 列表 */
   .list{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
-  .post{border:1px solid var(--line);border-radius:var(--radius);padding:22px 22px 20px;transition:.25s;
+  .post{border:1px solid rgba(255,255,255,.34);border-radius:var(--radius);padding:22px 22px 20px;transition:.25s;
     background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.015));display:flex;flex-direction:column}
-  .post:hover{border-color:var(--line-2);transform:translateY(-3px)}
+  .post:hover{border-color:rgba(255,255,255,.48);transform:translateY(-3px)}
   .post .ptag{font-size:11.5px;font-weight:700;letter-spacing:.5px;margin-bottom:10px}
   .post.c-research .ptag{color:var(--sky)} .post.c-tool .ptag{color:var(--mint)}
   .post.c-story .ptag{color:var(--violet)} .post.c-action .ptag{color:var(--gold)}
@@ -118,10 +118,12 @@
   .sub p{color:var(--ink-soft);font-size:14px;margin-bottom:20px}
   .subform{display:flex;gap:10px;max-width:480px;margin:0 auto;flex-wrap:wrap;justify-content:center}
   .subform input{flex:1;min-width:220px;padding:12px 16px;border-radius:12px;background:rgba(10,15,34,.7);
-    border:1px solid var(--line-2);color:var(--ink);font-family:inherit;font-size:14px;outline:none;transition:.2s}
+    border:1px solid rgba(255,255,255,.34);color:var(--ink);font-family:inherit;font-size:14px;outline:none;transition:.2s}
   .subform input:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(243,193,75,.12)}
   .sub .ok{color:var(--mint);font-size:13.5px;margin-top:14px;display:none}
   .sub .ok.show{display:block}
+  .sub .err{color:#ffb4a6;font-size:13.5px;margin-top:14px;display:none;text-align:center}
+  .sub .err.show{display:block}
 
   .cta{border:1px solid var(--line-2);border-radius:var(--radius);padding:40px 28px;text-align:center;margin-top:48px;
     background:linear-gradient(180deg,rgba(12,18,40,.5),rgba(9,14,32,.3))}
@@ -148,7 +150,7 @@
   a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--gold);outline-offset:3px;border-radius:6px}
 
 /* ===== 移动端汉堡菜单 ===== */
-.nav-toggle{display:none;width:40px;height:40px;border:1px solid var(--line);border-radius:10px;background:transparent;cursor:pointer;align-items:center;justify-content:center;flex-direction:column;gap:5px;padding:0;transition:.2s}
+.nav-toggle{display:none;width:40px;height:40px;border:1px solid rgba(255,255,255,.34);border-radius:10px;background:transparent;cursor:pointer;align-items:center;justify-content:center;flex-direction:column;gap:5px;padding:0;transition:.2s}
 .nav-toggle:hover,.nav-toggle:focus-visible{background:rgba(243,193,75,.12);border-color:var(--gold)}
 .nav-toggle span{display:block;width:18px;height:2px;background:var(--ink);border-radius:1px;transition:.2s}
 .nav-toggle[aria-expanded="true"]{background:rgba(243,193,75,.12);border-color:var(--gold)}
@@ -257,6 +259,7 @@
           <input type="email" id="subEmail" placeholder="你的邮箱，如 name@example.com" autocomplete="email" />
           <button type="submit" class="btn btn-primary">订阅</button>
         </form>
+        <div class="err" id="subErr" role="alert"></div>
         <div class="ok" id="subOk">已记下你的邮箱 ✓ 下一篇出来第一时间通知你（示意：本站暂无后端，不会真正发送）</div>
       </div>
 
@@ -326,12 +329,19 @@ render();
 /* ===== 订阅（示意，无后端） ===== */
 (function(){
   var f=document.getElementById('subForm'); if(!f) return;
+  var errEl=document.getElementById('subErr'), emailEl=document.getElementById('subEmail');
+  function showErr(m){errEl.textContent='\u26a0 '+m;errEl.classList.add('show');}
+  function clearErr(){errEl.classList.remove('show');errEl.textContent='';emailEl.removeAttribute('aria-invalid');emailEl.removeAttribute('aria-describedby');}
+  emailEl.addEventListener('input',clearErr);
   f.onsubmit=function(e){
     e.preventDefault();
-    var v=document.getElementById('subEmail').value.trim();
-    if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v)){ alert('邮箱格式好像不太对，再检查一下～'); return; }
-    document.getElementById('subOk').classList.add('show');
-    document.getElementById('subEmail').value='';
+    var v=emailEl.value.trim();
+    if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v)){
+      showErr('邮箱格式好像不太对，再检查一下～');
+      emailEl.setAttribute('aria-invalid','true');emailEl.setAttribute('aria-describedby','subErr');emailEl.focus();return;
+    }
+    clearErr();document.getElementById('subOk').classList.add('show');
+    emailEl.value='';
   };
 })();
 
