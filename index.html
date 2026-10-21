@@ -6,13 +6,13 @@
 <title>天赋星图 · 你做什么会忘记时间？</title>
   <link rel="icon" type="image/x-icon" href="favicon.ico">
   <link rel="icon" href="logo-mark.svg" type="image/svg+xml">
-  <meta name="description" content="天赋星图 · 用 RIASEC/VIA/心流/IKIGAI 三层定位 + 一层现实校验，8 分钟画出你的天赋星图，把被压住的生命力放大到它应该在的水平。">
+  <meta name="description" content="天赋星图 · 用 RIASEC/VIA/心流/IKIGAI 三层定位 + 一层现实校验，8–12 分钟画出你的天赋星图，把被压住的生命力放大到它应该在的水平。">
 <meta property="og:type" content="website">
 <meta property="og:title" content="天赋星图 · 你做什么会忘记时间？">
-<meta property="og:description" content="三层定位 + 一层现实校验，8 分钟画出你的天赋星图。">
+<meta property="og:description" content="三层定位 + 一层现实校验，8–12 分钟画出你的天赋星图。">
 <meta property="og:image" content="https://kumu314.github.io/talentmap/og-cover.png">
 <style>
-  :root{
+  :root{color-scheme:dark;scroll-padding-top:76px;
     --bg:#060912;
     --bg-1:#0a0f22;
     --ink:#eef2ff;
@@ -261,8 +261,8 @@
   }
 
 @media (prefers-reduced-motion: reduce){
-  *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}
-  .layerFar,.layerMid,.layerNear,.constel-layer{transform:none!important}
+  *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important;transition-delay:0s!important;animation-delay:0s!important}
+  .star-layer,.constel-layer{transform:none!important}
 }
 
   .brand-mark{width:18px;height:18px;flex:0 0 auto;border-radius:50%;object-fit:contain;filter:drop-shadow(0 0 6px rgba(243,193,75,.55))}
@@ -286,7 +286,7 @@
 
 /* ===== 移动端汉堡菜单 ===== */
 .nav-toggle{display:none;width:40px;height:40px;border:1px solid var(--line);border-radius:10px;background:transparent;cursor:pointer;align-items:center;justify-content:center;flex-direction:column;gap:5px;padding:0;transition:.2s}
-.nav-toggle:hover,.nav-toggle:focus-visible{background:rgba(243,193,75,.12);border-color:var(--gold);outline:none}
+.nav-toggle:hover,.nav-toggle:focus-visible{background:rgba(243,193,75,.12);border-color:var(--gold)}
 .nav-toggle span{display:block;width:18px;height:2px;background:var(--ink);border-radius:1px;transition:.2s}
 .nav-toggle[aria-expanded="true"]{background:rgba(243,193,75,.12);border-color:var(--gold)}
 .nav-toggle[aria-expanded="true"] span:nth-child(1){transform:translateY(7px) rotate(45deg)}
@@ -300,13 +300,13 @@
   header.cm-nav{padding:10px 16px;flex-wrap:nowrap}
   .nav-toggle{display:flex;flex:0 0 auto;margin-left:auto}
   header.nav .btn-primary{display:none !important}
-  .nav-links{display:none;position:fixed;top:64px;left:12px;right:12px;background:rgba(10,15,34,.98);border:1px solid var(--line);border-radius:16px;padding:12px;flex-direction:column;gap:4px;z-index:9999;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);max-height:calc(100vh - 90px);overflow:auto;box-shadow:0 20px 50px rgba(0,0,0,.4)}
+  .nav-links{display:none;position:fixed;top:64px;left:12px;right:12px;background:rgba(10,15,34,.98);border:1px solid var(--line);border-radius:16px;padding:12px;flex-direction:column;gap:4px;z-index:9999;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);max-height:calc(100vh - 90px);max-height:calc(100dvh - 90px);overflow:auto;box-shadow:0 20px 50px rgba(0,0,0,.4)}
   .nav-links.open{display:flex}
   .nav-links a{padding:12px 16px;border-radius:10px;color:var(--ink);text-decoration:none;white-space:nowrap;font-size:14px}
-  .nav-links a:hover,.nav-links a:focus-visible{background:rgba(243,193,75,.12);color:var(--gold);outline:none}
+  .nav-links a:hover,.nav-links a:focus-visible{background:rgba(243,193,75,.12);color:var(--gold)}
   .nav-links a.active{background:rgba(243,193,75,.15);color:var(--gold)}
   .nav-cta-mobile{display:flex;margin-top:6px;padding:12px 16px;border-radius:10px;background:linear-gradient(90deg,var(--gold),var(--sun,#f3a84b));color:#0a0f22;font-weight:700;text-align:center;justify-content:center;align-items:center}
-  .nav-cta-mobile:hover,.nav-cta-mobile:focus-visible{filter:brightness(1.08);outline:none}
+  .nav-cta-mobile:hover,.nav-cta-mobile:focus-visible{filter:brightness(1.08)}
 }
 @media (min-width:769px){
   .nav-toggle,.nav-cta-mobile{display:none !important}
@@ -338,7 +338,6 @@
       <a href="stories.html">案例</a>
       <a href="companion.html">伙伴</a>
       <a href="me.html">我的星图</a>
-<a href="pricing.html">价格</a>
 <a href="blog.html">博客</a>
 <a href="about.html">关于</a>
 <a href="faq.html">FAQ</a>
@@ -362,7 +361,7 @@
           <button class="btn btn-primary" id="tasteBtn">先尝一口 · 1 分钟</button>
           <a href="#how" class="btn btn-ghost">看完整方法</a>
         </div>
-        <p class="mini">完整测评约 8 分钟 · 三关轻量自测 · 当场生成你的天赋星图</p>
+        <p class="mini">完整测评约 8–12 分钟 · 四关自测 · 当场生成你的天赋星图</p>
       </div>
 
       <div class="constellation reveal">
@@ -508,19 +507,19 @@
       <div class="sec-head reveal">
         <div class="sec-tag">How to play / FAQ</div>
         <h2>三步，画出你的星图</h2>
-        <p>不用准备什么。打开就能玩，8 分钟拿到属于你的那张图。</p>
+        <p>不用准备什么。打开就能玩，8–12 分钟拿到属于你的那张图。</p>
       </div>
       <div class="howto reveal">
-        <div class="step"><div class="n">1</div><h4>测</h4><p>三关轻量自测：兴趣、优势、心流，各几分钟，越诚实越准。</p></div>
+        <div class="step"><div class="n">1</div><h4>测</h4><p>四关自测：兴趣、优势、心流、现实校验，各几分钟，越诚实越准。</p></div>
         <div class="step"><div class="n">2</div><h4>看</h4><p>三层叠成一张星图，再用 IKIGAI 验一遍——哪块能当饭吃。</p></div>
         <div class="step"><div class="n">3</div><h4>养</h4><p>去 21 天心流日记，把「发现」变成「养成」。天赋是长出来的。</p></div>
       </div>
       <div class="faq reveal">
-        <details><summary>测一次要多久？<span class="ar">+</span></summary><div class="ans">完整测评约 8 分钟，三关共 20+ 道轻量题。没空一次测完？进度会自动暂存，下次接着来。</div></details>
-        <details><summary>真的科学吗？<span class="ar">+</span></summary><div class="ans">框架来自心理学同行评审的工具：RIASEC（霍兰德）、VIA 24 项性格优势、契克森米哈赖的心流、IKIGAI 现实校验。我们刻意排除了星座、血型、多元智能这类实测效度弱的说法。它帮你看清模式，不替代专业诊断。</div></details>
+        <details><summary>测一次要多久？<span class="ar">+</span></summary><div class="ans">完整测评约 8–12 分钟，四关共 33 道情境题。没空一次测完？进度会自动暂存，下次接着来。</div></details>
+        <details><summary>真的科学吗？<span class="ar">+</span></summary><div class="ans">前三层用的是有实证传统的工具：RIASEC（霍兰德兴趣代码）、VIA 24 项性格优势、契克森米哈赖的心流研究。第四层 IKIGAI 四圈是一个流传很广的思考框架，并不是有信效度数据的量表——我们只拿它做「能不能当饭吃」的现实校验，不拿它下结论。我们刻意排除了星座、血型、多元智能这类实测效度弱的说法。它帮你看清模式，不替代专业诊断。</div></details>
         <details><summary>我的数据去哪了？<span class="ar">+</span></summary><div class="ans">全部存在你这台设备的浏览器里（localStorage），不经过任何服务器。可在「我的星图」页一键导出备份或清空。换设备 / 清缓存会丢失，重要内容记得先备份。</div></details>
         <details><summary>没测出来怎么办？<span class="ar">+</span></summary><div class="ans">很正常。天赋不是一次测出来的，是做出来的。先去记 21 天日记、做几个微实验，过阵子再测第二张，你会看见星图在动。</div></details>
-        <details><summary>测完能做什么？<span class="ar">+</span></summary><div class="ans">① 生成可保存 / 分享的星图卡片；② 复制朋友圈文案邀朋友一起测；③ 去 21 天日记把天赋养成习惯；④ 在案例墙看看别人怎么走出来。还能在「我的星图」集中管理所有数据。</div></details>
+        <details><summary>测完能做什么？<span class="ar">+</span></summary><div class="ans">① 生成可保存 / 分享的星图卡片；② 复制朋友圈文案邀朋友一起测；③ 去 21 天日记把天赋养成习惯；④ 在案例墙留下你的故事种子。还能在「我的星图」集中管理所有数据。</div></details>
       </div>
     </div>
   </section>
@@ -530,7 +529,7 @@
     <div class="wrap">
       <div class="card reveal">
         <h2>点一下，先看看你的星图长什么样</h2>
-        <p>完整测评约 8 分钟。做完你会拿到一张自己的天赋星图，和下一步能立刻去验证的小行动。</p>
+        <p>完整测评约 8–12 分钟。做完你会拿到一张自己的天赋星图，和下一步能立刻去验证的小行动。</p>
         <div class="cta-row" style="justify-content:center">
           <a href="quiz.html" class="btn btn-primary">开始绘制 →</a>
           <button class="btn btn-ghost" id="tasteBtn2">或者先尝一口</button>
@@ -551,7 +550,6 @@
         <a href="stories.html">案例</a>
         <a href="companion.html">伙伴</a>
         <a href="me.html">我的星图</a>
-        <a href="pricing.html">价格</a>
         <a href="blog.html">博客</a>
         <a href="about.html">关于</a>
         <a href="faq.html">FAQ</a>
@@ -721,6 +719,15 @@
   document.getElementById('closeTaste').addEventListener('click',closeT);
   overlay.addEventListener('click',e=>{if(e.target===overlay)closeT();});
   document.addEventListener('keydown',e=>{if(e.key==='Escape' && overlay.classList.contains('open'))closeT();});
+  function trapTab(ev,ov){
+    if(!ov||!ov.classList.contains('open')||ev.key!=='Tab')return;
+    var f=ov.querySelectorAll('a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])');
+    if(!f.length)return;
+    var first=f[0],last=f[f.length-1],a=document.activeElement;
+    if(ev.shiftKey){if(a===first||!ov.contains(a)){ev.preventDefault();last.focus();}}
+    else{if(a===last||!ov.contains(a)){ev.preventDefault();first.focus();}}
+  }
+  document.addEventListener('keydown',function(e){trapTab(e,overlay);trapTab(e,theoryOverlay);});
   document.querySelectorAll('.opt').forEach(b=>b.addEventListener('click',()=>{
     activate('interest');
     const label=b.dataset.label;
@@ -799,7 +806,7 @@
       bar.innerHTML='<a class="recover-card" href="report.html"><span class="rc-icon">✦</span><span class="rc-text">你已经有星图了'+(ria?' · '+ria:'')+'<br><b>查看我的完整星图报告 →</b></span></a>';
       bar.classList.add('show');
     } else if(progress){
-      const sn=progress.step===1?'第一关':progress.step===2?'第二关':progress.step===3?'第三关':'测评中途';
+      const sn=progress.step===1?'第一关':progress.step===2?'第二关':progress.step===3?'第三关':progress.step===4?'第四关':'测评中途';
       bar.innerHTML='<a class="recover-card" href="quiz.html"><span class="rc-icon">▶</span><span class="rc-text">上次测到'+sn+'，还没完<br><b>继续上次测评 →</b></span></a>';
       bar.classList.add('show');
     }
@@ -819,6 +826,19 @@
   document.addEventListener('click',function(e){if(!links.contains(e.target)&&!toggle.contains(e.target))setOpen(false);});
   document.addEventListener('keydown',function(e){if(e.key==='Escape')setOpen(false);});
 })();
+</script>
+<script>
+/* 兜底：本页主脚本若因异常停摆，.reveal 会永久隐形；1.2s 后仍有大面积可见却没显形，就强制显形 */
+setTimeout(function(){
+  var all=document.querySelectorAll('.reveal');if(!all.length)return;
+  var vh=window.innerHeight,vw=window.innerWidth,stuck=false,i,r,el;
+  for(i=0;i<all.length;i++){el=all[i];r=el.getBoundingClientRect();
+    if(el.classList.contains('in')||r.width<=0||r.height<=0)continue;
+    var ih=Math.min(r.bottom,vh)-Math.max(r.top,0),iw=Math.min(r.right,vw)-Math.max(r.left,0);
+    if(ih>0&&iw>0&&ih/r.height>=.25&&iw/r.width>=.25){stuck=true;break;}}
+  if(!stuck)return;
+  for(i=0;i<all.length;i++)all[i].classList.add('in');
+},1200);
 </script>
 </body>
 </html>

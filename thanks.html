@@ -4,9 +4,11 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>天赋星图 · 收到啦</title>
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="icon" href="logo-mark.svg" type="image/svg+xml">
 <meta name="description" content="你的天赋信号已进星图——你是星图的第一批共创者。" />
 <style>
-  :root{
+  :root{color-scheme:dark;scroll-padding-top:76px;
     --bg:#060912;--ink:#eef2ff;--ink-soft:#9aa6cf;--ink-faint:#7f8bb3;
     --gold:#f3c14b;--gold-soft:#ffe1a0;--sky:#6ea0ff;
     --line:rgba(255,255,255,.08);
@@ -59,14 +61,19 @@
   @media (prefers-reduced-motion: reduce){
     *,*::before,*::after{animation:none!important}
   }
+/* 无障碍：跳转链接 + 统一键盘焦点环 */
+  .skip-link{position:fixed;left:16px;top:-64px;z-index:1000;background:var(--gold);color:#0a0f22;padding:10px 18px;border-radius:12px;font-weight:700;transition:top .2s;box-shadow:0 10px 34px rgba(0,0,0,.45)}
+  .skip-link:focus{top:16px}
+  a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--gold);outline-offset:3px;border-radius:6px}
 </style>
 </head>
 <body>
+  <a class="skip-link" href="#main">跳到主内容</a>
   <div class="sky" aria-hidden="true">
     <div class="neb neb1"></div><div class="neb neb2"></div>
   </div>
 
-  <main class="card" role="status" aria-live="polite">
+  <main class="card" id="main" role="status" aria-live="polite">
     <div class="orb">
       <span class="ring"></span>
       <span class="disc"><svg viewBox="0 0 52 52"><path d="M14 27 l8 8 l16 -18"/></svg></span>
@@ -79,7 +86,7 @@
       <button id="copyWx" class="btn btn-gold" type="button">复制公众号「木焚心」</button>
       <a class="btn btn-ghost" href="https://kumu314.github.io/talentmap/" target="_blank" rel="noopener">回天赋星图首页 ↗</a>
     </div>
-    <div class="foot">天赋星图 · 用 8 分钟，读懂你的天赋信号</div>
+    <div class="foot">天赋星图 · 用 8–12 分钟，读懂你的天赋信号</div>
   </main>
 
   <script>

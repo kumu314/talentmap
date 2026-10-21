@@ -6,13 +6,13 @@
 <title>天赋星图 · 博客 — 关于天赋，我们认真聊</title>
   <link rel="icon" type="image/x-icon" href="favicon.ico">
   <link rel="icon" href="logo-mark.svg" type="image/svg+xml">
-  <meta name="description" content="天赋星图博客：研究笔记、方法工具、真实故事、行动清单。关于兴趣、优势、心流与自我探索，我们认真聊。">
+  <meta name="description" content="天赋星图博客：研究笔记、方法工具、个案讨论、行动清单。关于兴趣、优势、心流与自我探索，我们认真聊。">
 <meta property="og:type" content="website">
 <meta property="og:title" content="天赋星图 · 博客">
-<meta property="og:description" content="关于天赋，我们认真聊。研究笔记、方法工具、真实故事、行动清单。">
+<meta property="og:description" content="关于天赋，我们认真聊。研究笔记、方法工具、个案讨论、行动清单。">
 <meta property="og:image" content="https://kumu314.github.io/talentmap/og-cover.png">
 <style>
-  :root{
+  :root{color-scheme:dark;scroll-padding-top:76px;
     --bg:#060912;--bg-1:#0a0f22;--ink:#eef2ff;--ink-soft:#9aa6cf;--ink-faint:#7f8bb3;
     --gold:#f3c14b;--gold-soft:#ffe1a0;--sky:#6ea0ff;--violet:#a98bff;--mint:#54d8c4;
     --line:rgba(255,255,255,.08);--line-2:rgba(255,255,255,.16);--radius:20px;
@@ -72,7 +72,7 @@
 
   .sec{margin-top:48px}
   .filters{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
-  .fchip{padding:9px 18px;border-radius:999px;cursor:pointer;font-size:14px;font-weight:600;
+  .fchip{font-family:inherit;padding:9px 18px;border-radius:999px;cursor:pointer;font-size:14px;font-weight:600;
     border:1px solid var(--line-2);background:rgba(255,255,255,.03);color:var(--ink-soft);transition:.18s}
   .fchip:hover{border-color:var(--gold);color:var(--gold-soft)}
   .fchip.on{background:linear-gradient(135deg,var(--gold-soft),var(--gold));color:#1c1404;border-color:transparent}
@@ -137,7 +137,7 @@
   .reveal{opacity:0;transform:translateY(18px);transition:.7s ease}
   .reveal.in{opacity:1;transform:none}
   @media (prefers-reduced-motion: reduce){
-    *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}
+    *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important;transition-delay:0s!important;animation-delay:0s!important}
     .star-layer{transform:none!important}
     .reveal{opacity:1;transform:none}
   }
@@ -149,7 +149,7 @@
 
 /* ===== 移动端汉堡菜单 ===== */
 .nav-toggle{display:none;width:40px;height:40px;border:1px solid var(--line);border-radius:10px;background:transparent;cursor:pointer;align-items:center;justify-content:center;flex-direction:column;gap:5px;padding:0;transition:.2s}
-.nav-toggle:hover,.nav-toggle:focus-visible{background:rgba(243,193,75,.12);border-color:var(--gold);outline:none}
+.nav-toggle:hover,.nav-toggle:focus-visible{background:rgba(243,193,75,.12);border-color:var(--gold)}
 .nav-toggle span{display:block;width:18px;height:2px;background:var(--ink);border-radius:1px;transition:.2s}
 .nav-toggle[aria-expanded="true"]{background:rgba(243,193,75,.12);border-color:var(--gold)}
 .nav-toggle[aria-expanded="true"] span:nth-child(1){transform:translateY(7px) rotate(45deg)}
@@ -163,13 +163,13 @@
   header.cm-nav{padding:10px 16px;flex-wrap:nowrap}
   .nav-toggle{display:flex;flex:0 0 auto;margin-left:auto}
   header.nav .btn-primary{display:none !important}
-  .nav-links{display:none;position:fixed;top:64px;left:12px;right:12px;background:rgba(10,15,34,.98);border:1px solid var(--line);border-radius:16px;padding:12px;flex-direction:column;gap:4px;z-index:9999;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);max-height:calc(100vh - 90px);overflow:auto;box-shadow:0 20px 50px rgba(0,0,0,.4)}
+  .nav-links{display:none;position:fixed;top:64px;left:12px;right:12px;background:rgba(10,15,34,.98);border:1px solid var(--line);border-radius:16px;padding:12px;flex-direction:column;gap:4px;z-index:9999;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);max-height:calc(100vh - 90px);max-height:calc(100dvh - 90px);overflow:auto;box-shadow:0 20px 50px rgba(0,0,0,.4)}
   .nav-links.open{display:flex}
   .nav-links a{padding:12px 16px;border-radius:10px;color:var(--ink);text-decoration:none;white-space:nowrap;font-size:14px}
-  .nav-links a:hover,.nav-links a:focus-visible{background:rgba(243,193,75,.12);color:var(--gold);outline:none}
+  .nav-links a:hover,.nav-links a:focus-visible{background:rgba(243,193,75,.12);color:var(--gold)}
   .nav-links a.active{background:rgba(243,193,75,.15);color:var(--gold)}
   .nav-cta-mobile{display:flex;margin-top:6px;padding:12px 16px;border-radius:10px;background:linear-gradient(90deg,var(--gold),var(--sun,#f3a84b));color:#0a0f22;font-weight:700;text-align:center;justify-content:center;align-items:center}
-  .nav-cta-mobile:hover,.nav-cta-mobile:focus-visible{filter:brightness(1.08);outline:none}
+  .nav-cta-mobile:hover,.nav-cta-mobile:focus-visible{filter:brightness(1.08)}
 }
 @media (min-width:769px){
   .nav-toggle,.nav-cta-mobile{display:none !important}
@@ -201,7 +201,6 @@
         <a href="stories.html">案例</a>
         <a href="companion.html">伙伴</a>
         <a href="me.html">我的星图</a>
-        <a href="pricing.html">价格</a>
         <a href="blog.html" class="active">博客</a>
         <a href="about.html">关于</a>
         <a href="faq.html">FAQ</a>
@@ -220,13 +219,13 @@
       <div class="p-hero reveal">
         <span class="badge">✦ 天赋星图博客</span>
         <h1>关于天赋，我们<span class="hl">认真聊</span></h1>
-        <p>不灌鸡汤，不卖焦虑。研究笔记、方法工具、真实故事、行动清单——把「发现自己」这件大事，拆成你能用上的小事。</p>
+        <p>不灌鸡汤，不卖焦虑。研究笔记、方法工具、个案讨论、行动清单——把「发现自己」这件大事，拆成你能用上的小事。</p>
         <div class="filters reveal" id="filters" style="margin-top:26px">
-          <div class="fchip on" data-c="all">全部</div>
-          <div class="fchip" data-c="research">研究笔记</div>
-          <div class="fchip" data-c="tool">方法工具</div>
-          <div class="fchip" data-c="story">真实故事</div>
-          <div class="fchip" data-c="action">行动清单</div>
+          <button type="button" aria-pressed="true" class="fchip on" data-c="all">全部</button>
+          <button type="button" aria-pressed="false" class="fchip" data-c="research">研究笔记</button>
+          <button type="button" aria-pressed="false" class="fchip" data-c="tool">方法工具</button>
+          <button type="button" aria-pressed="false" class="fchip" data-c="story">个案讨论</button>
+          <button type="button" aria-pressed="false" class="fchip" data-c="action">行动清单</button>
         </div>
       </div>
 
@@ -237,8 +236,8 @@
             <span class="ftag">编辑精选 · 研究笔记</span>
             <h3>为什么做自己擅长的事，是最被低估的翻身策略</h3>
             <div class="meta">小羽 · 8 分钟阅读</div>
-            <p class="ex">我们总被教导「补短板」，但心理学里一条被反复验证的结论是：长期回报，更多来自你把已有的优势放到对的位置。这篇文章把 VIA 优势理论与真实案例串起来，告诉你「擅长」为什么值得被认真对待。</p>
-            <a class="btn btn-primary fbtn" href="blog.html#post-feature">读这篇 →</a>
+            <p class="ex">我们总被教导「补短板」，但心理学里一条被反复验证的结论是：长期回报，更多来自你把已有的优势放到对的位置。这篇文章把 VIA 优势理论与研究线索串起来，告诉你「擅长」为什么值得被认真对待。</p>
+            <a class="btn btn-primary fbtn" href="#postList">全部话题 →</a>
           </div>
           <div class="fvis" id="fvis" aria-hidden="true"></div>
         </div>
@@ -264,13 +263,13 @@
       <!-- CTA -->
       <div class="cta reveal">
         <h3>读得不过瘾？先画一张自己的星图</h3>
-        <p>文章是别人的思考，星图是你自己的线索。15 分钟，看看你「忘记时间」的时刻藏着什么。</p>
+        <p>文章是别人的思考，星图是你自己的线索。8–12 分钟，看看你「忘记时间」的时刻藏着什么。</p>
         <a class="btn btn-primary" href="quiz.html">免费开始我的测评</a>
       </div>
 
       <footer class="foot">
         <div class="fl">
-          <a href="index.html">首页</a>·<a href="quiz.html">测评</a>·<a href="report.html">报告</a>·<a href="action.html">行动</a>·<a href="stories.html">案例</a>·<a href="companion.html">伙伴</a>·<a href="me.html">我的星图</a>·<a href="pricing.html">价格</a>·<a href="blog.html">博客</a>·<a href="about.html">关于</a>·<a href="faq.html">FAQ</a>·<a href="contact.html">联系</a>
+          <a href="index.html">首页</a>·<a href="quiz.html">测评</a>·<a href="report.html">报告</a>·<a href="action.html">行动</a>·<a href="stories.html">案例</a>·<a href="companion.html">伙伴</a>·<a href="me.html">我的星图</a>·<a href="blog.html">博客</a>·<a href="about.html">关于</a>·<a href="faq.html">FAQ</a>·<a href="contact.html">联系</a>
         </div>
         <div class="slogan">天赋星图 · 在共产主义尚未到来的时期，把生命力放大到它应该在的水平</div>
       </footer>
@@ -279,18 +278,18 @@
 
 <script>
 /* ===== 文章数据（与 Ardot 博客页一致；新增文章直接往 POSTS 里加一项） =====
-   cat: research(研究笔记·sky) / tool(方法工具·mint) / story(真实故事·violet) / action(行动清单·gold) */
+   cat: research(研究笔记·sky) / tool(方法工具·mint) / story(个案讨论·violet) / action(行动清单·gold) */
 const POSTS = [
   {id:'p1', cat:'research', tag:'研究笔记', title:'六种兴趣代码，到底在说什么', min:6, ex:'RIASEC 不是六个标签，而是一张帮你定位「在哪类事里更自在」的坐标。用最直白的话讲清 R/I/A/S/E/C 各自意味着什么。'},
   {id:'p2', cat:'tool', tag:'方法工具', title:'你的「缺点」，可能是没用对的优势', min:5, ex:'VIA 24 项优势换个角度就是 24 种「用过头会翻车」的方式。教你把刺眼的小毛病，翻译成可以重新摆放的天赋。'},
   {id:'p3', cat:'tool', tag:'方法工具', title:'怎么知道自己进入了心流', min:7, ex:'心流不是「很专注」那么简单。三个可观察的信号 + 一个随身记录法，让你不再靠感觉，而是靠线索认出它。'},
   {id:'p4', cat:'research', tag:'研究笔记', title:'兴趣 × 优势 × 世界需要：四圈交集才是天赋区', min:8, ex:'IKIGAI 的四圈模型为什么比「做热爱的事」更诚实？我们把它和三层漏斗叠在一起，讲清楚「天赋区」的边界。'},
   {id:'p5', cat:'action', tag:'行动清单', title:'改变真的需要 21 天吗', min:6, ex:'21 天是个好记的整数，但不是魔法。一份可执行的微实验清单，帮你把「想改变」变成「在改变」。'},
-  {id:'p6', cat:'story', tag:'真实故事', title:'辞职去做喜欢的事，是勇气还是冲动', min:9, ex:'案例墙里一个真实的转身：他不是突然勇敢，而是先用 21 天日记确认了「忘记时间」的时刻真的存在。'}
+  {id:'p6', cat:'story', tag:'个案讨论', title:'辞职去做喜欢的事，是勇气还是冲动', min:9, ex:'先别急着递辞呈。用 21 天日记确认「忘记时间」的时刻真的存在，再谈裸奔不迟。'}
 ];
 
 let cat='all';
-const CATNAME={research:'研究笔记',tool:'方法工具',story:'真实故事',action:'行动清单'};
+const CATNAME={research:'研究笔记',tool:'方法工具',story:'个案讨论',action:'行动清单'};
 function esc(s){return String(s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));}
 
 function render(){
@@ -304,7 +303,7 @@ function render(){
       <div class="meta">小羽 · ${p.min} 分钟阅读</div>
     </a>`).join('');
   document.getElementById('noResult').classList.toggle('show', items.length===0);
-  document.querySelectorAll('#filters .fchip').forEach(c=>c.classList.toggle('on', c.dataset.c===cat));
+  document.querySelectorAll('#filters .fchip').forEach(c=>{const on=(c.dataset.c===cat);c.classList.toggle('on',on);c.setAttribute('aria-pressed',on?'true':'false');});
 }
 
 document.getElementById('filters').querySelectorAll('.fchip').forEach(c=>{
@@ -390,6 +389,19 @@ render();
   document.addEventListener('click',function(e){if(!links.contains(e.target)&&!toggle.contains(e.target))setOpen(false);});
   document.addEventListener('keydown',function(e){if(e.key==='Escape')setOpen(false);});
 })();
+</script>
+<script>
+/* 兜底：本页主脚本若因异常停摆，.reveal 会永久隐形；1.2s 后仍有大面积可见却没显形，就强制显形 */
+setTimeout(function(){
+  var all=document.querySelectorAll('.reveal');if(!all.length)return;
+  var vh=window.innerHeight,vw=window.innerWidth,stuck=false,i,r,el;
+  for(i=0;i<all.length;i++){el=all[i];r=el.getBoundingClientRect();
+    if(el.classList.contains('in')||r.width<=0||r.height<=0)continue;
+    var ih=Math.min(r.bottom,vh)-Math.max(r.top,0),iw=Math.min(r.right,vw)-Math.max(r.left,0);
+    if(ih>0&&iw>0&&ih/r.height>=.25&&iw/r.width>=.25){stuck=true;break;}}
+  if(!stuck)return;
+  for(i=0;i<all.length;i++)all[i].classList.add('in');
+},1200);
 </script>
 </body>
 </html>
