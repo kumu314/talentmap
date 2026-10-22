@@ -12,6 +12,11 @@
     --bg:#060912;--ink:#eef2ff;--ink-soft:#9aa6cf;--ink-faint:#7f8bb3;
     --gold:#f3c14b;--gold-soft:#ffe1a0;--sky:#6ea0ff;
     --line:rgba(255,255,255,.08);
+    --fs-hero:clamp(28.8px, calc(21.467px + 2.2917vw), 50.8px);
+    --fs-page:clamp(33.2px, calc(30.089px + .7978vw), 40.3px);
+    --fs-sec:clamp(27.6px, calc(25.672px + .4944vw), 32px);
+    --fs-mini:clamp(23px, calc(21.948px + .2697vw), 25.4px);
+    font-synthesis-weight:none;
   }
   *{box-sizing:border-box;margin:0;padding:0}
   html,body{height:100%}
@@ -43,7 +48,7 @@
     box-shadow:0 0 26px rgba(243,193,75,.6);display:flex;align-items:center;justify-content:center}
   .orb svg{width:42px;height:42px}
   .orb svg path{stroke:#1c1404;stroke-width:6;fill:none;stroke-linecap:round;stroke-linejoin:round}
-  h1{font-size:23px;font-weight:800;margin-bottom:12px}
+  h1{font-size:var(--fs-mini);font-weight:700;margin-bottom:12px}
   h1 .hl{font-family:"Songti SC","STSong",serif;font-style:italic;
     background:linear-gradient(120deg,var(--gold-soft),var(--gold) 55%,#a98bff);
     -webkit-background-clip:text;background-clip:text;color:transparent}

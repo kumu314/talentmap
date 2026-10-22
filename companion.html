@@ -26,6 +26,11 @@
     --line-2:rgba(255,255,255,.16);
     --radius:18px;
     --serif:"Songti SC","STSong","Noto Serif SC",Georgia,serif;
+    --fs-hero:clamp(28.8px, calc(21.467px + 2.2917vw), 50.8px);
+    --fs-page:clamp(33.2px, calc(30.089px + .7978vw), 40.3px);
+    --fs-sec:clamp(27.6px, calc(25.672px + .4944vw), 32px);
+    --fs-mini:clamp(23px, calc(21.948px + .2697vw), 25.4px);
+    font-synthesis-weight:none;
   }
   *{box-sizing:border-box;margin:0;padding:0}
   html,body{height:100%}
@@ -80,7 +85,7 @@
   .cm-wrap>*{flex-shrink:0}
 
   .cm-head{text-align:center;padding:8px 0 14px}
-  .cm-head h1{font-size:21px;font-weight:800}
+  .cm-head h1{font-size:var(--fs-mini);font-weight:700}
   .cm-head h1 .hl{font-family:var(--serif);font-style:italic;background:linear-gradient(120deg,var(--gold-soft),var(--gold) 55%,var(--violet));
     -webkit-background-clip:text;background-clip:text;color:transparent}
   .cm-head p{font-size:13px;color:var(--ink-faint);margin-top:4px}
@@ -140,7 +145,7 @@
   .survey-privacy{font-size:11.5px;color:var(--ink-faint);margin:2px 14px 10px;}
   /* 常驻问卷入口（提升可发现性） */
   .cm-survey{margin:16px 0 6px;}
-  .cm-survey-cta{display:block;width:100%;box-sizing:border-box;padding:14px 18px;border:1px solid var(--gold-soft);border-radius:14px;background:linear-gradient(180deg,rgba(243,193,75,.16),rgba(243,193,75,.06));color:var(--gold-soft);font-size:15px;font-weight:600;cursor:pointer;text-align:left;line-height:1.5;}
+  .cm-survey-cta{display:block;width:100%;box-sizing:border-box;padding:14px 18px;border:1px solid var(--gold-soft);border-radius:14px;background:linear-gradient(180deg,rgba(243,193,75,.16),rgba(243,193,75,.06));color:var(--gold-soft);font-size:15px;font-weight:700;cursor:pointer;text-align:left;line-height:1.5;}
   .cm-survey-cta:hover{background:linear-gradient(180deg,rgba(243,193,75,.26),rgba(243,193,75,.12));}
   .cm-survey-cta .sub{display:block;font-size:12.5px;font-weight:400;color:var(--ink-faint);margin-top:3px;}
   .cm-survey-body{margin-top:12px;}

@@ -17,6 +17,11 @@
     --gold:#f3c14b;--gold-soft:#ffe1a0;--sky:#6ea0ff;--violet:#a98bff;--mint:#54d8c4;
     --line:rgba(255,255,255,.08);--line-2:rgba(255,255,255,.16);--radius:20px;
     --maxw:860px;--serif:"Songti SC","STSong","Noto Serif SC",Georgia,serif;
+    --fs-hero:clamp(28.8px, calc(21.467px + 2.2917vw), 50.8px);
+    --fs-page:clamp(33.2px, calc(30.089px + .7978vw), 40.3px);
+    --fs-sec:clamp(27.6px, calc(25.672px + .4944vw), 32px);
+    --fs-mini:clamp(23px, calc(21.948px + .2697vw), 25.4px);
+    font-synthesis-weight:none;
   }
   *{box-sizing:border-box;margin:0;padding:0}
   html{scroll-behavior:smooth}
@@ -74,14 +79,14 @@
   .st{padding:108px 0 80px;min-height:100vh}
   .s-hero{text-align:center;margin-bottom:14px}
   .s-hero .s-no{font-family:var(--serif);font-style:italic;font-size:15px;color:var(--gold-soft);letter-spacing:2px;margin-bottom:12px}
-  .s-hero h1{font-size:clamp(26px,3.6vw,40px);font-weight:800;line-height:1.3}
-  .s-hero h1 .hl{font-family:var(--serif);font-style:italic;font-weight:600;
+  .s-hero h1{font-size:var(--fs-page);font-weight:700;line-height:1.3}
+  .s-hero h1 .hl{font-family:var(--serif);font-style:italic;font-weight:700;
     background:linear-gradient(120deg,var(--gold-soft),var(--gold) 55%,var(--mint));-webkit-background-clip:text;background-clip:text;color:transparent}
   .s-hero p{color:var(--ink-soft);margin:14px auto 0;font-size:15px;max-width:560px}
   .s-note{text-align:center;color:var(--ink-faint);font-size:13px;margin:18px auto 26px;max-width:560px;line-height:1.7}
 
   .filters{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:26px}
-  .fchip{font-family:inherit;padding:9px 18px;border-radius:999px;cursor:pointer;font-size:14px;font-weight:600;
+  .fchip{font-family:inherit;padding:9px 18px;border-radius:999px;cursor:pointer;font-size:14px;font-weight:700;
     border:1px solid rgba(255,255,255,.34);background:rgba(255,255,255,.03);color:var(--ink-soft);transition:.18s}
   .fchip:hover{border-color:var(--gold);color:var(--gold-soft)}
   .fchip.on{background:linear-gradient(135deg,var(--gold-soft),var(--gold));color:#1c1404;border-color:transparent}
@@ -92,12 +97,12 @@
   .story:hover{transform:translateY(-3px);border-color:var(--line-2)}
   .story::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--c)}
   .story .smeta{display:flex;align-items:center;gap:10px;margin-bottom:10px}
-  .story .badge{padding:3px 11px;border-radius:999px;font-size:12px;font-weight:600}
+  .story .badge{padding:3px 11px;border-radius:999px;font-size:12px;font-weight:700}
   .story .badge.ria{background:color-mix(in srgb,var(--sky) 16%,transparent);color:var(--sky)}
   .story .badge.via{background:color-mix(in srgb,var(--violet) 16%,transparent);color:var(--violet)}
   .story .badge.flow{background:color-mix(in srgb,var(--mint) 16%,transparent);color:var(--mint)}
   .story .who{font-size:13px;color:var(--ink-faint)}
-  .story h3{font-size:18px;font-weight:800;margin-bottom:10px;line-height:1.5}
+  .story h3{font-size:18px;font-weight:700;margin-bottom:10px;line-height:1.5}
   .story .body{font-size:14.5px;color:var(--ink-soft);line-height:1.7}
   .story .clue{font-size:12.5px;color:var(--ink-faint);margin-top:14px;padding-top:12px;border-top:1px solid var(--line)}
   .story .clue b{color:var(--gold-soft)}
@@ -107,7 +112,7 @@
   /* 提交卡片（D1） */
   .card{border:1px solid var(--line-2);border-radius:var(--radius);padding:26px 26px;margin:26px 0;
     background:linear-gradient(180deg,rgba(12,18,40,.5),rgba(9,14,32,.3))}
-  .card h3{font-size:18px;font-weight:800;margin-bottom:4px}
+  .card h3{font-size:18px;font-weight:700;margin-bottom:4px}
   .card .csub{font-size:13px;color:var(--ink-soft);margin-bottom:18px}
   label.fld{display:block;font-size:13.5px;color:var(--ink-soft);margin:16px 0 8px}
   textarea,input[type=text]{width:100%;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.34);border-radius:12px;
@@ -121,7 +126,7 @@
   .lchip .lv{display:block;font-size:13px;margin-top:3px;color:var(--ink-soft)}
   .lchip[data-k=ria]{--c:var(--sky)} .lchip[data-k=via]{--c:var(--violet)} .lchip[data-k=flow]{--c:var(--mint)}
   .lchip:hover{border-color:var(--c)}
-  .lchip.on{border-color:var(--c);background:color-mix(in srgb,var(--c) 14%,transparent);color:var(--ink);font-weight:600}
+  .lchip.on{border-color:var(--c);background:color-mix(in srgb,var(--c) 14%,transparent);color:var(--ink);font-weight:700}
   .form-actions{display:flex;gap:12px;margin-top:22px;flex-wrap:wrap}
   .sub-ok{display:none;color:var(--mint);font-size:13.5px;margin-top:14px;line-height:1.7}
   .sub-err{display:none;color:#ffb4a6;font-size:13.5px;margin-top:14px;line-height:1.7}
@@ -130,10 +135,10 @@
 
   .cta{border:1px solid var(--line-2);border-radius:var(--radius);padding:30px 28px;text-align:center;margin-top:30px;
     background:linear-gradient(180deg,rgba(12,18,40,.5),rgba(9,14,32,.3))}
-  .cta h3{font-size:19px;font-weight:800;margin-bottom:10px}
+  .cta h3{font-size:19px;font-weight:700;margin-bottom:10px}
   .cta p{color:var(--ink-soft);font-size:14px;margin-bottom:20px;max-width:520px;margin-left:auto;margin-right:auto}
   .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 26px;border-radius:999px;
-    font-size:15px;font-weight:600;border:1px solid transparent;cursor:pointer;transition:.2s;font-family:inherit;text-decoration:none;white-space:nowrap}
+    font-size:15px;font-weight:700;border:1px solid transparent;cursor:pointer;transition:.2s;font-family:inherit;text-decoration:none;white-space:nowrap}
   .btn-primary{color:#1c1404;background:linear-gradient(135deg,var(--gold-soft),var(--gold));box-shadow:0 8px 30px rgba(243,193,75,.26)}
   .btn-primary:hover{transform:translateY(-2px);box-shadow:0 12px 38px rgba(243,193,75,.4)}
   .btn-ghost{color:var(--ink);border-color:rgba(255,255,255,.34);background:rgba(255,255,255,.04);padding:11px 20px;font-size:14px}
