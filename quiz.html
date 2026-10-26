@@ -503,6 +503,7 @@ let past=[];
 let idx=0;            // 当前题序号（仅统计带 gate 的题目）
 let currentGate=0;
 let recallDone=false;
+let T0=0;             // 本次停留起点，用于 quiz_complete 的 seconds
 let history=[];       // 答题历史，用于回退 [{gate,qkey?,deltas:{k:delta},prevNote?}]
 let recallHistory=[]; // A2引导式回忆步骤历史，用于回退
 
@@ -571,7 +572,7 @@ function renderRecall(){
         <button class="btn btn-primary" id="startRecall">开始回想 →</button>
       </div>
     </div>`;
-  document.getElementById('startRecall').onclick=renderRecallStep;
+  document.getElementById('startRecall').onclick=()=>{ T0=Date.now(); if(window.tmTrack) tmTrack('recall_start'); renderRecallStep(); };
 }
 function renderRecallStep(){
   saveProgress('recall-step');
@@ -660,6 +661,7 @@ function finishRecallStep(){
   if(recallStepIdx>=RECALL_ITEMS.length){
     past = recallNotes.filter(Boolean);
     recallDone=true;
+    if(window.tmTrack) tmTrack('recall_done', {notes:past.length});
     renderGate(1);
   } else {
     recallStepKey='time';
@@ -692,7 +694,7 @@ function renderGate(g){
       <button class="btn btn-primary" id="startGate">开始这一关 →</button>
     </div>`;
   plabel.textContent=`第 ${g} / 4 关`;
-  document.getElementById('startGate').onclick=()=>renderQuestion();
+  document.getElementById('startGate').onclick=()=>{ if(!T0)T0=Date.now(); if(window.tmTrack) tmTrack('gate_start',{gate:g}); renderQuestion(); };
   saveProgress('gate');
 }
 
@@ -707,6 +709,7 @@ function updateProgress(){
 
 function renderQuestion(){
   const item=QUIZ[idx];
+  if(item.gate!==currentGate && window.tmTrack) tmTrack('gate_start',{gate:item.gate}); // 2–4 关是跨关自动进入，没有中间按钮
   currentGate=item.gate;
   const c = item.gate===1?'var(--sky)':item.gate===2?'var(--violet)':item.gate===3?'var(--mint)':'var(--gold)';
   const optsHtml=item.opts.map((o,i)=>`
@@ -822,7 +825,7 @@ function renderFeedback(g){
   }
   plabel.textContent=`第 ${g} 关 · 已完成`;
   setBar(QUIZ.filter(q=>q.gate<=g).length/total*100);
-  document.getElementById('nextFromFeedback').onclick=()=>renderQuestion();
+  document.getElementById('nextFromFeedback').onclick=()=>{ if(window.tmTrack) tmTrack('gate_done',{gate:g}); renderQuestion(); };
   saveProgress('feedback');
 }
 
@@ -875,6 +878,7 @@ function starMapSVG(ria, via, flow){
 }
 
 function renderResult(){
+  if(window.tmTrack) tmTrack('gate_done',{gate:4}); // 第 4 关没有火候反馈页，答完即通过
   setBar(100);
   plabel.textContent='星图已绘制';
 
@@ -939,7 +943,7 @@ function renderResult(){
     trail:JSON.parse(JSON.stringify(history))
   };
   try{ localStorage.setItem('talentmap_result', JSON.stringify(payload)); }catch(e){}
-  if(window.tmTrack) tmTrack('quiz_complete'); // Umami 漏斗：完成测评
+  if(window.tmTrack) tmTrack('quiz_complete', {seconds:T0?Math.round((Date.now()-T0)/1000):null, recall:recallDone?1:0}); // 漏斗：完成测评
   // ② 多次测评对比：把本次结果追加进历史（最多留 6 张）
   try{
     let h=[]; try{ h=JSON.parse(localStorage.getItem('talentmap_history'))||[]; }catch(e){}
@@ -1013,6 +1017,8 @@ function showResumeBanner(s){
       <div class="gnote" style="margin-top:18px">选「重新测一次」会清空这次进度，从第一关开始。</div>
     </div>`;
   document.getElementById('resumeBtn').onclick=()=>{
+    if(window.tmTrack) tmTrack('quiz_resume', {phase:s.phase||''});
+    T0=Date.now();
     restoreProgress(s);
     if(s.phase==='recall-step') renderRecallStep();
     else if(s.phase==='gate') renderGate(currentGate);
@@ -1021,7 +1027,7 @@ function showResumeBanner(s){
     else renderRecall();
     window.scrollTo(0,0);
   };
-  document.getElementById('restartBtn').onclick=()=>{ clearProgress(); renderRecall(); window.scrollTo(0,0); };
+  document.getElementById('restartBtn').onclick=()=>{ if(window.tmTrack) tmTrack('quiz_restart'); clearProgress(); renderRecall(); window.scrollTo(0,0); };
 }
 (function boot(){
   const saved=loadProgress();

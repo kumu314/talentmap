@@ -514,6 +514,7 @@ function renderLogs(){
   }).join('');
   box.querySelectorAll('.del').forEach(d=>d.onclick=()=>{
     entries=entries.filter(x=>x.date!==d.dataset.date);
+    if(window.tmTrack) tmTrack('diary_delete');
     save();renderAll();toast('已划掉这条');
   });
 }
@@ -545,8 +546,11 @@ function renderExp(){
   box.querySelectorAll('.exp-item').forEach(el=>el.onclick=()=>{
     let d=[]; try{d=JSON.parse(localStorage.getItem(EXP_KEY))||[];}catch(e){}
     const i=+el.dataset.i;
-    if(d.includes(i)) d=d.filter(x=>x!==i); else d.push(i);
-    localStorage.setItem(EXP_KEY,JSON.stringify(d)); renderExp();
+    const wasDone=d.includes(i);
+    if(wasDone) d=d.filter(x=>x!==i); else d.push(i);
+    localStorage.setItem(EXP_KEY,JSON.stringify(d));
+    if(window.tmTrack) tmTrack(wasDone?'exp_undo':'exp_done',{done:d.length});
+    renderExp();
   });
   const n=done.length;
   document.getElementById('expProg').textContent=`已完成 ${n} / 7 · 做完 3 件，你对自己的判断会比现在清楚很多。`;
@@ -624,7 +628,7 @@ function renderWeek(){
   const plain=insight.replace(/<[^>]+>/g,'');
   document.getElementById('wkCopy').onclick=async()=>{
     const txt='这一周，你的心流长这样（天赋星图）\n记录 '+days+' 天 · 平均强度 '+starTxt+' · 最常点亮：'+topName+'\n\n'+plain+'\n—— 21 天，把「发现」养成「习惯」。';
-    try{await navigator.clipboard.writeText(txt);toast('本周摘要已复制 ✓');}
+    try{await navigator.clipboard.writeText(txt);if(window.tmTrack) tmTrack('week_copy');toast('本周摘要已复制 ✓');}
     catch(e){toast('复制失败，可用「存为文本」');}
   };
   document.getElementById('wkDl').onclick=()=>{
@@ -633,6 +637,7 @@ function renderWeek(){
     const url=URL.createObjectURL(blob);
     const a=document.createElement('a');a.href=url;a.download='天赋星图-本周心流回顾.txt';
     document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);
+    if(window.tmTrack) tmTrack('week_download');
     toast('已下载本周回顾文本');
   };
 }
@@ -661,7 +666,7 @@ function checkRemind(){
   rmOn.onchange=()=>{
     const r=loadRemind(); r.on=rmOn.checked;
     if(r.on && 'Notification' in window && Notification.permission==='default'){ Notification.requestPermission(); }
-    saveRemind(r); toast(r.on?'已开启每日提醒 ✓':'已关闭提醒');
+    saveRemind(r); if(window.tmTrack) tmTrack('remind_toggle',{on:r.on?1:0}); toast(r.on?'已开启每日提醒 ✓':'已关闭提醒');
   };
   rmTime.onchange=()=>{const r=loadRemind();r.time=rmTime.value;saveRemind(r);toast('提醒时间改为 '+rmTime.value);};
   rmTest.onclick=()=>{
@@ -686,6 +691,7 @@ document.getElementById('saveBtn').onclick=()=>{
   entries.sort((a,b)=>a.date.localeCompare(b.date));
   if(entries.length>21) entries=entries.slice(entries.length-21);
   save();renderAll();
+  if(window.tmTrack) tmTrack('diary_save',{day:entries.length,layer:rec.layer,star:rec.star});
   document.getElementById('fText').value='';document.getElementById('fWho').value='';
   pickStar=3;renderStars();
   toast('今天已点亮 ✦');
@@ -697,7 +703,7 @@ document.getElementById('expBtn').onclick=async()=>{
   const head=`我的 21 天心流日记（天赋星图）\n`;
   const body=entries.map(e=>`${fmt(e.date)} · ${LAYER_META[e.layer].name} · ${'★'.repeat(e.star)}｜${e.text}${e.who?'（'+e.who+'）':''}`).join('\n');
   const txt=head+body+'\n—— 在共产主义尚未到来的时期，把生命力放大到它应该在的水平。';
-  try{await navigator.clipboard.writeText(txt);toast('已复制，去粘贴到你的笔记/朋友圈');}
+  try{await navigator.clipboard.writeText(txt);if(window.tmTrack) tmTrack('diary_copy');toast('已复制，去粘贴到你的笔记/朋友圈');}
   catch(e){toast('复制失败，可手动截图');}
 };
 
@@ -711,6 +717,7 @@ document.getElementById('dlBtn').onclick=()=>{
   a.href=url;a.download='天赋星图-21天日记备份.json';
   document.body.appendChild(a);a.click();a.remove();
   URL.revokeObjectURL(url);
+  if(window.tmTrack) tmTrack('backup_download',{n:entries.length});
   toast('已下载备份文件，新设备导入即可续记');
 };
 
@@ -733,6 +740,7 @@ document.getElementById('impFile').onchange=(e)=>{
       if(entries.length>21) entries=entries.slice(entries.length-21);
       if(obj.exp&&Array.isArray(obj.exp)) localStorage.setItem(EXP_KEY,JSON.stringify(obj.exp));
       save();renderAll();if(obj.exp) renderExp();
+      if(window.tmTrack) tmTrack('backup_import',{added:added});
       toast(`已导入 ${imp.length} 条（新增 ${added}）· 续上你的星图`);
     }catch(err){toast('文件格式不对，换一个试试');}
     e.target.value='';

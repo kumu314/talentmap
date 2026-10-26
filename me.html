@@ -220,6 +220,21 @@
 
       <div id="groups"></div>
 
+      <div class="grp reveal" style="margin-top:22px">
+        <h3>漏斗计数开关</h3>
+        <div class="gsub">本站在这台设备上记「你走到了哪一步」：只有事件名、次数和日期，不存你写的任何内容，也不经过任何服务器。</div>
+        <div class="ditem">
+          <div class="di-main">
+            <div class="di-key">本机漏斗计数</div>
+            <div class="di-desc" id="tkState">读取中…</div>
+          </div>
+          <div class="di-acts">
+            <button class="mini-btn" id="tkToggle" type="button">关闭</button>
+            <button class="mini-btn del" id="tkClear" type="button">清除计数</button>
+          </div>
+        </div>
+      </div>
+
       <p class="me-note reveal">所有数据都保存在你浏览器的 <b>localStorage</b> 里，不经过任何服务器。换设备 / 清缓存会丢失，重要内容请先用上方「导出全部数据」存一份备份。</p>
     </section>
   </div>
@@ -248,6 +263,10 @@ const GROUPS=[
   ]},
   {id:'stat',name:'统计 · 本地归因',sub:'视频来源 UTM 计数（单人本地视角，非全网汇总）',keys:[
     {k:'__utm__',name:'UTM 来源计数',desc:'各视频渠道带来的访问/转化计数',dynamic:true}
+  ]},
+  {id:'funnel',name:'统计 · 本地漏斗与偏好',sub:'「走到哪一步」的事件名计数与埋点开关，不含你填写的任何内容',keys:[
+    {k:'talentmap_funnel',name:'本地漏斗计数',desc:'事件名 + 次数 + 日期，只存这台设备；报告页 ?debug=1 可看明细',link:'report.html?debug=1'},
+    {k:'talentmap_optout',name:'埋点开关（本机）',desc:'设为 1 时本机计数与 Umami 上报一起停；未设置时跟随浏览器「请勿跟踪」',link:''}
   ]}
 ];
 
@@ -324,6 +343,7 @@ function render(){
     const k=b.dataset.del;
     if(confirm('确定删除「'+k+'」吗？\n\n此操作不可撤销，删除后无法恢复（除非你有备份）。')){
       try{localStorage.removeItem(k);}catch(e){}
+      if(window.tmTrack) tmTrack('item_delete');
       toast('已删除 '+k); render();
     }
   });
@@ -331,6 +351,7 @@ function render(){
     const k=b.dataset.export; const raw=safeGet(k); if(raw==null)return;
     let obj; try{obj=JSON.parse(raw);}catch(e){obj=raw;}
     download({type:'talentmap_item',key:k,data:obj,ts:Date.now()}, '天赋星图-'+k+'.json');
+    if(window.tmTrack) tmTrack('item_export');
     toast('已导出 '+k);
   });
 }
@@ -346,6 +367,7 @@ document.getElementById('exportAll').onclick=()=>{
   const all=collectAll();
   if(!Object.keys(all.data).length){toast('当前没有任何数据可导出');return;}
   download(all,'天赋星图-全部数据备份.json');
+  if(window.tmTrack) tmTrack('export_all',{n:Object.keys(all.data).length});
   toast('已导出全部数据 ✓');
 };
 document.getElementById('refreshBtn').onclick=()=>render();
@@ -356,11 +378,42 @@ document.getElementById('clearAll').onclick=()=>{
   if(confirm('确定清空全部本地数据吗？\n\n共 '+n+' 项，包括测评结果、日记、反馈、统计。此操作不可撤销。\n建议先点「导出全部数据」存一份备份。')){
     Object.keys(all.data).forEach(k=>{ if(k!=='__utm__'){try{localStorage.removeItem(k);}catch(e){}} });
     if(all.data.__utm__){ Object.keys(all.data.__utm__).forEach(k=>{try{localStorage.removeItem('talentmap_utm_'+k);}catch(e){}}); }
+    if(window.tmTrack) tmTrack('clear_all');
     toast('已清空全部本地数据'); render();
   }
 };
 
 render();
+
+/* ---- 本机漏斗计数开关（状态由 track.js 的 tmOptOutState / tmSetOptOut 提供） ---- */
+(function initTrackCard(){
+  const btn=document.getElementById('tkToggle'), state=document.getElementById('tkState'), clearBtn=document.getElementById('tkClear');
+  if(!btn||!state||!window.tmOptOutState) return;
+  function paint(){
+    const s=window.tmOptOutState();
+    const f=window.tmFunnel&&window.tmFunnel();
+    const total=f&&f.counts?Object.keys(f.counts).reduce((a,k)=>a+f.counts[k],0):0;
+    state.textContent=(s.blocked?'已关闭：不再记任何漏斗事件':'开着：本机已记 '+total+' 次')
+      +(s.explicit===null?(s.dnt?'（浏览器开了「请勿跟踪」，所以默认不记）':'（没手动设置，跟随浏览器「请勿跟踪」）'):'（本机手动设置，优先于浏览器）')
+      +(s.umami?'；Umami 已配置':'；Umami 未配置（只存这台设备）');
+    btn.textContent=s.blocked?'开启':'关闭';
+    btn.setAttribute('aria-pressed',String(!s.blocked));
+  }
+  btn.onclick=()=>{
+    const wasOn=!window.tmOptOutState().blocked;
+    if(wasOn&&window.tmTrack) tmTrack('tracking_off');
+    const now=window.tmSetOptOut(wasOn);
+    if(!now&&window.tmTrack) tmTrack('tracking_on');
+    paint(); toast(now?'已停止本机计数':'已恢复本机计数'+(window.tmOptOutState().umami?'（Umami 要刷新后才上报）':''));
+  };
+  clearBtn.onclick=()=>{
+    if(confirm('清除本机漏斗计数吗？\n\n只删「走到哪一步」的计数，测评结果、日记、投稿都不受影响。')){
+      if(window.tmClearFunnel) window.tmClearFunnel();
+      toast('已清除漏斗计数'); render();
+    }
+  };
+  paint();
+})();
 
 // 进入视口淡入
 const io=new IntersectionObserver((es)=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}}),{threshold:.1});

@@ -717,7 +717,7 @@
   const overlay=document.getElementById('overlay');
   const fb=document.getElementById('tasteFeedback');
   let tasteLastFocus=null;
-  const openT=()=>{tasteLastFocus=document.activeElement;overlay.classList.add('open');fb.classList.remove('show');document.body.style.overflow='hidden';const c=document.getElementById('closeTaste');if(c)c.focus();};
+  const openT=()=>{tasteLastFocus=document.activeElement;overlay.classList.add('open');fb.classList.remove('show');document.body.style.overflow='hidden';const c=document.getElementById('closeTaste');if(c)c.focus();if(window.tmTrack)tmTrack('taste_open');};
   const closeT=()=>{overlay.classList.remove('open');document.body.style.overflow='';if(tasteLastFocus&&tasteLastFocus.focus)tasteLastFocus.focus();};
   document.getElementById('tasteBtn').addEventListener('click',openT);
   document.getElementById('tasteBtn2').addEventListener('click',openT);
@@ -738,6 +738,7 @@
     const label=b.dataset.label;
     fb.innerHTML='你的手，先伸向了 <b>'+label+'</b>。<br>这只是冰山一角——完整测评会把它画成一张属于你的星图。';
     fb.classList.add('show');
+    if(window.tmTrack) tmTrack('taste_pick', {ria:label});
     document.querySelector('.constellation').scrollIntoView({behavior:'smooth',block:'center'});
   }));
 

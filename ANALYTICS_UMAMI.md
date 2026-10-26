@@ -20,10 +20,9 @@
 
 | 文件 | 改动 |
 |---|---|
-| `track.js`（新增） | Umami 接入层。读 `UMAMI_CFG`，注入官方脚本，暴露 `tmTrack()`。WEBSITE_ID 空 → no-op。 |
-| 全部 7 页 `<head>` | 引入 `<script src="track.js"></script>`（非 defer，保证 `tmTrack` 早于页面内联脚本定义）。 |
-| `quiz.html` | 出结果时 `tmTrack('quiz_complete')`——关键转化：完成测评。 |
-| `report.html` | 报告渲染时 `tmTrack('report_view')`——次级转化：查看报告。 |
+| `track.js` | 埋点层。读 `UMAMI_CFG`：**始终写本机漏斗计数**（`talentmap_funnel`，只有事件名/次数/日期）；配了 `WEBSITE_ID` 才注入官方脚本并上报同名事件。DNT 或 me.html 开关可整体关掉两条通道。 |
+| 12 页 `<head>` | 引入 `<script src="track.js"></script>`（非 defer，保证 `tmTrack` 早于页面内联脚本定义）。`thanks.html` 无交互，未引入。 |
+| 全站 | 漏斗事件已按「测→报告→行动→传播」补全，见文末「八、漏斗事件全表」。 |
 
 页面浏览量由 Umami `data-auto-track` 自动记录（落地页/测评页/报告页/其他页都算）。
 漏斗事件自动带上 `from` 维度（从 URL `?from=` 读取），即使后台没开 Query Parameters 也能按来源分组。
@@ -102,3 +101,54 @@ Umami 后台 → 你的 Website → **Settings → Query Parameters**，加入 `
 - [ ] Umami 后台实时看板出现该次浏览，且带 `from=bili01`。
 - [ ] 走完测评 → 报告，后台 Events 出现 `quiz_complete` / `report_view` 且 `from=bili01`。
 - [ ] 换个来源（如 `?from=xhs01`）重复，确认能分开统计。
+
+---
+
+## 八、漏斗事件全表（2026-10-26 补全）
+
+命名约定：`对象_动作`，全小写下划线；props 只放维度，不放内容（绝不上传用户写的文字、星图标签值）。
+
+共 43 个事件名、45 处 `tmTrack` 调用，分布在 8 个页面：index 2 / landing 1 / quiz 9 / report 10 / action 9 / stories 2 / companion 6 / me 6。其中 `exp_done` 与 `exp_undo` 共用一处三元调用；`gate_start`、`gate_done`、`friend_import` 各有两处调用点（`gate_start`：按钮进入 + 跨关自动进入；`gate_done`：逐关完成 + 第四关收尾；`friend_import`：解码成功与失败两条分支），所以 45 处调用落在 43 个不重名事件上。
+
+| 页 | 事件 | 触发点 | props |
+|---|---|---|---|
+| index | `taste_open` | 点开「一分钟尝一口」 | — |
+| index | `taste_pick` | 点了某个兴趣方向 | ria |
+| landing | `landing_cta` | 点任意「开始测」CTA | —（from 自动带） |
+| quiz | `recall_start` | 第 0 关点「开始回想」 | — |
+| quiz | `recall_done` | 三件小事回想完 | notes |
+| quiz | `gate_start` | 点「开始这一关」 | gate |
+| quiz | `gate_done` | 点「继续下一关」（1–3 关）；第 4 关答完即记 | gate |
+| quiz | `quiz_resume` / `quiz_restart` | 断点续测里选继续 / 重测 | phase / — |
+| quiz | `quiz_complete` | 出结果 | seconds, recall |
+| report | `report_view` | 报告页加载 | shared, has_result |
+| report | `share_card_open` / `share_img_dl` | 打开分享卡 / 保存图片 | — / size |
+| report | `copy_moment` / `copy_link` | 复制朋友圈文案 / 星图码链接 | — |
+| report | `friend_import` | 粘贴好友星图码 | ok（1 成功 / 0 解析失败） |
+| report | `mirror_save` | 他人镜子记下三个词 | total |
+| report | `gal_open` / `hist_clean` | 点往期星图卡片 / 清空对比历史 | — |
+| action | `diary_save` / `diary_delete` | 记下今天那一下 / 划掉一条 | day, layer, star / — |
+| action | `exp_done` / `exp_undo` | 勾上 / 取消 7 天微实验 | done（当前完成数） |
+| action | `week_copy` / `week_download` / `diary_copy` | 周摘要复制 / 存文本 / 复制日记 | — |
+| action | `backup_download` / `backup_import` | 下载 JSON 备份 / 导入 | n / added |
+| action | `remind_toggle` | 每日提醒开关 | on |
+| stories | `story_seed_save` / `story_export` | 保存故事种子 / 导出 txt | layer / n |
+| companion | `companion_ask` / `companion_preset` | 发一句话 / 点预设按钮 | — / q |
+| companion | `companion_no_data` | 没测评结果就打开伙伴 | — |
+| companion | `feedback_saved` / `copy_feedback` | 反馈存本机 / 复制反馈文本 | — |
+| companion | `survey_open` | 点站外问卷链接（问卷在金数据里提交，本站看不到填没填） | — |
+| me | `export_all` / `item_export` / `item_delete` / `clear_all` | 数据自助操作 | n / — |
+| me | `tracking_on` / `tracking_off` | 拨漏斗计数开关 | — |
+
+**关键读法（起好 Umami 后能直接算出来的东西）：**
+- 第 0 关流失：`recall_start` → `recall_done`；四关流失：`gate_start#n` → `gate_done#n`（本机计数键自带 `#gate2` 这类后缀）。
+- 「测了但没看报告」：`quiz_complete` vs `report_view`；`report_view{has_result:0}` 就是白跑一趟的人。
+- 传播有没有发生：`copy_moment + copy_link + share_img_dl` 除以 `report_view`；`friend_import{ok:0}` 高说明星图码粘贴体验有问题。
+- 行动闭环有没有接上：`report_view` → `diary_save` → `exp_done`；`companion_no_data` 高说明入口把人带到了读不到结果的地方。
+
+**隐私边界（改动后要守住的口径）：**
+- 只要 `WEBSITE_ID` 为空，埋点这层就是**零外部请求**——`companion.html` / `faq.html` / `index.html` / `me.html` 里「不经过任何服务器」的说法继续成立，`talentmap_funnel` 也在 localStorage 里，`me.html` 可看、可关、可清、可导出。（例外与本改动无关：`companion.html` 里那张金数据问卷 iframe 是第三方托管。实测该 iframe 文档自己发出 1 条 `https://www.googletagmanager.com/gtag/js?id=G-FYKFYPNXQS`，发起帧是 `k68wjncs.jsjform.com/f/do4TtQ`，改前（HEAD）与改后完全一致——是金数据在统计它自己的页面，不是本站埋点。除金数据的 4 个主机和这条 gtag 之外，10 个页面全量对拍下来外部主机数为 0。
+  这条 gtag 是慢加载才出现的：等待 3.5 秒时有时抓到、有时抓不到，等待 8 秒时改前/改后各 3 次都稳定抓到 1 条。所以任何「改前没有、改后有」的外联读数，先怀疑等待时长，别当成回归——本机第一版对拍就是这么误报过一次。
+- **一旦填入 `WEBSITE_ID`，上面那四处文案就变成假话**，必须同步改成「本机数据不出设备，但访问与事件计数会上报到你自托管的 Umami」。这是同一个开关带出来的连带义务，不是可选项。
+- 开关优先级：`talentmap_optout`（me.html 手动）> 浏览器 `doNotTrack` / `globalPrivacyControl`。被拦下时 Umami 脚本根本不注入。
+

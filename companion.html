@@ -244,7 +244,7 @@
             <iframe src="https://k68wjncs.jsjform.com/f/do4TtQ" title="天赋星图问卷"></iframe>
             <p class="survey-tip">提交后金数据会显示成功页。想继续聊，微信搜公众号「木焚心」。</p>
             <a class="survey-fb-mini" href="https://k68wjncs.jsjform.com/f/do4TtQ" target="_blank" rel="noopener">打不开？点此在新窗口打开问卷 ↗</a>
-            <p class="survey-privacy">留不留邮箱都行。留了，我们只在星图有大变化时发一次，不广告、不转卖；随时回「退订」即停。这条通道经过金数据和公众号，不是本站服务器。</p>
+            <p class="survey-privacy">留不留邮箱都行。留了，我们只在星图有大变化时发一次，不广告、不转卖；随时回「退订」即停。这条通道经过金数据和公众号，不是本站服务器。问卷那页自己还会加载它自家的统计脚本（实测有一条 Google 的 gtag），统计的是金数据那边的页面访问；本站这一个字节也没往外发。</p>
           </div>
         </div>
       </div>
@@ -491,6 +491,7 @@
       const arr=JSON.parse(localStorage.getItem('talentmap_feedback')||'[]');
       arr.push({t:Date.now(),text,via:'公众号木焚心'});
       localStorage.setItem('talentmap_feedback',JSON.stringify(arr));
+      if(window.tmTrack) tmTrack('feedback_saved');
     }catch(e){}
     const box='<div class="fb-box" id="fbBox">'+esc(text)+'</div>';
     const btn='<button class="copy-fb" id="copyFb" onclick="copyFB()">复制并去公众号「木焚心」发给我</button>';
@@ -503,7 +504,7 @@
     const b=document.getElementById('copyFb');
     if(!t) return;
     const txt=t.innerText;
-    const done=()=>{if(b){b.textContent='已复制 ✓ 去微信搜「木焚心」发我';b.classList.add('done');}};
+    const done=()=>{if(window.tmTrack) tmTrack('copy_feedback');if(b){b.textContent='已复制 ✓ 去微信搜「木焚心」发我';b.classList.add('done');}};
     if(navigator.clipboard&&navigator.clipboard.writeText){
       navigator.clipboard.writeText(txt).then(done).catch(()=>{fallbackCopy(txt,done);});
     } else { fallbackCopy(txt,done); }
@@ -547,6 +548,7 @@
   }
 
   function handlePreset(q){
+    if(window.tmTrack) tmTrack('companion_preset',{q:q});
     const d=data();
     if(!RAW){addMsg('bot',noData());return;}
     if(q==='status') addMsg('bot',ansStatus(d));
@@ -559,6 +561,7 @@
     const text=input.value.trim();
     if(!text) return;
     addMsg('me',esc(text));
+    if(window.tmTrack) tmTrack('companion_ask');
     input.value='';
     input.style.height='auto';
     if(feedbackMode){addMsg('bot',saveFeedback(text));return;}
@@ -581,10 +584,14 @@
   input.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();submit();}});
   input.addEventListener('input',()=>{input.style.height='auto';input.style.height=Math.min(input.scrollHeight,120)+'px';});
 
+  // 问卷在第方表单站点的 iframe 里，提交与否本站永远看不到：只记「点了站外问卷链接」这一个动作
+  document.addEventListener('click',e=>{const a=e.target.closest&&e.target.closest('a[href]');if(a&&a.href&&a.href.indexOf('jsjform.com')>=0&&window.tmTrack)tmTrack('survey_open');});
+
   // 开场
   if(!RAW){
     addMsg('bot','嗨，我是<b>星图伙伴</b>。我专门帮你看懂自己的天赋星图——回答你的现状、执行卡点、还有「这结果好像不太准」的怀疑。');
     addMsg('bot',noData());
+    if(window.tmTrack) tmTrack('companion_no_data');
   }else{
     const d=data();
     addMsg('bot','嗨，我是<b>星图伙伴</b>。我刚读了你的星图——兴趣偏向 <b>'+(riaName(d.ria[0])||'…')+'</b>，优势里 <b>'+(nameOf(d.via[0])||'…')+'</b> 最亮。有什么想聊的？现状、卡点、还是觉得哪不准，都可以直接说。');

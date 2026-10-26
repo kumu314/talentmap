@@ -441,12 +441,25 @@ if(SHARE_PARAM){
     if(nav) nav.insertAdjacentElement('afterend',bar);
     try{const k='talentmap_utm_report_'+SRC_FROM;localStorage.setItem(k,String((parseInt(localStorage.getItem(k)||'0',10)||0)+1));}catch(e){}
   }
-  if(window.tmTrack) tmTrack('report_view'); // Umami 漏斗：查看报告
+  if(window.tmTrack) tmTrack('report_view', {shared:isSharedView?1:0, has_result:RAW?1:0}); // 漏斗：查看报告
   if(new URLSearchParams(location.search).get('debug')==='1'){
     const rows=[];
     for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.indexOf('talentmap_utm_')===0)rows.push(k.replace('talentmap_utm_','')+': '+localStorage.getItem(k));}
+    const parts=['<b>UTM 归因（本地）</b><br>'+(rows.length?rows.join('<br>'):'(暂无数据)')+'<br><span class="hint">完成测评→report 计在看报告；key：talentmap_utm_&lt;from&gt; / _report_&lt;from&gt;</span>'];
+    const fn=window.tmFunnel&&window.tmFunnel();
+    const st=window.tmOptOutState?window.tmOptOutState():null;
+    if(fn&&fn.counts&&Object.keys(fn.counts).length){
+      const ek=Object.keys(fn.counts).sort();
+      const fl=ek.map(k=>k+': '+fn.counts[k]);
+      const dk=Object.keys(fn.days||{}).sort().slice(-7);
+      const dayTxt=dk.map(d=>d+'→'+Object.values(fn.days[d]).reduce((a,b)=>a+b,0));
+      parts.push('<br><b>漏斗事件计数（本机 localStorage，未上传）</b><br>'+(st&&st.blocked?'（计数开关现在是关的，下面是关闭前的留存）<br>':'')+'talentmap_funnel v'+(fn.v||1)+' · 共 '+ek.length+' 种事件<br>'+fl.join('<br>')+'<br><span class="hint">近 7 天：'+(dayTxt.join(' · ')||'无')+'</span>');
+    }else{
+      parts.push('<br><b>漏斗事件计数</b><br>(talentmap_funnel 为空——操作会即时写入本机)');
+    }
+    parts.push('<br><span class="hint">Umami：'+(st?(st.umami?'已配置，同名事件同时上报':'未配置（WEBSITE_ID 为空，只记本机）'):'未知')+(st&&st.dnt?' · 浏览器 DNT 已开':'')+'</span>');
     const dp=document.createElement('div');dp.className='utm-debug';
-    dp.innerHTML='<b>UTM 归因（本地）</b><br>'+(rows.length?rows.join('<br>'):'(暂无数据)')+'<br><span class="hint">完成测评→report 计在看报告；key：talentmap_utm_&lt;from&gt; / _report_&lt;from&gt;</span>';
+    dp.innerHTML=parts.join('');
     document.body.appendChild(dp);
   }
 
@@ -883,7 +896,7 @@ else {
     document.body.style.overflow='';
     if(shareLastFocus && shareLastFocus.focus) shareLastFocus.focus();
   }
-  if(shareImgBtn)shareImgBtn.onclick=()=>{ drawShare(); openShare(); };
+  if(shareImgBtn)shareImgBtn.onclick=()=>{ if(window.tmTrack) tmTrack('share_card_open'); drawShare(); openShare(); };
   if(shareClose)shareClose.onclick=closeShare;
   if(shareOv)shareOv.addEventListener('click',e=>{ if(e.target===shareOv)closeShare(); });
   document.addEventListener('keydown',e=>{ if(e.key==='Escape' && shareOv && shareOv.classList.contains('open')) closeShare(); });
@@ -901,6 +914,7 @@ else {
   if(cleanBtn)cleanBtn.onclick=()=>{
     if(confirm('确定清空「多次对比」历史吗？\n\n只会删除用来对比的往期星图记录，你当前这份报告不受影响。此操作不可撤销。')){
       try{ localStorage.removeItem('talentmap_history'); }catch(e){}
+      if(window.tmTrack) tmTrack('hist_clean');
       toast('已清空历史，正在刷新…');
       setTimeout(()=>location.reload(),300);
     }
@@ -979,7 +993,7 @@ else {
   const shareDl=document.getElementById('shareDl');
   if(shareDl)shareDl.onclick=()=>{
     const c=document.getElementById('shareCanvas'); if(!c)return;
-    try{ const a=document.createElement('a'); a.download='天赋星图-分享卡.png'; a.href=c.toDataURL('image/png'); a.click(); toast('已保存图片 ✓'); }
+    try{ const a=document.createElement('a'); a.download='天赋星图-分享卡.png'; a.href=c.toDataURL('image/png'); a.click(); if(window.tmTrack) tmTrack('share_img_dl',{size:shareSize}); toast('已保存图片 ✓'); }
     catch(e){ toast('保存失败，请长按图片存到相册。'); }
   };
   // 复制朋友圈文案（一键可发，带话题标签，服务视频冷启动截图分享钩子）
@@ -989,7 +1003,7 @@ else {
     const via=(RAW.viaTop||[]).map(([k])=>k).join('/')||'—';
     const flow=(RAW.flowTop||[]).map(([k])=>k).join('/')||'—';
     const txt='刚用「天赋星图」画了我的星图：\n兴趣 '+ria+'｜优势 '+via+'｜心流 '+flow+'\n原来我「忘记时间」的时刻，藏着这样的天赋。\n#天赋星图 #RIASEC #自我探索 #找到热爱';
-    try{ await navigator.clipboard.writeText(txt); toast('已复制朋友圈文案，去粘贴吧 ✓'); }
+    try{ await navigator.clipboard.writeText(txt); if(window.tmTrack) tmTrack('copy_moment'); toast('已复制朋友圈文案，去粘贴吧 ✓'); }
     catch(e){ toast('复制失败，请手动选择。'); }
   };
   // 复制分享链接（结果编码进 URL，朋友打开直接看你的星图）
@@ -1006,7 +1020,7 @@ else {
     try{ encoded=btoa(unescape(encodeURIComponent(JSON.stringify(payload)))); }catch(e){ toast('编码失败，请重试'); return; }
     const base=(location.origin||'https://kumu314.github.io/talentmap')+location.pathname;
     const shareUrl=base+'?d='+encoded;
-    try{ await navigator.clipboard.writeText(shareUrl); toast('已复制分享链接，发给朋友吧 ✓'); }
+    try{ await navigator.clipboard.writeText(shareUrl); if(window.tmTrack) tmTrack('copy_link'); toast('已复制分享链接，发给朋友吧 ✓'); }
     catch(e){ prompt('复制这个链接发给朋友：', shareUrl); }
   };
   // 星图集画廊：点击卡片展示当时详情
@@ -1023,6 +1037,7 @@ else {
       detail.innerHTML='<div class="gd-date">'+dt+' 的星图</div><div class="gd-verdict">'+esc(verdict)+'</div>'+(energy.type?'<div class="gd-energy">能量：'+esc(energy.type)+'</div>':'');
       detail.classList.add('show');
       detail.scrollIntoView({behavior:'smooth',block:'nearest'});
+      if(window.tmTrack) tmTrack('gal_open');
     };
     card.addEventListener('click',handler);
     card.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();handler();}});
@@ -1038,8 +1053,9 @@ else {
       const f = JSON.parse(code);
       const r=(f.r||[]).join('、')||'—', v=(f.v||[]).join('、')||'—', fl=(f.f||[]).join('、')||'—';
       document.getElementById('cmpFriend').innerHTML = `${r}<br/><span style="color:var(--ink-faint)">${v}</span><br/><span style="color:var(--mint)">${fl}</span>`;
+      if(window.tmTrack) tmTrack('friend_import', {ok:1});
       toast('已并排显示好友星图 ✓');
-    }catch(e){ toast('星图码解析失败，检查是否复制完整。'); }
+    }catch(e){ if(window.tmTrack) tmTrack('friend_import', {ok:0}); toast('星图码解析失败，检查是否复制完整。'); }
   };
   // 他人镜子：保存三个词
   const MKEY='talentmap_mirror';
@@ -1055,6 +1071,7 @@ else {
     let arr=[]; try{arr=JSON.parse(localStorage.getItem(MKEY))||[];}catch(e){}
     arr.unshift(v); if(arr.length>12) arr=arr.slice(0,12);
     localStorage.setItem(MKEY,JSON.stringify(arr));
+    if(window.tmTrack) tmTrack('mirror_save', {total:arr.length});
     document.getElementById('mInput').value=''; renderMirror(); toast('已记下这三个词 ✓');
   };
   renderMirror();

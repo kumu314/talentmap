@@ -297,6 +297,9 @@
     if(badge) badge.innerHTML='<span class="play"></span>从'+label+'来的？这里直接画你的星图';
   })();
 
+  // CTA 点击：漏斗第一步（来源由 ?from= 自动带进事件维度，无需在这里重复）
+  document.addEventListener('click',e=>{const a=e.target.closest&&e.target.closest('a[href^="quiz.html"]');if(a&&window.tmTrack)tmTrack('landing_cta');});
+
   const topBar=document.getElementById('top');
   const layers=[...document.querySelectorAll('[data-speed]')];
   function onScroll(){

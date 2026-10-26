@@ -356,6 +356,7 @@ let subLayer='flow';
     render();
     const card=document.getElementById('submitCard');card.scrollIntoView({behavior:'smooth',block:'center'});
     say('已存为你的故事种子 ★ 它会显示在案例墙最前面（只存在这台设备上）。');
+    if(window.tmTrack) tmTrack('story_seed_save',{layer:subLayer});
   };
   const expBtn=document.getElementById('subExport');
   if(expBtn) expBtn.onclick=()=>{
@@ -368,6 +369,7 @@ let subLayer='flow';
       const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='我的天赋星图故事种子.txt'; document.body.appendChild(a); a.click(); a.remove();
       setTimeout(()=>URL.revokeObjectURL(a.href),2000);
       say('已导出 '+arr.length+' 条故事种子为 .txt 文件。可发给运营者人工精选，等投稿通道开放后一键提交。');
+      if(window.tmTrack) tmTrack('story_export',{n:arr.length});
     }catch(e){ fail('导出失败：'+e.message,null); }
   };
 })();
