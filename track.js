@@ -1,7 +1,7 @@
 /* 天赋星图 · 埋点层（零依赖，纯前端）
  * 两条通道，事件名一致：
  *   1) 本地漏斗计数（localStorage: talentmap_funnel）——只记「事件名 + 次数 + 日期」，不记你填写的任何内容，不发任何请求。
- *      WEBSITE_ID 留空时它是唯一通道，漏斗照样能走完整条（在 report.html?debug=1 里读，在 me.html 里关或清）。
+ *      WEBSITE_ID 留空时它是唯一通道，漏斗照样能走完整条：在 me.html 「这台设备走到了哪一步」可读、可复制成摘要带走，原始明细在 report.html?debug=1，开关和清除也在 me.html。
  *   2) Umami（可选）——填好 UMAMI_CFG.WEBSITE_ID 后额外注入官方脚本，把同名事件连同 props 上报到你的实例。
  * 隐私闸门：me.html 的本机开关优先；没手动设置时跟随浏览器 doNotTrack / globalPrivacyControl。
  *   被拦下时两条通道都停，Umami 脚本也不注入。本机计数每调用重查开关（拨一下就停）；Umami 脚本注入与否在加载时决定，改了开关要刷新页面才接上。
@@ -91,6 +91,7 @@ window.UMAMI_CFG = window.UMAMI_CFG || {
     document.head.appendChild(s);
   }
 
+  // 返回值只表示「有没有走到 Umami」；本机计数写没写成，看 tmFunnel() 的 counts。
   window.tmTrack = function (name, props) {
     if (isBlocked()) return false;
     props = props || {};

@@ -109,7 +109,7 @@ Umami 后台 → 你的 Website → **Settings → Query Parameters**，加入 `
 
 命名约定：`对象_动作`，全小写下划线；props 只放维度，不放内容（绝不上传用户写的文字、星图标签值）。
 
-共 46 个事件名、53 处 `tmTrack` 调用，分布在 8 个页面：index 2 / landing 1 / quiz 9 / report 10 / action 11 / stories 2 / companion 6 / me 12。其中 `exp_done` 与 `exp_undo` 共用一处三元调用；5 个名字各有多个调用点（`backup_failed` 5 处：本机读回/写入/生成码三处失败分支 + 行动页两处；`gate_start` 2 处：按钮进入 + 跨关自动进入；`gate_done` 2 处：逐关完成 + 第四关收尾；`friend_import` 2 处：解码成功与失败；`backup_import` 2 处：两个页面各一处），所以 53 处调用落在 46 个不重名事件上。
+共 47 个事件名、54 处 `tmTrack` 调用，分布在 8 个页面：index 2 / landing 1 / quiz 9 / report 10 / action 11 / stories 2 / companion 6 / me 13。其中 `exp_done` 与 `exp_undo` 共用一处三元调用；5 个名字各有多个调用点（`backup_failed` 5 处：本机读回/写入/生成码三处失败分支 + 行动页两处；`gate_start` 2 处：按钮进入 + 跨关自动进入；`gate_done` 2 处：逐关完成 + 第四关收尾；`friend_import` 2 处：解码成功与失败；`backup_import` 2 处：两个页面各一处），所以 54 处调用落在 47 个不重名事件上。
 
 | 页 | 事件 | 触发点 | props |
 |---|---|---|---|
@@ -143,6 +143,7 @@ Umami 后台 → 你的 Website → **Settings → Query Parameters**，加入 `
 | me | `export_code` | 复制备份码（手机上不带文件走） | n |
 | me | `backup_restore` | 用导入前快照还原 | n |
 | me | `tracking_on` / `tracking_off` | 拨漏斗计数开关 | — |
+| me | `funnel_copy` | 复制本机走查摘要（用户自愿带走，仍不发请求） | n |
 
 **关键读法（起好 Umami 后能直接算出来的东西）：**
 - 第 0 关流失：`recall_start` → `recall_done`；四关流失：`gate_start#n` → `gate_done#n`（本机计数键自带 `#gate2` 这类后缀）。
@@ -152,9 +153,26 @@ Umami 后台 → 你的 Website → **Settings → Query Parameters**，加入 `
 - 行动闭环有没有接上：`report_view` → `diary_save` → `exp_done`；`companion_no_data` 高说明入口把人带到了读不到结果的地方。
 
 **隐私边界（改动后要守住的口径）：**
-- 只要 `WEBSITE_ID` 为空，埋点这层就是**零外部请求**（`backup.js` 同样只读写 localStorage，不发请求）——`companion.html` / `faq.html` / `index.html` / `me.html` 里「不经过任何服务器」的说法继续成立，`talentmap_funnel` 也在 localStorage 里，`me.html` 可看、可关、可清、可导出。（例外与本改动无关，且取证口径已换成更硬的一条：不看「主机集合变没变」，看「每条外联是哪个文档发起的」。
-  10 个页面各跑 2 遍、每遍等 8 秒，**由本站文档发起的对外请求为 0 条**；companion.html 上那 140 条全部由第三方表单文档
-  `k68wjncs.jsjform.com/f/do4TtQ` 自己发起，含它自家的 4 个资源域名和 1 条 Google gtag（`/gtag/js?id=G-FYKFYPNXQS`）——
-  是金数据在统计它自己的页面，本站代码里没有任何对外请求。之前按「改前/改后主机集合对拍」的口径会误报：那条 gtag 是慢加载，
-  3.5 秒有时抓不到、8 秒也有时抓不到，同一份文件跑两遍结果不同。归因口径不受这个抖动影响。）> 浏览器 `doNotTrack` / `globalPrivacyControl`。被拦下时 Umami 脚本根本不注入。
+- 取证口径不看「主机集合变没变」，看「每条外联是哪个文档发起的」。10 个页面各跑 2 遍、每遍等 8 秒，**由本站文档发起的对外请求为 0 条**；companion.html 上那 140 条全部由第三方表单文档 `k68wjncs.jsjform.com/f/do4TtQ` 自己发起，含它自家的 4 个资源域名和 1 条 Google gtag（`/gtag/js?id=G-FYKFYPNXQS`）——是金数据在统计它自己的页面。之前按「改前/改后主机集合对拍」会误报：那条 gtag 是慢加载，3.5 秒有时抓不到、8 秒也有时抓不到，同一份文件跑两遍结果不同；归因口径不受这个抖动影响。
+- 只要 `WEBSITE_ID` 为空，埋点这层就是**零外部请求**（`backup.js` 同样只读写 localStorage，不发请求）——`companion.html` / `faq.html` / `index.html` / `me.html` 里「不经过任何服务器」的说法继续成立；`talentmap_funnel` 也在 localStorage 里，me.html 可读、可复制摘要、可关、可清、可导出。
+- 记不记由这台设备说了算：`me.html` 的本机开关优先，没手动设置时跟随浏览器 `doNotTrack` / `globalPrivacyControl`。被拦下时本机计数停、Umami 脚本根本不注入。
+
+## 九、不接 Umami 时，这条漏斗怎么闭环（2026-10-26 落地）
+
+Umami 要一台 7×24 的 HTTPS 主机，那台机器不在本项目手里，所以**先不接**，把「主机无关」的那半做完：
+
+- **本机自读**：`me.html` 的「这台设备走到了哪一步」把 `talentmap_funnel.counts` 按 13 个里程碑渲染成步骤条，
+  每步给「开始 n / 完成 m」和最近日期，末尾一行直接算出「最远走到」与「看上去停在」。数字口径与第八节的关键读法一致，
+  只是算在用户自己的浏览器里。原始明细仍在 `report.html?debug=1`。
+- **用户自愿携带**：同一页「复制走查摘要」把同一份计数变成一段纯文本（步骤名 + 次数 + 日期区间 + 开关状态 + `from` 标记），
+  由访问者自己贴进伙伴页的反馈框或站外问卷。**这一步是用户发起的，本站代码不发任何请求**，零外联取证口径不变。
+- **摘要有没有内容泄露**：`talentmap_funnel` 的键只由「事件名 + 维度白名单（gate/ok）」构成，props 里从来不写用户文字
+  （第八节命名约定），所以摘要在结构上就不可能带上日记、回想、投稿的内容。`verify_round13.py` 用哨兵字符串把这条钉住：往日记里塞一句只有测试知道的话，再断言它不出现在摘要和面板文本里。
+
+**这条路的读数边界（必须写清，否则会被当成转化率用）：**
+- 样本是**自选择**的——只有愿意复制并贴回来的人才会出现，通常是走得比较顺或特别在意的人；
+  沉默的流失者不会贡献任何摘要。
+- 因此它能看**形状**（关卡内部哪里开始多完成少、`report_view` 之后有没有人回行动页），**不能看比例**：
+  「10 份摘要里有 3 份停在第四关」不等于「30% 的人卡在第四关」。
+- 要拿真正的转化率，仍然要么接一台 Umami（第三、四节），要么在问卷里加一道「你走到第几关」的自报题——后者更便宜，且不新增外联。
 
