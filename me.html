@@ -103,6 +103,7 @@
   .ditem{display:flex;align-items:center;gap:14px;padding:13px 14px;border:1px solid var(--line);border-radius:14px;
     background:rgba(255,255,255,.025);margin-bottom:10px}
   .ditem:last-child{margin-bottom:0}
+  .ditem[hidden]{display:none}
   .ditem .di-main{flex:1;min-width:0}
   .ditem .di-key{font-size:13px;color:var(--gold-soft);font-weight:700;letter-spacing:.3px}
   .ditem .di-desc{font-size:13px;color:var(--ink-soft);margin-top:3px;line-height:1.5}
@@ -114,6 +115,10 @@
   .mini-btn.del:hover{border-color:#ff8a8a;color:#ffb4b4;background:rgba(255,138,138,.1)}
 
   .empty-grp{text-align:center;font-size:14px;color:var(--ink-faint);padding:18px;font-style:italic}
+  .tm-paste{width:100%;min-height:82px;margin:2px 0 12px;padding:11px 13px;border:1px solid var(--line-2);
+    border-radius:12px;background:rgba(255,255,255,.03);color:var(--ink);resize:vertical;word-break:break-all;
+    font:12px/1.6 ui-monospace,SFMono-Regular,Consolas,monospace}
+  .tm-paste:focus{outline:2px solid var(--gold);outline-offset:2px}
 
   .me-note{font-size:13px;color:var(--ink-faint);line-height:1.7;text-align:center;max-width:600px;margin:26px auto 0}
   .me-note b{color:var(--gold-soft)}
@@ -169,7 +174,8 @@
 }
 
 </style>
-  <script src="track.js"></script></head>
+  <script src="track.js"></script>
+  <script src="backup.js"></script></head>
 <body>
   <a class="skip-link" href="#main">跳到主内容</a>
   <div class="sky-bg" aria-hidden="true">
@@ -214,11 +220,33 @@
 
       <div class="me-tools reveal">
         <button class="btn btn-primary" id="exportAll">导出全部数据</button>
+        <button class="btn btn-ghost" id="importBtn">导入备份</button>
+        <input type="file" id="importFile" accept="application/json,.json" style="display:none" />
+        <button class="btn btn-ghost" id="copyCodeBtn">复制备份码</button>
         <button class="btn btn-ghost" id="refreshBtn">刷新</button>
         <button class="btn btn-danger" id="clearAll">清空全部</button>
       </div>
 
       <div id="groups"></div>
+
+      <div class="grp reveal" style="margin-top:22px">
+        <h3>导入与撤销</h3>
+        <div class="gsub">导出的文件在这里读回来。手机上存不了文件，就点「复制备份码」把整份备份变成一段文本，换设备时粘回下面的框。</div>
+        <textarea class="tm-paste" id="pasteBox" placeholder="粘贴备份码，或整段 JSON" aria-label="备份码输入框"></textarea>
+        <div class="di-acts" style="margin-bottom:14px">
+          <button class="mini-btn" id="pasteBtn" type="button">从粘贴码恢复</button>
+        </div>
+        <div class="ditem" id="preLine" hidden>
+          <div class="di-main">
+            <div class="di-key">导入前快照</div>
+            <div class="di-desc" id="preDesc">—</div>
+          </div>
+          <div class="di-acts">
+            <button class="mini-btn" id="undoBtn" type="button">还原到导入前</button>
+            <button class="mini-btn del" id="dropBtn" type="button">丢弃快照</button>
+          </div>
+        </div>
+      </div>
 
       <div class="grp reveal" style="margin-top:22px">
         <h3>漏斗计数开关</h3>
@@ -235,7 +263,7 @@
         </div>
       </div>
 
-      <p class="me-note reveal">所有数据都保存在你浏览器的 <b>localStorage</b> 里，不经过任何服务器。换设备 / 清缓存会丢失，重要内容请先用上方「导出全部数据」存一份备份。</p>
+      <p class="me-note reveal">所有数据都保存在你浏览器的 <b>localStorage</b> 里，不经过任何服务器。换设备 / 清缓存会丢失，重要内容请先用上方「导出全部数据」存一份备份，回到本页用「导入备份」或粘贴备份码就能原样恢复。</p>
     </section>
   </div>
 
@@ -275,18 +303,8 @@ function esc(s){return String(s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>
 function sizeHuman(n){if(n<1024)return n+' B';if(n<1024*1024)return (n/1024).toFixed(1)+' KB';return (n/1024/1024).toFixed(2)+' MB';}
 function safeGet(k){try{const v=localStorage.getItem(k);return v==null?null:v;}catch(e){return null;}}
 
-function collectAll(){
-  const out={type:'talentmap_all',ts:Date.now(),data:{}};
-  for(let i=0;i<localStorage.length;i++){
-    const k=localStorage.key(i);
-    if(k&&k.indexOf('talentmap_')===0){ try{out.data[k]=JSON.parse(localStorage.getItem(k));}catch(e){out.data[k]=localStorage.getItem(k);} }
-  }
-  // 单独收 UTM 计数
-  const utm={};
-  for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.indexOf('talentmap_utm_')===0)utm[k]=localStorage.getItem(k);}
-  if(Object.keys(utm).length) out.data['__utm__']=utm;
-  return out;
-}
+function collectAll(){ return TMBackup.collectAll(); }
+// UTM 计数本来就是 talentmap_utm_* 的独立键，collectAll 一并收走，不再并成 __utm__ 包装
 
 function render(){
   const root=document.getElementById('groups');
@@ -350,7 +368,7 @@ function render(){
   root.querySelectorAll('[data-export]').forEach(b=>b.onclick=()=>{
     const k=b.dataset.export; const raw=safeGet(k); if(raw==null)return;
     let obj; try{obj=JSON.parse(raw);}catch(e){obj=raw;}
-    download({type:'talentmap_item',key:k,data:obj,ts:Date.now()}, '天赋星图-'+k+'.json');
+    download(TMBackup.envelope('talentmap_item',{key:k,data:obj}), '天赋星图-'+k+'.json');
     if(window.tmTrack) tmTrack('item_export');
     toast('已导出 '+k);
   });
@@ -376,12 +394,80 @@ document.getElementById('clearAll').onclick=()=>{
   const n=Object.keys(all.data).length;
   if(!n){toast('当前没有任何数据');return;}
   if(confirm('确定清空全部本地数据吗？\n\n共 '+n+' 项，包括测评结果、日记、反馈、统计。此操作不可撤销。\n建议先点「导出全部数据」存一份备份。')){
-    Object.keys(all.data).forEach(k=>{ if(k!=='__utm__'){try{localStorage.removeItem(k);}catch(e){}} });
-    if(all.data.__utm__){ Object.keys(all.data.__utm__).forEach(k=>{try{localStorage.removeItem('talentmap_utm_'+k);}catch(e){}}); }
+    Object.keys(all.data).forEach(k=>{ try{localStorage.removeItem(k);}catch(e){} });
     if(window.tmTrack) tmTrack('clear_all');
     toast('已清空全部本地数据'); render();
   }
 };
+
+/* ---- 导入备份：信封与快照都在 backup.js，这层只做确认和播报 ---- */
+function doImport(text, source){
+  let items, p, r;
+  try{
+    items = TMBackup.normalize(TMBackup.parseText(text));
+    p = TMBackup.plan(items);
+  }catch(e){
+    if(window.tmTrack) tmTrack('backup_failed',{src:source});
+    toast(e.message||'这份备份读不了'); return;
+  }
+  if(!confirm('将写入 '+p.total+' 项本地数据：\n\n新增 '+p.fresh+' 项，覆盖 '+p.overwrite+' 项已有数据。\n\n导入前会把被触碰的内容存成快照，本页可一键还原。')){
+    toast('已取消，未改动任何数据'); return;
+  }
+  try{ r = TMBackup.apply(items); }
+  catch(e){
+    if(window.tmTrack) tmTrack('backup_failed',{src:source});
+    toast(e.message||'写入失败，数据未改动'); return;
+  }
+  if(window.tmTrack) tmTrack('backup_import',{added:r.written});
+  toast(r.failed?('写入了 '+r.written+' 项，有 '+r.failed+' 项没写进去（存储可能已满）')
+                 :('已恢复 '+r.written+' 项数据 · 快照已存，可一键还原'));
+  render(); paintSnapshot();
+}
+document.getElementById('importBtn').onclick=()=>document.getElementById('importFile').click();
+document.getElementById('importFile').onchange=(e)=>{
+  const f=e.target.files[0]; if(!f) return;
+  const rd=new FileReader();
+  rd.onload=()=>doImport(rd.result,'file');
+  rd.onerror=()=>toast('文件读不出来');
+  rd.readAsText(f);
+  e.target.value='';
+};
+document.getElementById('pasteBtn').onclick=()=>{
+  const t=document.getElementById('pasteBox').value;
+  if(!t.trim()){ toast('还没有粘贴备份码'); return; }
+  doImport(t,'paste');
+};
+document.getElementById('copyCodeBtn').onclick=async ()=>{
+  const all=collectAll(), n=Object.keys(all.data).length;
+  if(!n){ toast('当前没有任何数据可导出'); return; }
+  let code;
+  try{ code=TMBackup.toCode(all); }
+  catch(e){ if(window.tmTrack) tmTrack('backup_failed',{src:'code'}); toast(e.message); return; }
+  document.getElementById('pasteBox').value=code;   // 复制失败也把码留在框里，用户还能手动全选
+  try{ await navigator.clipboard.writeText(code); }
+  catch(err){ toast('浏览器不让直接复制，备份码已填进下方输入框，长按全选复制'); return; }
+  if(window.tmTrack) tmTrack('export_code',{n:n});
+  toast('已复制备份码（'+code.length+' 字符），也放进了下方输入框');
+};
+function paintSnapshot(){
+  const s=TMBackup.snapshotInfo(), line=document.getElementById('preLine');
+  if(!s){ line.hidden=true; return; }
+  line.hidden=false;
+  document.getElementById('preDesc').textContent='记录于 '+(s.ts?new Date(s.ts).toLocaleString():'未知时间')+
+    ' · 覆盖 '+s.keys+' 项被上次导入触碰的数据';
+}
+document.getElementById('undoBtn').onclick=()=>{
+  let r;
+  try{ r=TMBackup.restore(); }catch(e){ toast(e.message); return; }
+  if(!r){ toast('没有可用的快照'); paintSnapshot(); return; }
+  if(window.tmTrack) tmTrack('backup_restore',{n:r.restored});
+  toast('已还原 '+r.restored+' 项到上次导入之前的状态');
+  render(); paintSnapshot();
+};
+document.getElementById('dropBtn').onclick=()=>{
+  TMBackup.dropSnapshot(); paintSnapshot(); toast('已丢弃快照，导入前的数据不再可还原');
+};
+paintSnapshot();
 
 render();
 

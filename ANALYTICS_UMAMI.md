@@ -22,7 +22,8 @@
 |---|---|
 | `track.js` | 埋点层。读 `UMAMI_CFG`：**始终写本机漏斗计数**（`talentmap_funnel`，只有事件名/次数/日期）；配了 `WEBSITE_ID` 才注入官方脚本并上报同名事件。DNT 或 me.html 开关可整体关掉两条通道。 |
 | 12 页 `<head>` | 引入 `<script src="track.js"></script>`（非 defer，保证 `tmTrack` 早于页面内联脚本定义）。`thanks.html` 无交互，未引入。 |
-| 全站 | 漏斗事件已按「测→报告→行动→传播」补全，见文末「八、漏斗事件全表」。 |
+| 全站 | 漏斗事件已按「测→报告→行动→传播→可携」补全，见文末「八、漏斗事件全表」。 |
+| `backup.js`（新增） | 备份与恢复的信封契约：`talentmap_all` / `talentmap_item` / `talentmap_diary` 三种形状都读得回来，写入前存 `talentmap_preimport` 快照供一键还原；读不懂就吵，不做静默降级。被 `me.html` 与 `action.html` 引入。 |
 
 页面浏览量由 Umami `data-auto-track` 自动记录（落地页/测评页/报告页/其他页都算）。
 漏斗事件自动带上 `from` 维度（从 URL `?from=` 读取），即使后台没开 Query Parameters 也能按来源分组。
@@ -108,7 +109,7 @@ Umami 后台 → 你的 Website → **Settings → Query Parameters**，加入 `
 
 命名约定：`对象_动作`，全小写下划线；props 只放维度，不放内容（绝不上传用户写的文字、星图标签值）。
 
-共 43 个事件名、45 处 `tmTrack` 调用，分布在 8 个页面：index 2 / landing 1 / quiz 9 / report 10 / action 9 / stories 2 / companion 6 / me 6。其中 `exp_done` 与 `exp_undo` 共用一处三元调用；`gate_start`、`gate_done`、`friend_import` 各有两处调用点（`gate_start`：按钮进入 + 跨关自动进入；`gate_done`：逐关完成 + 第四关收尾；`friend_import`：解码成功与失败两条分支），所以 45 处调用落在 43 个不重名事件上。
+共 46 个事件名、53 处 `tmTrack` 调用，分布在 8 个页面：index 2 / landing 1 / quiz 9 / report 10 / action 11 / stories 2 / companion 6 / me 12。其中 `exp_done` 与 `exp_undo` 共用一处三元调用；5 个名字各有多个调用点（`backup_failed` 5 处：本机读回/写入/生成码三处失败分支 + 行动页两处；`gate_start` 2 处：按钮进入 + 跨关自动进入；`gate_done` 2 处：逐关完成 + 第四关收尾；`friend_import` 2 处：解码成功与失败；`backup_import` 2 处：两个页面各一处），所以 53 处调用落在 46 个不重名事件上。
 
 | 页 | 事件 | 触发点 | props |
 |---|---|---|---|
@@ -131,6 +132,7 @@ Umami 后台 → 你的 Website → **Settings → Query Parameters**，加入 `
 | action | `exp_done` / `exp_undo` | 勾上 / 取消 7 天微实验 | done（当前完成数） |
 | action | `week_copy` / `week_download` / `diary_copy` | 周摘要复制 / 存文本 / 复制日记 | — |
 | action | `backup_download` / `backup_import` | 下载 JSON 备份 / 导入 | n / added |
+| action me | `backup_failed` | 备份读不了 / 版本不认识 / 写不进去（按 src 分文件、粘贴码、生成码） | src |
 | action | `remind_toggle` | 每日提醒开关 | on |
 | stories | `story_seed_save` / `story_export` | 保存故事种子 / 导出 txt | layer / n |
 | companion | `companion_ask` / `companion_preset` | 发一句话 / 点预设按钮 | — / q |
@@ -138,17 +140,21 @@ Umami 后台 → 你的 Website → **Settings → Query Parameters**，加入 `
 | companion | `feedback_saved` / `copy_feedback` | 反馈存本机 / 复制反馈文本 | — |
 | companion | `survey_open` | 点站外问卷链接（问卷在金数据里提交，本站看不到填没填） | — |
 | me | `export_all` / `item_export` / `item_delete` / `clear_all` | 数据自助操作 | n / — |
+| me | `export_code` | 复制备份码（手机上不带文件走） | n |
+| me | `backup_restore` | 用导入前快照还原 | n |
 | me | `tracking_on` / `tracking_off` | 拨漏斗计数开关 | — |
 
 **关键读法（起好 Umami 后能直接算出来的东西）：**
 - 第 0 关流失：`recall_start` → `recall_done`；四关流失：`gate_start#n` → `gate_done#n`（本机计数键自带 `#gate2` 这类后缀）。
 - 「测了但没看报告」：`quiz_complete` vs `report_view`；`report_view{has_result:0}` 就是白跑一趟的人。
 - 传播有没有发生：`copy_moment + copy_link + share_img_dl` 除以 `report_view`；`friend_import{ok:0}` 高说明星图码粘贴体验有问题。
+- 可携性有没有闭环：导过备份的人里有多少真的导入成功——`export_all` / `export_code` 对上 `backup_import`；`backup_failed` 按 `src` 分开看：`file` 多说明文件在设备间搬运坏了，`paste` 多说明备份码复制时被截断，`code` 多说明这台设备连 base64 都生成不了（该改用下载）。`backup_restore` 不为 0 说明有人导入完就反悔，快照那层买对了。
 - 行动闭环有没有接上：`report_view` → `diary_save` → `exp_done`；`companion_no_data` 高说明入口把人带到了读不到结果的地方。
 
 **隐私边界（改动后要守住的口径）：**
-- 只要 `WEBSITE_ID` 为空，埋点这层就是**零外部请求**——`companion.html` / `faq.html` / `index.html` / `me.html` 里「不经过任何服务器」的说法继续成立，`talentmap_funnel` 也在 localStorage 里，`me.html` 可看、可关、可清、可导出。（例外与本改动无关：`companion.html` 里那张金数据问卷 iframe 是第三方托管。实测该 iframe 文档自己发出 1 条 `https://www.googletagmanager.com/gtag/js?id=G-FYKFYPNXQS`，发起帧是 `k68wjncs.jsjform.com/f/do4TtQ`，改前（HEAD）与改后完全一致——是金数据在统计它自己的页面，不是本站埋点。除金数据的 4 个主机和这条 gtag 之外，10 个页面全量对拍下来外部主机数为 0。
-  这条 gtag 是慢加载才出现的：等待 3.5 秒时有时抓到、有时抓不到，等待 8 秒时改前/改后各 3 次都稳定抓到 1 条。所以任何「改前没有、改后有」的外联读数，先怀疑等待时长，别当成回归——本机第一版对拍就是这么误报过一次。
-- **一旦填入 `WEBSITE_ID`，上面那四处文案就变成假话**，必须同步改成「本机数据不出设备，但访问与事件计数会上报到你自托管的 Umami」。这是同一个开关带出来的连带义务，不是可选项。
-- 开关优先级：`talentmap_optout`（me.html 手动）> 浏览器 `doNotTrack` / `globalPrivacyControl`。被拦下时 Umami 脚本根本不注入。
+- 只要 `WEBSITE_ID` 为空，埋点这层就是**零外部请求**（`backup.js` 同样只读写 localStorage，不发请求）——`companion.html` / `faq.html` / `index.html` / `me.html` 里「不经过任何服务器」的说法继续成立，`talentmap_funnel` 也在 localStorage 里，`me.html` 可看、可关、可清、可导出。（例外与本改动无关，且取证口径已换成更硬的一条：不看「主机集合变没变」，看「每条外联是哪个文档发起的」。
+  10 个页面各跑 2 遍、每遍等 8 秒，**由本站文档发起的对外请求为 0 条**；companion.html 上那 140 条全部由第三方表单文档
+  `k68wjncs.jsjform.com/f/do4TtQ` 自己发起，含它自家的 4 个资源域名和 1 条 Google gtag（`/gtag/js?id=G-FYKFYPNXQS`）——
+  是金数据在统计它自己的页面，本站代码里没有任何对外请求。之前按「改前/改后主机集合对拍」的口径会误报：那条 gtag 是慢加载，
+  3.5 秒有时抓不到、8 秒也有时抓不到，同一份文件跑两遍结果不同。归因口径不受这个抖动影响。）> 浏览器 `doNotTrack` / `globalPrivacyControl`。被拦下时 Umami 脚本根本不注入。
 

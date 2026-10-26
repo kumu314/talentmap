@@ -260,7 +260,8 @@
 }
 
 </style>
-  <script src="track.js"></script></head>
+  <script src="track.js"></script>
+  <script src="backup.js"></script></head>
 <body>
   <a class="skip-link" href="#main">跳到主内容</a>
     <div class="sky-bg" id="skyBg" aria-hidden="true">
@@ -350,7 +351,7 @@
           <button class="btn btn-ghost" id="impBtn">导入备份</button>
           <input type="file" id="impFile" accept="application/json,.json" style="display:none" />
         </div>
-        <div class="ropt-tip" style="margin-top:10px">换手机 / 清缓存前点「下载备份」存个文件，新设备点「导入备份」就能续上你的星图。</div>
+        <div class="ropt-tip" style="margin-top:10px">换手机 / 清缓存前点「下载备份」存个文件，新设备点「导入备份」就能续上你的星图。手机上存不了文件，去「我的星图」页点「复制备份码」，回来粘进输入框即可。</div>
       </div>
 
       <div class="card reveal">
@@ -710,7 +711,7 @@ document.getElementById('expBtn').onclick=async()=>{
 /* ---- 下载备份（JSON 文件） ---- */
 document.getElementById('dlBtn').onclick=()=>{
   if(!entries.length){toast('还没有可备份的记录');return;}
-  const data=JSON.stringify({type:'talentmap_diary',entries:entries,exp:loadExp(),ts:Date.now()});
+  const data=JSON.stringify(TMBackup.envelope('talentmap_diary',{entries:entries,exp:loadExp()}));
   const blob=new Blob([data],{type:'application/json'});
   const url=URL.createObjectURL(blob);
   const a=document.createElement('a');
@@ -721,30 +722,36 @@ document.getElementById('dlBtn').onclick=()=>{
   toast('已下载备份文件，新设备导入即可续记');
 };
 
-/* ---- 导入备份 ---- */
+/* ---- 导入备份：与 me.html 共用 backup.js 的信封，整键覆盖写回 ---- */
 document.getElementById('impBtn').onclick=()=>document.getElementById('impFile').click();
 document.getElementById('impFile').onchange=(e)=>{
   const f=e.target.files[0]; if(!f) return;
   const reader=new FileReader();
   reader.onload=()=>{
+    let items,p,r;
     try{
-      const obj=JSON.parse(reader.result);
-      const imp=Array.isArray(obj)?obj:(obj.entries||[]);
-      if(!imp.length){toast('文件里没有记录');return;}
-      const map={};
-      entries.forEach(en=>{ if(en&&en.date) map[en.date]=en; });
-      let added=0;
-      imp.forEach(en=>{ if(en&&en.date){ if(!map[en.date]) added++; map[en.date]=en; } });
-      entries=Object.values(map);
-      entries.sort((a,b)=>a.date.localeCompare(b.date));
-      if(entries.length>21) entries=entries.slice(entries.length-21);
-      if(obj.exp&&Array.isArray(obj.exp)) localStorage.setItem(EXP_KEY,JSON.stringify(obj.exp));
-      save();renderAll();if(obj.exp) renderExp();
-      if(window.tmTrack) tmTrack('backup_import',{added:added});
-      toast(`已导入 ${imp.length} 条（新增 ${added}）· 续上你的星图`);
-    }catch(err){toast('文件格式不对，换一个试试');}
+      items=TMBackup.normalize(TMBackup.parseText(reader.result));
+      p=TMBackup.plan(items);
+    }catch(err){
+      if(window.tmTrack) tmTrack('backup_failed',{src:'file'});
+      toast(err.message||'这份备份读不了'); e.target.value=''; return;
+    }
+    if(!confirm('将写入 '+p.total+' 项本地数据：\n\n新增 '+p.fresh+' 项，覆盖 '+p.overwrite+' 项已有数据。\n\n导入前会存一份快照，到「我的星图」页可一键还原。')){
+      toast('已取消，未改动任何数据'); e.target.value=''; return;
+    }
+    try{ r=TMBackup.apply(items); }
+    catch(err){
+      if(window.tmTrack) tmTrack('backup_failed',{src:'file'});
+      toast(err.message||'写入失败，数据未改动'); e.target.value=''; return;
+    }
+    entries=(()=>{try{return JSON.parse(localStorage.getItem(KEY))||[];}catch(e){return [];}})();
+    renderAll();
+    if(p.keys.indexOf(EXP_KEY)>=0) renderExp();
+    if(window.tmTrack) tmTrack('backup_import',{added:r.written});
+    toast('已恢复 '+r.written+' 项数据 · 续上你的星图');
     e.target.value='';
   };
+  reader.onerror=()=>toast('文件读不出来');
   reader.readAsText(f);
 };
 function loadExp(){try{return JSON.parse(localStorage.getItem(EXP_KEY))||[];}catch(e){return [];}}
